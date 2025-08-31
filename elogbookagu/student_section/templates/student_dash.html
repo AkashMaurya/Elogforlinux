@@ -1,0 +1,202 @@
+{% extends 'base.html' %}
+
+{% block title %}
+  Student Dashboard
+{% endblock %}
+
+{% block navbar %}
+  {% include './components/student_auth_navbar.html' %}
+{% endblock %}
+
+{% block content %}
+  <div class="text-center p-10 mt-2">
+    <!-- Dashboard Header -->
+    <div class="text-center my-6 animate-fade-in">
+      <h2 class="text-4xl font-bold dark:text-white bg-gradient-to-r from-blue-500 to-teal-500 dark:from-blue-400 dark:to-teal-400 text-transparent bg-clip-text">Welcome to Your Dashboard, {{ request.session.first_name }}</h2>
+      <p class="text-gray-600 dark:text-gray-300 mt-2">Manage your records, posts, and more with ease.</p>
+    </div>
+
+    <!-- Dashboard Stats -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+      <!-- Total Records -->
+      <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg flex items-center space-x-4 transform transition-all duration-300 hover:scale-105 animate-pulse-card">
+        <img src="{{ profile_photo|default:'https://cdn-icons-png.flaticon.com/512/3135/3135715.png' }}" class="rounded-full w-14 h-14 border-2 border-gray-200 dark:border-gray-600" alt="Profile Photo" />
+        <div>
+          <h3 class="text-xl font-semibold dark:text-white">Total Records</h3>
+          <p class="text-3xl font-bold text-blue-600 dark:text-blue-400">{{ total_records }}</p>
+        </div>
+      </div>
+
+      <!-- Yet to Be Reviewed -->
+      <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg flex items-center space-x-4 transform transition-all duration-300 hover:scale-105 animate-pulse-card">
+        <img src="https://cdn-icons-png.flaticon.com/512/1008/1008928.png" alt="Pending Icon" class="w-14 h-14" />
+        <div>
+          <h3 class="text-xl font-semibold dark:text-white">Yet to Be Reviewed</h3>
+          <p class="text-3xl font-bold text-yellow-600 dark:text-yellow-400">{{ yet_to_be_reviewed }}</p>
+        </div>
+      </div>
+
+      <!-- Reviewed -->
+      <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg flex items-center space-x-4 transform transition-all duration-300 hover:scale-105 animate-pulse-card">
+        <img src="https://cdn-icons-png.flaticon.com/512/190/190411.png" alt="Reviewed Icon" class="w-14 h-14" />
+        <div>
+          <h3 class="text-xl font-semibold dark:text-white">Reviewed</h3>
+          <p class="text-3xl font-bold text-teal-600 dark:text-teal-400">{{ reviewed }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Student Info and Quick Links -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
+      <!-- Student Info -->
+      <div class="bg-white dark:bg-gray-800 p-8 rounded-xl shadow-lg flex flex-col items-center justify-center min-h-[250px] transform transition-all duration-300 hover:shadow-xl">
+        <h3 class="text-2xl font-semibold dark:text-white mb-4">Your Information</h3>
+        <p class="text-gray-800 dark:text-gray-200 text-lg">
+          <strong>Name:</strong> {{ request.session.first_name }} {{ request.session.last_name }}
+        </p>
+        <p class="text-gray-800 dark:text-gray-200 text-lg">
+          <strong>Group:</strong> {{ your_group|default:'No Group' }}
+        </p>
+      </div>
+
+      <!-- Quick Links -->
+      <div class="bg-white dark:bg-gray-800 p-8 rounded-xl shadow-lg transform transition-all duration-300 hover:shadow-xl">
+        <h3 class="text-2xl font-semibold dark:text-white mb-4">Quick Actions</h3>
+        <div class="space-y-3">
+          <a href="{% url 'student_section:student_elog' %}" class="block py-3 px-6 bg-gradient-to-r from-blue-500 to-blue-700 dark:from-blue-600 dark:to-blue-800 text-white rounded-lg hover:from-blue-600 hover:to-blue-800 dark:hover:from-blue-700 dark:hover:to-blue-900 transition duration-300 transform hover:-translate-y-1"><i class="fas fa-book-reader mr-2"></i> Add Elog</a>
+          <a href="{% url 'student_section:student_support' %}" class="block py-3 px-6 bg-gradient-to-r from-yellow-500 to-yellow-700 dark:from-yellow-600 dark:to-yellow-800 text-white rounded-lg hover:from-yellow-600 hover:to-yellow-800 dark:hover:from-yellow-700 dark:hover:to-yellow-900 transition duration-300 transform hover:-translate-y-1"><i class="fab fa-hire-a-helper mr-2"></i> Help</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Chart.js Visualization -->
+    <div class="bg-white dark:bg-gray-800 p-8 rounded-xl shadow-lg animate-fade-in">
+      <h3 class="text-2xl font-semibold dark:text-white mb-6">Record Status Overview</h3>
+      <canvas id="recordChart" height="120"></canvas>
+    </div>
+  </div>
+
+  <!-- Chart.js Script -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // Get real data from database (no dummy defaults)
+      const totalRecords = parseInt('{{ total_records|default:0 }}') || 0
+      const yetToBeReviewed = parseInt('{{ yet_to_be_reviewed|default:0 }}') || 0
+      const reviewed = parseInt('{{ reviewed|default:0 }}') || 0
+      console.log('Chart Data (Real):', [totalRecords, yetToBeReviewed, reviewed]) // Debug log
+
+      const ctx = document.getElementById('recordChart').getContext('2d')
+      const isDarkMode = () => {
+        const dark = document.documentElement.classList.contains('dark')
+        console.log('Is Dark Mode:', dark)
+        return dark
+      }
+      const textColor = () => {
+        const color = isDarkMode() ? '#ffffff' : '#000000'
+        console.log('Text Color:', color)
+        return color
+      }
+
+      // Initialize the chart with JavaScript variables
+      const recordChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: ['Total Records', 'Yet to Be Reviewed', 'Reviewed'],
+          datasets: [
+            {
+              label: 'Record Status',
+              data: [totalRecords, yetToBeReviewed, reviewed], // Use JavaScript variables
+              backgroundColor: [
+                'rgba(54, 162, 235, 0.7)', // Blue
+                'rgba(255, 206, 86, 0.7)', // Yellow
+                'rgba(75, 192, 192, 0.7)' // Teal
+              ],
+              borderColor: ['rgba(54, 162, 235, 1)', 'rgba(255, 206, 86, 1)', 'rgba(75, 192, 192, 1)'],
+              borderWidth: 1
+            }
+          ]
+        },
+        options: {
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: {
+                color: textColor(),
+                font: {
+                  weight: 'bold'
+                }
+              },
+              grid: {
+                color: isDarkMode() ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)'
+              }
+            },
+            x: {
+              ticks: {
+                color: textColor(),
+                font: {
+                  weight: 'bold'
+                }
+              },
+              grid: {
+                color: isDarkMode() ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)'
+              }
+            }
+          },
+          plugins: {
+            legend: {
+              labels: {
+                color: textColor(),
+                font: {
+                  weight: 'bold'
+                }
+              }
+            }
+          }
+        }
+      })
+
+      // Update chart colors when theme changes
+      window.addEventListener('themeChanged', () => {
+        const newColor = textColor()
+        const newGridColor = isDarkMode() ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)'
+
+        recordChart.options.scales.y.ticks.color = newColor
+        recordChart.options.scales.x.ticks.color = newColor
+        recordChart.options.plugins.legend.labels.color = newColor
+        recordChart.options.scales.y.grid.color = newGridColor
+        recordChart.options.scales.x.grid.color = newGridColor
+        recordChart.update()
+      })
+    })
+  </script>
+  <!-- Custom Animations -->
+  <style>
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    .animate-fade-in {
+      animation: fadeIn 1s ease-out forwards;
+    }
+
+    @keyframes pulseCard {
+      0%,
+      100% {
+        transform: scale(1);
+      }
+      50% {
+        transform: scale(1.02);
+      }
+    }
+    .animate-pulse-card {
+      animation: pulseCard 2s infinite ease-in-out;
+    }
+  </style>
+{% endblock %}

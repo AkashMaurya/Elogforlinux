@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Student Records PDF</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #333;
+            padding-bottom: 10px;
+        }
+        .logo {
+            max-width: 120px;
+            max-height: 120px;
+            margin: 0 auto 10px auto;
+            display: block;
+        }
+        .university-name {
+            font-size: 18px;
+            font-weight: bold;
+            color: #1f2937;
+            margin: 10px 0;
+        }
+        .report-title {
+            font-size: 16px;
+            color: #2563eb;
+            margin: 15px 0;
+        }
+        .student-info {
+            margin-bottom: 20px;
+            padding: 10px;
+            background-color: #f5f5f5;
+            border-radius: 5px;
+        }
+        .student-info p {
+            margin: 5px 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        .footer {
+            margin-top: 30px;
+            text-align: center;
+            font-size: 12px;
+            color: #777;
+            border-top: 1px solid #ddd;
+            padding-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <!-- AGU Logo -->
+        <img src="{{ MEDIA_URL }}agulogo.png" alt="AGU Logo" class="logo">
+
+        <!-- University Name -->
+        <div class="university-name">Arabian Gulf University</div>
+
+        <!-- Report Title -->
+        <h1 class="report-title">
+            {% if status_type == 'pending' %}
+                Pending Review Log Records
+            {% elif status_type == 'reviewed' %}
+                Reviewed Log Records
+            {% else %}
+                All Student Log Records
+            {% endif %}
+        </h1>
+        <p>Generated on: {{ generated_date }}</p>
+    </div>
+
+    <div class="student-info">
+        <h2>Student Information</h2>
+        <p><strong>Name:</strong> {{ student_info.student_name }}</p>
+        <p><strong>ID:</strong> {{ student_info.student_id }}</p>
+        <p><strong>Year:</strong> {{ student_info.year_name }}</p>
+        <p><strong>Section:</strong> {{ student_info.section_name }}</p>
+        <p><strong>Group:</strong> {{ student_info.group_name }}</p>
+    </div>
+
+    <h2>
+        {% if status_type == 'pending' %}
+            Log Records (Pending Review)
+        {% elif status_type == 'reviewed' %}
+            Log Records (Reviewed)
+        {% else %}
+            All Log Records
+        {% endif %}
+    </h2>
+
+    {% if logs %}
+    <table>
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Department</th>
+                <th>Activity Type</th>
+                <th>Core Diagnosis</th>
+                <th>Tutor</th>
+                <th>Patient ID</th>
+                <th>Participation</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for log in logs %}
+            <tr>
+                <td>{{ log.date }}</td>
+                <td>{{ log.department.name }}</td>
+                <td>{{ log.activity_type.name }}</td>
+                <td>{{ log.core_diagnosis.name }}</td>
+                <td>{{ log.tutor.user.get_full_name }}</td>
+                <td>{{ log.patient_id }}</td>
+                <td>{{ log.participation_type }}</td>
+                <td>
+                    {% if log.is_reviewed %}
+                        {% if log.reviewer_comments and 'reject' in log.reviewer_comments|lower %}
+                            Rejected
+                        {% else %}
+                            Approved
+                        {% endif %}
+                    {% else %}
+                        Pending
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>No pending log records found.</p>
+    {% endif %}
+
+    <div class="footer">
+        <p>This is an automatically generated document from the ElogBook system.</p>
+        <p>Arabian Gulf University - Student Records</p>
+    </div>
+</body>
+</html>

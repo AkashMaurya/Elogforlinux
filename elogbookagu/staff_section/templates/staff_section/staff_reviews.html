@@ -1,0 +1,342 @@
+{% extends 'base.html' %}
+
+{% block title %}
+  Staff Reviews
+{% endblock %}
+
+{% block navbar %}
+  {% include 'components/staff_auth_navbar.html' %}
+{% endblock %}
+
+{% block content %}
+  <div class="container mx-auto px-4 py-8">
+    <div class="flex justify-between items-center mb-6">
+      <h2 class="text-2xl font-bold text-gray-800 dark:text-white">
+        {% if selected_status == 'pending' %}
+          Pending Review Logs
+        {% elif selected_status == 'reviewed' %}
+          Reviewed Logs
+        {% else %}
+          All Student Logs
+        {% endif %}
+      </h2>
+      <!-- Export Buttons -->
+      <div class="flex space-x-2">
+        <button id="export-csv" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 flex items-center transition-all duration-200 transform hover:scale-105">
+          <i class="fas fa-file-csv mr-2"></i>
+          Export CSV
+        </button>
+        <button id="export-excel" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center transition-all duration-200 transform hover:scale-105">
+          <i class="fas fa-file-excel mr-2"></i>
+          Export Excel
+        </button>
+        <button id="export-pdf" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 flex items-center transition-all duration-200 transform hover:scale-105">
+          <i class="fas fa-file-pdf mr-2"></i>
+          Export PDF
+        </button>
+      </div>
+    </div>
+
+    <!-- Filters Section -->
+    <div class="bg-white dark:bg-gray-800 shadow overflow-hidden sm:rounded-lg mb-6">
+      <div class="px-4 py-5 sm:p-6">
+        <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
+          <!-- Department Filter -->
+          <div>
+            <label for="department-filter" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Department</label>
+            <select id="department-filter" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+              <option value="">All Departments</option>
+              {% for department in departments %}
+                <option value="{{ department.id }}" {% if selected_department == department.id|stringformat:"s" %}selected{% endif %}>
+                  {{ department.name }}
+                </option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <!-- Status Filter -->
+          <div>
+            <label for="status-filter" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Status</label>
+            <select id="status-filter" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+              <option value="pending" {% if selected_status == 'pending' %}selected{% endif %}>Pending Review</option>
+              <option value="reviewed" {% if selected_status == 'reviewed' %}selected{% endif %}>Reviewed</option>
+              <option value="all" {% if selected_status == 'all' %}selected{% endif %}>All</option>
+            </select>
+          </div>
+
+          <!-- Search Box -->
+          <div>
+            <label for="search-box" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Search</label>
+            <div class="flex">
+              <input type="text" id="search-box" placeholder="Search by name or ID" value="{{ search_query }}" class="flex-grow px-4 py-2 rounded-l-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+              <button id="apply-filters" class="px-4 py-2 bg-blue-600 text-white rounded-r-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                Apply
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Batch Review Form -->
+    <form id="batch-review-form" method="post" action="{% url 'staff_section:batch_review' %}" class="mb-6">
+      {% csrf_token %}
+      {{ batch_form.log_ids }}
+      <div class="bg-white dark:bg-gray-800 shadow overflow-hidden sm:rounded-lg p-4">
+        <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Batch Review</h3>
+
+        <div class="mb-4">
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Action</label>
+          <div class="space-y-2">
+            {% for value, text in batch_form.action.field.choices %}
+            <div class="flex items-center">
+              <input type="radio" name="{{ batch_form.action.name }}" value="{{ value }}" id="id_action_{{ forloop.counter0 }}"
+                     class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                     {% if forloop.first %}checked{% endif %}>
+              <label for="id_action_{{ forloop.counter0 }}" class="ml-2 block text-sm text-gray-700 dark:text-gray-300">
+                {{ text }}
+              </label>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+
+        <div class="mb-4">
+          <label for="id_comments" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Comments (Optional)</label>
+          {{ batch_form.comments }}
+        </div>
+
+        <div class="flex justify-between items-center">
+          <div>
+            <label class="inline-flex items-center">
+              <input type="checkbox" id="select-all-checkbox" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+              <span class="ml-2 text-sm text-gray-700 dark:text-gray-300">Select All</span>
+            </label>
+          </div>
+
+          <button type="submit" id="batch-submit" disabled class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 opacity-50 cursor-not-allowed">
+            Process Selected
+          </button>
+        </div>
+      </div>
+    </form>
+
+    <!-- Records Table -->
+    <div class="bg-white dark:bg-gray-800 shadow overflow-hidden sm:rounded-lg">
+      {% if logs %}
+        <!-- Table Container for Scroll -->
+        <div class="overflow-x-auto">
+          <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+            <thead class="bg-gray-50 dark:bg-gray-700">
+              <tr>
+                <th scope="col" class="px-3 py-3 text-center">
+                  <span class="sr-only">Select</span>
+                </th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Student</th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Date</th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Department</th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Activity</th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Status</th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Action</th>
+              </tr>
+            </thead>
+            <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+              {% for log in logs %}
+                <tr>
+                  <td class="px-3 py-4 whitespace-nowrap text-center">
+                    {% if not log.is_reviewed %}
+                      <input type="checkbox" name="log_checkbox" value="{{ log.id }}" class="log-checkbox h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                    {% endif %}
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="text-sm font-medium text-gray-900 dark:text-white">{{ log.student.user.get_full_name }}</div>
+                    <div class="text-sm text-gray-500 dark:text-gray-400">{{ log.student.student_id }}</div>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">{{ log.date }}</td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">{{ log.department.name }}</td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">{{ log.activity_type.name }}</td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    {% if log.is_reviewed %}
+                      {% if log.reviewer_comments and log.reviewer_comments|slice:":9" == "REJECTED:" %}
+                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800 dark:bg-red-800 dark:text-red-100">
+                          Rejected
+                        </span>
+                      {% else %}
+                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100">
+                          Approved
+                        </span>
+                      {% endif %}
+                    {% else %}
+                      <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800 dark:bg-yellow-800 dark:text-yellow-100">
+                        Pending
+                      </span>
+                    {% endif %}
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                    <a href="{% url 'staff_section:review_log' log.id %}" class="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300">
+                      {% if log.is_reviewed %}View{% else %}Review{% endif %}
+                    </a>
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Pagination -->
+        {% if logs.has_other_pages %}
+          <div class="px-4 py-3 flex items-center justify-between border-t border-gray-200 dark:border-gray-700 sm:px-6">
+            <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+              <div>
+                <p class="text-sm text-gray-700 dark:text-gray-300">
+                  Showing <span class="font-medium">{{ logs.start_index }}</span> to <span class="font-medium">{{ logs.end_index }}</span> of <span class="font-medium">{{ logs.paginator.count }}</span> results
+                </p>
+              </div>
+              <div>
+                <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+                  {% if logs.has_previous %}
+                    <a href="?page={{ logs.previous_page_number }}{% if selected_department %}&department={{ selected_department }}{% endif %}{% if selected_status %}&status={{ selected_status }}{% endif %}{% if search_query %}&q={{ search_query }}{% endif %}" class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white dark:bg-gray-700 dark:border-gray-600 text-sm font-medium text-gray-500 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600">
+                      <span class="sr-only">Previous</span>
+                      <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                        <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
+                      </svg>
+                    </a>
+                  {% endif %}
+
+                  {% for i in logs.paginator.page_range %}
+                    {% if logs.number == i %}
+                      <span class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-blue-50 dark:bg-blue-900 text-sm font-medium text-blue-600 dark:text-blue-200">
+                        {{ i }}
+                      </span>
+                    {% elif i > logs.number|add:'-3' and i < logs.number|add:'3' %}
+                      <a href="?page={{ i }}{% if selected_department %}&department={{ selected_department }}{% endif %}{% if selected_status %}&status={{ selected_status }}{% endif %}{% if search_query %}&q={{ search_query }}{% endif %}" class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white dark:bg-gray-700 dark:border-gray-600 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600">
+                        {{ i }}
+                      </a>
+                    {% endif %}
+                  {% endfor %}
+
+                  {% if logs.has_next %}
+                    <a href="?page={{ logs.next_page_number }}{% if selected_department %}&department={{ selected_department }}{% endif %}{% if selected_status %}&status={{ selected_status }}{% endif %}{% if search_query %}&q={{ search_query }}{% endif %}" class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white dark:bg-gray-700 dark:border-gray-600 text-sm font-medium text-gray-500 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600">
+                      <span class="sr-only">Next</span>
+                      <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                        <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+                      </svg>
+                    </a>
+                  {% endif %}
+                </nav>
+              </div>
+            </div>
+          </div>
+        {% endif %}
+      {% else %}
+        <div class="px-4 py-5 sm:p-6 text-center">
+          <p class="text-gray-500 dark:text-gray-400">No logs found matching your criteria.</p>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- JavaScript for filters and batch selection -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Filter application
+      document.getElementById('apply-filters').addEventListener('click', function() {
+        const departmentValue = document.getElementById('department-filter').value;
+        const statusValue = document.getElementById('status-filter').value;
+        const searchValue = document.getElementById('search-box').value.trim();
+
+        let url = '{% url "staff_section:staff_reviews" %}';
+        const params = [];
+
+        if (departmentValue) params.push(`department=${departmentValue}`);
+        if (statusValue) params.push(`status=${statusValue}`);
+        if (searchValue) params.push(`q=${encodeURIComponent(searchValue)}`);
+
+        if (params.length > 0) {
+          url += '?' + params.join('&');
+        }
+
+        window.location.href = url;
+      });
+
+      // Search box enter key handler
+      document.getElementById('search-box').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+          document.getElementById('apply-filters').click();
+        }
+      });
+
+      // Batch review functionality
+      const batchForm = document.getElementById('batch-review-form');
+      const logIdsInput = document.querySelector('input[name="log_ids"]');
+      const batchSubmitBtn = document.getElementById('batch-submit');
+      const logCheckboxes = document.querySelectorAll('.log-checkbox');
+      const selectAllCheckbox = document.getElementById('select-all-checkbox');
+
+      // Update the hidden input with selected log IDs
+      function updateSelectedLogIds() {
+        const selectedIds = Array.from(logCheckboxes)
+          .filter(checkbox => checkbox.checked)
+          .map(checkbox => checkbox.value);
+
+        logIdsInput.value = selectedIds.join(',');
+
+        // Enable/disable submit button based on selection
+        if (selectedIds.length > 0) {
+          batchSubmitBtn.disabled = false;
+          batchSubmitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+        } else {
+          batchSubmitBtn.disabled = true;
+          batchSubmitBtn.classList.add('opacity-50', 'cursor-not-allowed');
+        }
+      }
+
+      // Select all checkbox handler
+      selectAllCheckbox.addEventListener('change', function() {
+        logCheckboxes.forEach(checkbox => {
+          checkbox.checked = selectAllCheckbox.checked;
+        });
+        updateSelectedLogIds();
+      });
+
+      // Individual checkbox handlers
+      logCheckboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+          // Update "select all" checkbox state
+          selectAllCheckbox.checked = Array.from(logCheckboxes).every(cb => cb.checked);
+          updateSelectedLogIds();
+        });
+      });
+
+      // Initialize
+      updateSelectedLogIds();
+
+      // Export functionality
+      const exportCsvBtn = document.getElementById('export-csv');
+      const exportExcelBtn = document.getElementById('export-excel');
+      const exportPdfBtn = document.getElementById('export-pdf');
+
+      if (exportCsvBtn) {
+        exportCsvBtn.addEventListener('click', function() {
+          const params = new URLSearchParams(window.location.search);
+          params.set('format', 'csv');
+          window.open(`{% url "staff_section:export_staff_reviews" %}?${params.toString()}`, '_blank');
+        });
+      }
+      if (exportExcelBtn) {
+        exportExcelBtn.addEventListener('click', function() {
+          const params = new URLSearchParams(window.location.search);
+          params.set('format', 'excel');
+          window.open(`{% url "staff_section:export_staff_reviews" %}?${params.toString()}`, '_blank');
+        });
+      }
+      if (exportPdfBtn) {
+        exportPdfBtn.addEventListener('click', function() {
+          const params = new URLSearchParams(window.location.search);
+          params.set('format', 'pdf');
+          window.open(`{% url "staff_section:export_staff_reviews" %}?${params.toString()}`, '_blank');
+        });
+      }
+    });
+  </script>
+{% endblock %}

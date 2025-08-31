@@ -1,0 +1,294 @@
+{% extends 'base.html' %}
+{% block title %}
+  Admin Profile
+{% endblock %}
+
+{% block navbar %}
+  {% include 'components/admin_auth_navbar.html' %}
+{% endblock %}
+
+{% block content %}
+  <div class="container mx-auto px-4 py-8">
+    <!-- Profile Header with Background -->
+    <div class="relative mb-8">
+      <div class="absolute inset-0 bg-gradient-to-r from-purple-600 to-indigo-700 h-48 rounded-t-xl"></div>
+      <div class="relative pt-6 px-8">
+        <div class="flex flex-col md:flex-row items-center">
+          <!-- Profile Picture with Enhanced Styling -->
+          <div class="relative z-10 mb-4 md:mb-0">
+            <div class="relative group">
+              <div class="w-32 h-32 md:w-40 md:h-40 rounded-full border-4 border-white dark:border-gray-800 overflow-hidden shadow-xl">
+                <img src="{{ profile_photo }}" alt="Profile Photo" onerror="this.src='/media/profiles/default.jpg';"
+                  class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110" />
+              </div>
+
+              <!-- Upload Button with Improved Styling -->
+              <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300">
+                <label for="profile-photo-upload" class="cursor-pointer bg-purple-600 hover:bg-purple-700 text-white px-3 py-2 rounded-full shadow-lg transform transition-transform duration-300 hover:scale-105">
+                  <i class="fas fa-camera mr-1"></i> Change Photo
+                </label>
+              </div>
+
+              <!-- Hidden File Input -->
+              <form id="profile-photo-form" action="{% url 'admin_section:update_profile_photo' %}" method="post" enctype="multipart/form-data" class="hidden">
+                {% csrf_token %}
+                <input type="file" id="profile-photo-upload" name="profile_photo" accept="image/*" class="hidden" />
+              </form>
+            </div>
+          </div>
+
+          <!-- Profile Title and Name -->
+          <div class="md:ml-6 text-center md:text-left">
+            <h1 class="text-3xl font-bold text-white">{{ full_name }}</h1>
+            <p class="text-purple-100 text-lg">Administrator</p>
+            <div class="mt-2">
+              <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
+                <span class="w-2 h-2 bg-green-500 rounded-full mr-1"></span> Active
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Content with Cards -->
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-xl p-6 md:p-8 transition-all duration-300 hover:shadow-2xl -mt-10">
+      <!-- Profile Content -->
+      <div class="grid md:grid-cols-2 gap-8">
+        <!-- Left Column -->
+        <div class="space-y-6">
+          <!-- Personal Information Card -->
+          <div class="bg-gray-50 dark:bg-gray-700 rounded-xl shadow-md overflow-hidden transition-all duration-300 hover:shadow-lg">
+            <div class="bg-purple-600 dark:bg-purple-800 px-6 py-4">
+              <h2 class="text-xl font-semibold text-white flex items-center">
+                <i class="fas fa-user-shield mr-2"></i> Personal Information
+              </h2>
+            </div>
+            <div class="p-6">
+              <div class="space-y-4">
+                <div class="flex items-center p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors duration-200">
+                  <div class="flex-shrink-0 w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center mr-3">
+                    <i class="fas fa-envelope text-blue-500 dark:text-blue-300"></i>
+                  </div>
+                  <div class="flex-grow">
+                    <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Email</p>
+                    <p class="font-medium text-gray-800 dark:text-white break-all">{{ user_email }}</p>
+                  </div>
+                </div>
+
+                <div class="flex items-center p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors duration-200">
+                  <div class="flex-shrink-0 w-10 h-10 rounded-full bg-green-100 dark:bg-green-900 flex items-center justify-center mr-3">
+                    <i class="fas fa-user-tag text-green-500 dark:text-green-300"></i>
+                  </div>
+                  <div class="flex-grow">
+                    <p class="text-sm font-medium text-gray-500 dark:text-gray-400">User Role</p>
+                    <p class="font-medium text-gray-800 dark:text-white">{{ user_role }}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Professional Details -->
+          <div class="bg-gray-50 dark:bg-gray-700 rounded-xl shadow-md overflow-hidden transition-all duration-300 hover:shadow-lg">
+            <div class="bg-indigo-600 dark:bg-indigo-800 px-6 py-4">
+              <h2 class="text-xl font-semibold text-white flex items-center">
+                <i class="fas fa-briefcase mr-2"></i> Professional Details
+              </h2>
+            </div>
+            <div class="p-6">
+              <div class="space-y-4">
+                <div class="flex items-center p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors duration-200">
+                  <div class="flex-shrink-0 w-10 h-10 rounded-full bg-yellow-100 dark:bg-yellow-900 flex items-center justify-center mr-3">
+                    <i class="fas fa-building text-yellow-500 dark:text-yellow-300"></i>
+                  </div>
+                  <div class="flex-grow">
+                    <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Department</p>
+                    <p class="font-medium text-gray-800 dark:text-white">Administration</p>
+                  </div>
+                </div>
+
+                <div class="flex items-center p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors duration-200">
+                  <div class="flex-shrink-0 w-10 h-10 rounded-full bg-teal-100 dark:bg-teal-900 flex items-center justify-center mr-3">
+                    <i class="fas fa-tasks text-teal-500 dark:text-teal-300"></i>
+                  </div>
+                  <div class="flex-grow">
+                    <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Responsibilities</p>
+                    <div class="font-medium text-gray-800 dark:text-white">
+                      <span class="inline-block bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200 px-2 py-1 rounded-full text-xs mr-2 mb-2">User Management</span>
+                      <span class="inline-block bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200 px-2 py-1 rounded-full text-xs mr-2 mb-2">System Configuration</span>
+                      <span class="inline-block bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200 px-2 py-1 rounded-full text-xs mr-2 mb-2">Content Management</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Column -->
+        <div class="space-y-6">
+          <!-- Contact Information Card -->
+          <div class="bg-gray-50 dark:bg-gray-700 rounded-xl shadow-md overflow-hidden transition-all duration-300 hover:shadow-lg">
+            <div class="bg-green-600 dark:bg-green-800 px-6 py-4 flex justify-between items-center">
+              <h2 class="text-xl font-semibold text-white flex items-center">
+                <i class="fas fa-address-card mr-2"></i> Contact Information
+              </h2>
+              <button id="openModal" class="px-3 py-1 bg-white text-green-600 rounded-lg hover:bg-gray-100 transition-colors duration-200 flex items-center text-sm font-medium">
+                <i class="fas fa-edit mr-1"></i> Edit
+              </button>
+            </div>
+            <div class="p-6">
+              <div class="space-y-4">
+                <div class="flex items-center p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors duration-200">
+                  <div class="flex-shrink-0 w-10 h-10 rounded-full bg-purple-100 dark:bg-purple-900 flex items-center justify-center mr-3">
+                    <i class="fas fa-phone-alt text-purple-500 dark:text-purple-300"></i>
+                  </div>
+                  <div class="flex-grow">
+                    <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Phone</p>
+                    <p id="phone-text" class="font-medium text-gray-800 dark:text-white">{{ user_phone|default:'Not provided' }}</p>
+                  </div>
+                </div>
+
+                <div class="flex items-center p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors duration-200">
+                  <div class="flex-shrink-0 w-10 h-10 rounded-full bg-indigo-100 dark:bg-indigo-900 flex items-center justify-center mr-3">
+                    <i class="fas fa-city text-indigo-500 dark:text-indigo-300"></i>
+                  </div>
+                  <div class="flex-grow">
+                    <p class="text-sm font-medium text-gray-500 dark:text-gray-400">City</p>
+                    <p id="city-text" class="font-medium text-gray-800 dark:text-white">{{ user_city|default:'Not provided' }}</p>
+                  </div>
+                </div>
+
+                <div class="flex items-center p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors duration-200">
+                  <div class="flex-shrink-0 w-10 h-10 rounded-full bg-red-100 dark:bg-red-900 flex items-center justify-center mr-3">
+                    <i class="fas fa-globe text-red-500 dark:text-red-300"></i>
+                  </div>
+                  <div class="flex-grow">
+                    <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Country</p>
+                    <p id="country-text" class="font-medium text-gray-800 dark:text-white">{{ user_country|default:'Not provided' }}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Activity Stats Card -->
+          <div class="bg-gray-50 dark:bg-gray-700 rounded-xl shadow-md overflow-hidden transition-all duration-300 hover:shadow-lg">
+            <div class="bg-amber-600 dark:bg-amber-800 px-6 py-4">
+              <h2 class="text-xl font-semibold text-white flex items-center">
+                <i class="fas fa-chart-line mr-2"></i> System Stats
+              </h2>
+            </div>
+            <div class="p-6">
+              <div class="grid grid-cols-2 gap-4">
+                <div class="bg-white dark:bg-gray-800 rounded-lg p-4 text-center shadow-sm">
+                  <div class="text-3xl font-bold text-blue-600 dark:text-blue-400">
+                    <i class="fas fa-users"></i>
+                  </div>
+                  <p class="text-gray-500 dark:text-gray-400 text-sm mt-1">Total Users</p>
+                  <p class="text-2xl font-bold text-gray-800 dark:text-white mt-1">{{ total_users|default:"0" }}</p>
+                </div>
+                <div class="bg-white dark:bg-gray-800 rounded-lg p-4 text-center shadow-sm">
+                  <div class="text-3xl font-bold text-green-600 dark:text-green-400">
+                    <i class="fas fa-user-md"></i>
+                  </div>
+                  <p class="text-gray-500 dark:text-gray-400 text-sm mt-1">Doctors</p>
+                  <p class="text-2xl font-bold text-gray-800 dark:text-white mt-1">{{ total_doctors|default:"0" }}</p>
+                </div>
+                <div class="bg-white dark:bg-gray-800 rounded-lg p-4 text-center shadow-sm">
+                  <div class="text-3xl font-bold text-amber-600 dark:text-amber-400">
+                    <i class="fas fa-user-graduate"></i>
+                  </div>
+                  <p class="text-gray-500 dark:text-gray-400 text-sm mt-1">Students</p>
+                  <p class="text-2xl font-bold text-gray-800 dark:text-white mt-1">{{ total_students|default:"0" }}</p>
+                </div>
+                <div class="bg-white dark:bg-gray-800 rounded-lg p-4 text-center shadow-sm">
+                  <div class="text-3xl font-bold text-purple-600 dark:text-purple-400">
+                    <i class="fas fa-clipboard-list"></i>
+                  </div>
+                  <p class="text-gray-500 dark:text-gray-400 text-sm mt-1">Total Logs</p>
+                  <p class="text-2xl font-bold text-gray-800 dark:text-white mt-1">{{ total_logs|default:"0" }}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Contact Information Modal -->
+  <div id="editModal" class="hidden fixed inset-0 bg-black bg-opacity-70 z-50 backdrop-blur-sm transition-all duration-300">
+    <div class="flex items-center justify-center min-h-screen px-4">
+      <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-2xl transform transition-all duration-300 scale-95 opacity-0" id="modalContent">
+        <!-- Modal Header with Green Gradient -->
+        <div class="bg-gradient-to-r from-green-500 to-green-700 rounded-t-xl p-6">
+          <div class="flex justify-between items-center">
+            <h2 class="text-2xl font-bold text-white flex items-center">
+              <i class="fas fa-address-card mr-3"></i> Edit Contact Information
+            </h2>
+            <button class="text-white hover:text-gray-200 transition-colors duration-200" id="closeModal">
+              <i class="fas fa-times text-xl"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Modal Body -->
+        <div class="p-8">
+          <!-- Edit Form -->
+          <form id="contactForm" action="{% url 'admin_section:update_contact_info' %}" method="post">
+            {% csrf_token %}
+            <div class="mb-6">
+              <label for="phone" class="block text-gray-700 dark:text-gray-300 text-sm font-medium mb-2">
+                <i class="fas fa-phone text-green-500 mr-2"></i> Phone Number
+              </label>
+              <input type="text" id="phone" name="phone" value="{{ user_phone }}"
+                class="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-200 dark:bg-gray-700 dark:text-white"
+                placeholder="Enter your phone number" />
+            </div>
+
+            <div class="mb-6">
+              <label for="city" class="block text-gray-700 dark:text-gray-300 text-sm font-medium mb-2">
+                <i class="fas fa-city text-green-500 mr-2"></i> City
+              </label>
+              <input type="text" id="city" name="city" value="{{ user_city }}"
+                class="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-200 dark:bg-gray-700 dark:text-white"
+                placeholder="Enter your city" />
+            </div>
+
+            <div class="mb-6">
+              <label for="country" class="block text-gray-700 dark:text-gray-300 text-sm font-medium mb-2">
+                <i class="fas fa-globe text-green-500 mr-2"></i> Country
+              </label>
+              <input type="text" id="country" name="country" value="{{ user_country }}"
+                class="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-200 dark:bg-gray-700 dark:text-white"
+                placeholder="Enter your country" />
+            </div>
+
+            <!-- Status Message Area -->
+            <div id="contactFormStatus" class="mb-6 hidden rounded-lg p-4"></div>
+
+            <!-- Submit Button -->
+            <div class="flex space-x-4">
+              <button type="button" id="cancelBtn"
+                class="w-1/2 py-3 px-4 bg-gray-200 hover:bg-gray-300 text-gray-800 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-white font-semibold rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-opacity-75 transition-all duration-200">
+                Cancel
+              </button>
+              <button type="submit" id="contactSubmitBtn"
+                class="w-1/2 py-3 px-4 bg-gradient-to-r from-green-500 to-green-700 text-white font-semibold rounded-lg shadow-md hover:from-green-600 hover:to-green-800 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-75 transition-all duration-200 flex justify-center items-center">
+                <span id="contactBtnText">Save Changes</span>
+                <span id="contactLoadingSpinner" class="hidden ml-2 inline-block h-5 w-5 animate-spin rounded-full border-3 border-solid border-white border-r-transparent"></span>
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}
+
+{% load static %}
+{% block extra_scripts %}
+  <script src="{% static 'js/admin_profile.js' %}" defer></script>
+{% endblock %}

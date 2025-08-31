@@ -1,0 +1,368 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Emergency Attendance{% endblock %}
+
+{% block extra_head %}
+<style>
+  .emergency-card {
+    background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+  }
+  
+  .student-card {
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+  }
+  
+  .student-card:hover {
+    border-color: #dc2626;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+  
+  .attendance-radio {
+    transform: scale(1.2);
+    margin: 0 8px;
+  }
+  
+  .present-selected {
+    background-color: #dcfce7;
+    border-color: #16a34a;
+  }
+  
+  .absent-selected {
+    background-color: #fef2f2;
+    border-color: #dc2626;
+  }
+  
+  .student-avatar {
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  .student-avatar:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  }
+  
+  .avatar-initials {
+    background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+  }
+  
+  .emergency-warning {
+    animation: pulse 2s infinite;
+  }
+</style>
+{% endblock %}
+
+{% block navbar %}
+  {% include 'components/staff_auth_navbar.html' %}
+{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    
+    <!-- Header Section -->
+    <div class="emergency-card rounded-lg p-6 mb-8 text-white">
+      <div class="flex items-center justify-between">
+        <div>
+          <h1 class="text-3xl font-bold flex items-center">
+            <i class="fas fa-exclamation-triangle emergency-warning mr-3"></i>
+            Emergency Attendance
+          </h1>
+          <p class="mt-2 text-red-100">
+            Take attendance for any date - past, present, or future
+          </p>
+        </div>
+        <div class="flex space-x-3">
+          <a href="{% url 'staff_section:emergency_attendance_history' %}" 
+             class="inline-flex items-center px-4 py-2 bg-white text-red-600 rounded-lg hover:bg-gray-100 transition-colors duration-200 font-medium">
+            <i class="fas fa-history mr-2"></i>
+            View History
+          </a>
+          <a href="{% url 'staff_section:staff_dash' %}" 
+             class="inline-flex items-center px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors duration-200 font-medium">
+            <i class="fas fa-arrow-left mr-2"></i>
+            Back to Dashboard
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Emergency Warning -->
+    <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-8">
+      <div class="flex">
+        <div class="flex-shrink-0">
+          <i class="fas fa-exclamation-triangle text-yellow-400"></i>
+        </div>
+        <div class="ml-3">
+          <h3 class="text-sm font-medium text-yellow-800">
+            Emergency Attendance Notice
+          </h3>
+          <div class="mt-2 text-sm text-yellow-700">
+            <p>This feature allows you to take attendance for any date in emergency situations. Unlike regular attendance, you can select past, present, or future dates.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Selection Form -->
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm mb-8">
+      <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+        <h3 class="text-lg font-semibold text-gray-900 dark:text-white flex items-center">
+          <i class="fas fa-cog mr-2 text-red-600"></i>
+          Emergency Attendance Settings
+        </h3>
+      </div>
+      <div class="p-6">
+        <form method="post" id="emergency-attendance-form">
+          {% csrf_token %}
+          
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+            <!-- Department Selection -->
+            <div>
+              <label for="{{ form.department.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Department <span class="text-red-500">*</span>
+              </label>
+              {{ form.department }}
+              {% if form.department.errors %}
+                <p class="mt-1 text-sm text-red-600">{{ form.department.errors.0 }}</p>
+              {% endif %}
+            </div>
+
+            <!-- Training Site Selection -->
+            <div>
+              <label for="{{ form.training_site.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Training Site (Optional)
+              </label>
+              {{ form.training_site }}
+              {% if form.training_site.errors %}
+                <p class="mt-1 text-sm text-red-600">{{ form.training_site.errors.0 }}</p>
+              {% endif %}
+            </div>
+
+            <!-- Date Selection (Any Date) -->
+            <div>
+              <label for="{{ form.attendance_date.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Attendance Date <span class="text-red-500">*</span>
+              </label>
+              {{ form.attendance_date }}
+              {% if form.attendance_date.errors %}
+                <p class="mt-1 text-sm text-red-600">{{ form.attendance_date.errors.0 }}</p>
+              {% endif %}
+              <p class="mt-1 text-sm text-gray-500">You can select any date for emergency attendance</p>
+            </div>
+          </div>
+
+          <!-- Load Students Button -->
+          {% if not students_data %}
+            <div class="text-center">
+              <button type="submit" name="load_students" 
+                      class="inline-flex items-center px-6 py-3 bg-red-600 hover:bg-red-700 text-white font-medium rounded-lg shadow-sm transition-colors duration-200">
+                <i class="fas fa-users mr-2"></i>
+                Load Students
+              </button>
+            </div>
+          {% endif %}
+
+          <!-- Students Emergency Attendance Section -->
+          {% if students_data %}
+            <div class="border-t border-gray-200 dark:border-gray-700 pt-6">
+              <div class="flex items-center justify-between mb-6">
+                <h4 class="text-lg font-semibold text-gray-900 dark:text-white">
+                  Emergency Attendance - {{ selected_department.department_name }}
+                  {% if selected_training_site %} | {{ selected_training_site.name }}{% endif %}
+                  <br><span class="text-sm text-gray-500">Date: {{ selected_date|date:"F d, Y" }}</span>
+                </h4>
+                <div class="flex space-x-2">
+                  <button type="button" id="mark-all-present" 
+                          class="px-3 py-2 bg-green-100 text-green-800 rounded-md hover:bg-green-200 transition-colors duration-200 text-sm font-medium">
+                    <i class="fas fa-check mr-1"></i>
+                    Mark All Present
+                  </button>
+                  <button type="button" id="mark-all-absent" 
+                          class="px-3 py-2 bg-red-100 text-red-800 rounded-md hover:bg-red-200 transition-colors duration-200 text-sm font-medium">
+                    <i class="fas fa-times mr-1"></i>
+                    Mark All Absent
+                  </button>
+                </div>
+              </div>
+
+              {% if students_data %}
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+                  {% for student_data in students_data %}
+                    <div class="student-card bg-white dark:bg-gray-700 rounded-lg p-4 border border-gray-200 dark:border-gray-600" 
+                         data-student-id="{{ student_data.student.id }}">
+                      
+                      <!-- Student Info -->
+                      <div class="flex items-center mb-3">
+                        <div class="student-avatar w-12 h-12 rounded-full overflow-hidden mr-3 flex-shrink-0 border-2 border-gray-200 dark:border-gray-600">
+                          {% if student_data.student.user.profile_photo %}
+                            <img src="{{ student_data.student.user.profile_photo.url }}" 
+                                 alt="{{ student_data.student.user.get_full_name|default:student_data.student.user.username }}"
+                                 class="w-full h-full object-cover">
+                          {% else %}
+                            <div class="avatar-initials w-full h-full flex items-center justify-center">
+                              <span class="text-white font-semibold text-sm">
+                                {{ student_data.student.user.get_full_name|default:student_data.student.user.username|first|upper }}
+                              </span>
+                            </div>
+                          {% endif %}
+                        </div>
+                        <div class="flex-1">
+                          <h5 class="font-medium text-gray-900 dark:text-white">
+                            {{ student_data.student.user.get_full_name|default:student_data.student.user.username }}
+                          </h5>
+                          <p class="text-sm text-gray-500 dark:text-gray-400">
+                            ID: {{ student_data.student.student_id }} | {{ student_data.group.group_name }}
+                          </p>
+                        </div>
+                      </div>
+
+                      <!-- Attendance Status -->
+                      <div class="mb-3">
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                          Emergency Attendance Status
+                        </label>
+                        <div class="flex items-center space-x-4">
+                          <label class="flex items-center cursor-pointer">
+                            <input type="radio" name="student_{{ student_data.student.id }}_status" value="present" 
+                                   class="attendance-radio text-green-600 focus:ring-green-500"
+                                   {% if student_data.existing_attendance.status == 'present' %}checked{% endif %}>
+                            <span class="ml-2 text-sm font-medium text-green-700 dark:text-green-400">Present</span>
+                          </label>
+                          <label class="flex items-center cursor-pointer">
+                            <input type="radio" name="student_{{ student_data.student.id }}_status" value="absent" 
+                                   class="attendance-radio text-red-600 focus:ring-red-500"
+                                   {% if student_data.existing_attendance.status == 'absent' %}checked{% endif %}>
+                            <span class="ml-2 text-sm font-medium text-red-700 dark:text-red-400">Absent</span>
+                          </label>
+                        </div>
+                      </div>
+
+                      <!-- Individual Notes -->
+                      <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                          Individual Notes (Optional)
+                        </label>
+                        <textarea name="student_{{ student_data.student.id }}_notes" 
+                                  rows="2" 
+                                  class="w-full px-3 py-2 text-sm rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-red-500 dark:bg-gray-600 dark:border-gray-500 dark:text-white"
+                                  placeholder="Individual emergency notes...">{% if student_data.existing_attendance %}{{ student_data.existing_attendance.notes }}{% endif %}</textarea>
+                      </div>
+
+                      <!-- Existing Attendance Indicator -->
+                      {% if student_data.existing_attendance %}
+                        <div class="mt-2 text-xs text-red-600 dark:text-red-400">
+                          <i class="fas fa-exclamation-triangle mr-1"></i>
+                          Previously marked as {{ student_data.existing_attendance.status }} (Emergency)
+                        </div>
+                      {% endif %}
+                    </div>
+                  {% endfor %}
+                </div>
+
+                <!-- Submit Button -->
+                <div class="text-center">
+                  <button type="submit" name="submit_attendance" 
+                          class="inline-flex items-center px-8 py-3 bg-red-600 hover:bg-red-700 text-white font-medium rounded-lg shadow-sm transition-colors duration-200">
+                    <i class="fas fa-exclamation-triangle mr-2"></i>
+                    Save Emergency Attendance
+                  </button>
+                </div>
+              {% else %}
+                <div class="text-center py-8">
+                  <i class="fas fa-users text-gray-400 text-4xl mb-3"></i>
+                  <p class="text-gray-500 dark:text-gray-400">No students found for the selected department.</p>
+                  <p class="text-sm text-gray-400 dark:text-gray-500 mt-1">Please check if you are mapped to this department.</p>
+                </div>
+              {% endif %}
+            </div>
+          {% endif %}
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Mark all present functionality
+    document.getElementById('mark-all-present')?.addEventListener('click', function() {
+        const presentRadios = document.querySelectorAll('input[type="radio"][value="present"]');
+        presentRadios.forEach(radio => {
+            radio.checked = true;
+            updateCardStyle(radio);
+        });
+    });
+
+    // Mark all absent functionality
+    document.getElementById('mark-all-absent')?.addEventListener('click', function() {
+        const absentRadios = document.querySelectorAll('input[type="radio"][value="absent"]');
+        absentRadios.forEach(radio => {
+            radio.checked = true;
+            updateCardStyle(radio);
+        });
+    });
+
+    // Update card styling based on selection
+    function updateCardStyle(radio) {
+        const studentCard = radio.closest('.student-card');
+        const studentId = studentCard.dataset.studentId;
+        
+        // Remove all status classes
+        studentCard.classList.remove('present-selected', 'absent-selected');
+        
+        // Add appropriate class based on selection
+        if (radio.value === 'present' && radio.checked) {
+            studentCard.classList.add('present-selected');
+        } else if (radio.value === 'absent' && radio.checked) {
+            studentCard.classList.add('absent-selected');
+        }
+    }
+
+    // Add event listeners to all radio buttons
+    document.querySelectorAll('input[type="radio"][name*="_status"]').forEach(radio => {
+        radio.addEventListener('change', function() {
+            updateCardStyle(this);
+        });
+        
+        // Initialize card styling
+        if (radio.checked) {
+            updateCardStyle(radio);
+        }
+    });
+
+    // Auto-submit form when any required field changes
+    const departmentSelect = document.getElementById('{{ form.department.id_for_label }}');
+    const dateSelect = document.getElementById('{{ form.attendance_date.id_for_label }}');
+    const trainingSiteSelect = document.getElementById('{{ form.training_site.id_for_label }}');
+
+    function checkAndSubmitForm() {
+        const department = departmentSelect?.value;
+        const date = dateSelect?.value;
+
+        // Auto-submit if both department and date are selected
+        if (department && date) {
+            document.getElementById('emergency-attendance-form').submit();
+        }
+    }
+
+    if (departmentSelect) {
+        departmentSelect.addEventListener('change', checkAndSubmitForm);
+    }
+
+    if (dateSelect) {
+        dateSelect.addEventListener('change', checkAndSubmitForm);
+    }
+
+    if (trainingSiteSelect) {
+        trainingSiteSelect.addEventListener('change', function() {
+            // Only auto-submit if department and date are already selected
+            checkAndSubmitForm();
+        });
+    }
+});
+</script>
+{% endblock %}

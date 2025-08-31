@@ -1,0 +1,761 @@
+{% extends 'base.html' %}
+
+{% block title %}
+  Student Records
+{% endblock %}
+
+{% block extra_head %}
+<style>
+  /* Optimize table rendering */
+  table {
+    contain: content;
+    will-change: transform;
+  }
+
+  /* Optimize modal animations */
+  .modal {
+    backface-visibility: hidden;
+    transform: translateZ(0);
+    will-change: opacity, transform;
+  }
+
+  /* Optimize loading */
+  .loading-spinner {
+    animation: spin 1s linear infinite;
+  }
+
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+</style>
+{% endblock %}
+
+{% block navbar %}
+  {% include './components/student_auth_navbar.html' %}
+{% endblock %}
+
+{% block content %}
+  <div class="p-4 sm:p-6 md:p-8 lg:p-10 max-w-7xl mx-auto">
+    <!-- Page Header with Title and PDF Button -->
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+      <div>
+        <h2 class="text-2xl sm:text-3xl font-bold text-gray-800 dark:text-white">
+          {% if selected_status == 'pending' %}
+            <span class="flex items-center">
+              <i class="fas fa-clock text-yellow-500 mr-2"></i> Pending Review Records
+            </span>
+          {% elif selected_status == 'reviewed' %}
+            <span class="flex items-center">
+              <i class="fas fa-check-circle text-green-500 mr-2"></i> Reviewed Records
+            </span>
+          {% else %}
+            <span class="flex items-center">
+              <i class="fas fa-list text-blue-500 mr-2"></i> All Records
+            </span>
+          {% endif %}
+        </h2>
+        <p class="text-gray-600 dark:text-gray-400 mt-1">Manage and track your clinical activity logs</p>
+      </div>
+
+      <!-- PDF & Excel Download Buttons -->
+      <div class="flex space-x-2">
+        <a href="{% url 'student_section:generate_records_pdf' %}?status={{ selected_status }}{% if selected_department %}&department={{ selected_department }}{% endif %}{% if selected_activity_type %}&activity_type={{ selected_activity_type }}{% endif %}{% if search_query %}&q={{ search_query }}{% endif %}"
+           class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 flex items-center transition-all duration-200 transform hover:scale-105">
+          <i class="fas fa-file-pdf mr-2"></i>
+          Download PDF
+        </a>
+        <button id="export-excel" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center transition-all duration-200 transform hover:scale-105">
+          <i class="fas fa-file-excel mr-2"></i>
+          Download Excel
+        </button>
+      </div>
+    </div>
+
+    <!-- Student Info Card -->
+    <div class="mb-6 bg-white dark:bg-gray-800 p-4 sm:p-6 rounded-xl shadow-md border border-gray-200 dark:border-gray-700 transition-all duration-300 hover:shadow-lg">
+      <h3 class="text-lg font-semibold text-gray-800 dark:text-white mb-4 flex items-center">
+        <i class="fas fa-user-graduate text-blue-500 mr-2"></i> Student Information
+      </h3>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div class="flex items-center">
+          <span class="text-gray-500 dark:text-gray-400 w-24">Name:</span>
+          <span class="font-medium text-gray-800 dark:text-white">{{ student_info.student_name }}</span>
+        </div>
+        <div class="flex items-center">
+          <span class="text-gray-500 dark:text-gray-400 w-24">ID:</span>
+          <span class="font-medium text-gray-800 dark:text-white">{{ student_info.student_id }}</span>
+        </div>
+        <div class="flex items-center">
+          <span class="text-gray-500 dark:text-gray-400 w-24">Year:</span>
+          <span class="font-medium text-gray-800 dark:text-white">{{ student_info.year_name }}</span>
+        </div>
+        <div class="flex items-center">
+          <span class="text-gray-500 dark:text-gray-400 w-24">Section:</span>
+          <span class="font-medium text-gray-800 dark:text-white">{{ student_info.section_name }}</span>
+        </div>
+        <div class="flex items-center">
+          <span class="text-gray-500 dark:text-gray-400 w-24">Group:</span>
+          <span class="font-medium text-gray-800 dark:text-white">{{ student_info.group_name }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filters Card -->
+    <div class="bg-white dark:bg-gray-800 shadow-md rounded-xl p-4 sm:p-6 mb-6 border border-gray-200 dark:border-gray-700 transition-all duration-300 hover:shadow-lg">
+      <h3 class="text-lg font-semibold text-gray-800 dark:text-white mb-4 flex items-center">
+        <i class="fas fa-filter text-blue-500 mr-2"></i> Filter Records
+      </h3>
+
+      <form id="filterForm" method="get" class="space-y-4">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <!-- Status Filter -->
+          <div class="relative">
+            <label for="status" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Status</label>
+            <div class="relative">
+              <select name="status" id="status" class="block w-full pl-10 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white transition-colors duration-200">
+                <option value="all" {% if selected_status == 'all' %} selected{% endif %}>All Records</option>
+                <option value="pending"{% if selected_status == 'pending' %} selected{% endif %}>Pending Review</option>
+                <option value="reviewed"{% if selected_status == 'reviewed' %} selected{% endif %}>Reviewed</option>
+              </select>
+              <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <i class="fas fa-tasks text-gray-400"></i>
+              </div>
+            </div>
+          </div>
+
+          <!-- Department Filter -->
+          <div class="relative">
+            <label for="department" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Department</label>
+            <div class="relative">
+              <select name="department" id="department" class="block w-full pl-10 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white transition-colors duration-200">
+                <option value="">All Departments</option>
+                {% for dept in departments %}
+                  <option value="{{ dept.id }}" {% if selected_department == dept.id|stringformat:"s" %}selected{% endif %}>{{ dept.name }}</option>
+                {% endfor %}
+              </select>
+              <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <i class="fas fa-hospital text-gray-400"></i>
+              </div>
+            </div>
+          </div>
+
+          <!-- Activity Type Filter -->
+          <div class="relative">
+            <label for="activity_type" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Activity Type</label>
+            <div class="relative">
+              <select name="activity_type" id="activity_type" class="block w-full pl-10 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white transition-colors duration-200">
+                <option value="">All Activity Types</option>
+                {% for activity in activity_types %}
+                  <option value="{{ activity.id }}" {% if selected_activity_type == activity.id|stringformat:'s' %}selected{% endif %}>{{ activity.name }}</option>
+                {% endfor %}
+              </select>
+              <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <i class="fas fa-clipboard-list text-gray-400"></i>
+              </div>
+            </div>
+          </div>
+
+          <!-- Search Box -->
+          <div class="relative">
+            <label for="search" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Search</label>
+            <div class="relative">
+              <input type="text" name="q" id="search" class="block w-full pl-10 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white transition-colors duration-200" placeholder="Patient ID, diagnosis..." value="{{ search_query }}">
+              <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <i class="fas fa-search text-gray-400"></i>
+              </div>
+              <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
+                <button type="button" id="clearSearch" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 focus:outline-none" title="Clear search">
+                  <i class="fas fa-times"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Filter Actions -->
+        <div class="flex justify-end space-x-2">
+          <button type="button" id="resetFilters" class="px-4 py-2 bg-gray-200 text-gray-800 dark:bg-gray-700 dark:text-white rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors duration-200">
+            <i class="fas fa-undo mr-1"></i> Reset
+          </button>
+          <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors duration-200">
+            <i class="fas fa-filter mr-1"></i> Apply Filters
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Records Table Card -->
+    <div class="bg-white dark:bg-gray-800 shadow-md rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden transition-all duration-300 hover:shadow-lg">
+      <!-- Table Header with Count -->
+      <div class="bg-gray-50 dark:bg-gray-700 px-6 py-4 border-b border-gray-200 dark:border-gray-600 flex justify-between items-center">
+        <h3 class="text-lg font-semibold text-gray-800 dark:text-white flex items-center">
+          <i class="fas fa-clipboard-list text-blue-500 mr-2"></i>
+          <span>Records</span>
+          {% if logs %}
+            <span class="ml-2 px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+              {{ logs.paginator.count }}
+            </span>
+          {% endif %}
+        </h3>
+
+        <!-- Applied Filters Badges -->
+        <div class="flex flex-wrap gap-2">
+          {% if selected_status != 'all' %}
+            <span class="px-2.5 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 flex items-center">
+              Status: {{ selected_status|title }}
+            </span>
+          {% endif %}
+
+          {% if selected_department %}
+            <span class="px-2.5 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200 flex items-center">
+              {% for dept in departments %}
+                {% if selected_department == dept.id|stringformat:"s" %}
+                  Dept: {{ dept.name }}
+                {% endif %}
+              {% endfor %}
+            </span>
+          {% endif %}
+
+          {% if selected_activity_type %}
+            <span class="px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 flex items-center">
+              {% for activity in activity_types %}
+                {% if selected_activity_type == activity.id|stringformat:'s' %}
+                  Activity: {{ activity.name }}
+                {% endif %}
+              {% endfor %}
+            </span>
+          {% endif %}
+
+          {% if search_query %}
+            <span class="px-2.5 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200 flex items-center">
+              Search: "{{ search_query }}"
+            </span>
+          {% endif %}
+        </div>
+      </div>
+
+      {% if logs %}
+        <!-- Table Container with Loading State -->
+        <div id="tableContainer" class="relative">
+          <!-- Loading Overlay -->
+          <div id="tableLoading" class="hidden absolute inset-0 bg-white bg-opacity-75 dark:bg-gray-800 dark:bg-opacity-75 z-10">
+            <div class="flex items-center justify-center h-full">
+              <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+            </div>
+          </div>
+
+          <!-- Table with Responsive Scroll -->
+          <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+              <thead class="bg-gray-50 dark:bg-gray-700">
+                <tr>
+                  <th scope="col" class="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Date</th>
+                  <th scope="col" class="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Department</th>
+                  <th scope="col" class="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Activity Type</th>
+                  <th scope="col" class="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Core Diagnosis</th>
+                  <th scope="col" class="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Tutor</th>
+                  <th scope="col" class="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Status</th>
+                  <th scope="col" class="px-4 sm:px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Actions</th>
+                </tr>
+              </thead>
+              <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                {% for log in logs %}
+                  <tr class="{% cycle 'bg-white' 'bg-gray-50' %} dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-150">
+                    <td class="px-4 sm:px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">{{ log.date }}</td>
+                    <td class="px-4 sm:px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{{ log.department.name }}</td>
+                    <td class="px-4 sm:px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{{ log.activity_type.name }}</td>
+                    <td class="px-4 sm:px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{{ log.core_diagnosis.name }}</td>
+                    <td class="px-4 sm:px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{{ log.tutor.user.get_full_name }}</td>
+                    <td class="px-4 sm:px-6 py-4 whitespace-nowrap">
+                      {% if log.is_reviewed %}
+                        {% if log.reviewer_comments and 'reject' in log.reviewer_comments|lower %}
+                          <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200">
+                            <i class="fas fa-times-circle mr-1"></i> Rejected
+                          </span>
+                        {% else %}
+                          <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+                            <i class="fas fa-check-circle mr-1"></i> Approved
+                          </span>
+                        {% endif %}
+                      {% else %}
+                        <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200">
+                          <i class="fas fa-clock mr-1"></i> Pending
+                        </span>
+                      {% endif %}
+                    </td>
+                    <td class="px-4 sm:px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                      <div class="flex items-center justify-end space-x-3">
+                        <button type="button" onclick="showLogDetails({{ log.id }})" class="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300 transition-colors duration-200" title="View Details">
+                          <i class="fas fa-eye"></i>
+                        </button>
+                        {% if not log.is_reviewed %}
+                          <a href="{% url 'student_section:edit_log' log.id %}" class="text-green-600 hover:text-green-900 dark:text-green-400 dark:hover:text-green-300 transition-colors duration-200" title="Edit Log">
+                            <i class="fas fa-edit"></i>
+                          </a>
+                          <button type="button" onclick="confirmDelete({{ log.id }})" class="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 transition-colors duration-200" title="Delete Log">
+                            <i class="fas fa-trash-alt"></i>
+                          </button>
+                        {% else %}
+                          <span class="text-gray-400 cursor-not-allowed" title="Cannot edit reviewed logs">
+                            <i class="fas fa-edit"></i>
+                          </span>
+                          <span class="text-gray-400 cursor-not-allowed" title="Cannot delete reviewed logs">
+                            <i class="fas fa-trash-alt"></i>
+                          </span>
+                        {% endif %}
+                      </div>
+                    </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Enhanced Pagination -->
+          {% if logs.has_other_pages %}
+            <div class="px-4 sm:px-6 py-4 bg-gray-50 dark:bg-gray-700 border-t border-gray-200 dark:border-gray-600 flex flex-col sm:flex-row justify-between items-center gap-4">
+              <div class="text-sm text-gray-700 dark:text-gray-300">
+                Showing <span class="font-medium">{{ logs.start_index }}</span> to <span class="font-medium">{{ logs.end_index }}</span> of <span class="font-medium">{{ logs.paginator.count }}</span> entries
+              </div>
+              <div class="flex flex-wrap justify-center gap-2">
+                {% if logs.has_previous %}
+                  <a href="?page=1&status={{ selected_status }}{% if selected_department %}&department={{ selected_department }}{% endif %}{% if selected_activity_type %}&activity_type={{ selected_activity_type }}{% endif %}{% if search_query %}&q={{ search_query }}{% endif %}"
+                     class="px-3 py-1 rounded-md bg-gray-200 text-gray-700 dark:bg-gray-600 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-500 transition-colors duration-200" title="First Page">
+                    <i class="fas fa-angle-double-left"></i>
+                  </a>
+                  <a href="?page={{ logs.previous_page_number }}&status={{ selected_status }}{% if selected_department %}&department={{ selected_department }}{% endif %}{% if selected_activity_type %}&activity_type={{ selected_activity_type }}{% endif %}{% if search_query %}&q={{ search_query }}{% endif %}"
+                     class="px-3 py-1 rounded-md bg-gray-200 text-gray-700 dark:bg-gray-600 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-500 transition-colors duration-200">
+                    <i class="fas fa-angle-left mr-1"></i> Previous
+                  </a>
+                {% endif %}
+
+                <div class="hidden sm:flex space-x-1">
+                  {% for num in logs.paginator.page_range %}
+                    {% if logs.number == num %}
+                      <span class="px-3 py-1 rounded-md bg-blue-600 text-white">
+                        {{ num }}
+                      </span>
+                    {% elif num > logs.number|add:'-3' and num < logs.number|add:'3' %}
+                      <a href="?page={{ num }}&status={{ selected_status }}{% if selected_department %}&department={{ selected_department }}{% endif %}{% if selected_activity_type %}&activity_type={{ selected_activity_type }}{% endif %}{% if search_query %}&q={{ search_query }}{% endif %}"
+                         class="px-3 py-1 rounded-md bg-gray-200 text-gray-700 dark:bg-gray-600 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-500 transition-colors duration-200">
+                        {{ num }}
+                      </a>
+                    {% endif %}
+                  {% endfor %}
+                </div>
+
+                <span class="sm:hidden px-3 py-1 rounded-md bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300">
+                  Page {{ logs.number }} of {{ logs.paginator.num_pages }}
+                </span>
+
+                {% if logs.has_next %}
+                  <a href="?page={{ logs.next_page_number }}&status={{ selected_status }}{% if selected_department %}&department={{ selected_department }}{% endif %}{% if selected_activity_type %}&activity_type={{ selected_activity_type }}{% endif %}{% if search_query %}&q={{ search_query }}{% endif %}"
+                     class="px-3 py-1 rounded-md bg-gray-200 text-gray-700 dark:bg-gray-600 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-500 transition-colors duration-200">
+                    Next <i class="fas fa-angle-right ml-1"></i>
+                  </a>
+                  <a href="?page={{ logs.paginator.num_pages }}&status={{ selected_status }}{% if selected_department %}&department={{ selected_department }}{% endif %}{% if selected_activity_type %}&activity_type={{ selected_activity_type }}{% endif %}{% if search_query %}&q={{ search_query }}{% endif %}"
+                     class="px-3 py-1 rounded-md bg-gray-200 text-gray-700 dark:bg-gray-600 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-500 transition-colors duration-200" title="Last Page">
+                    <i class="fas fa-angle-double-right"></i>
+                  </a>
+                {% endif %}
+              </div>
+            </div>
+          {% endif %}
+        </div>
+      {% else %}
+        <!-- Empty State -->
+        <div class="px-6 py-10 text-center">
+          <div class="py-8 px-6 bg-gray-50 dark:bg-gray-700 rounded-lg max-w-md mx-auto">
+            <i class="fas fa-clipboard-list text-gray-400 text-5xl mb-4"></i>
+            <h4 class="text-xl font-semibold text-gray-800 dark:text-white mb-2">No records found</h4>
+            <p class="text-gray-600 dark:text-gray-400 mb-6">No records match your current filter criteria.</p>
+            <button id="resetAllFilters" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors duration-200">
+              <i class="fas fa-sync-alt mr-2"></i> Reset Filters
+            </button>
+          </div>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Log Details Modal -->
+  <div id="logDetailsModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50">
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-xl max-w-3xl w-full max-h-[90vh] overflow-hidden">
+      <!-- Modal Header -->
+      <div class="bg-gray-50 dark:bg-gray-700 px-6 py-4 border-b border-gray-200 dark:border-gray-600 flex justify-between items-center">
+        <h3 class="text-lg font-semibold text-gray-800 dark:text-white flex items-center">
+          <i class="fas fa-clipboard-check text-blue-500 mr-2"></i>
+          <span>Log Details</span>
+        </h3>
+        <button type="button" onclick="closeLogDetailsModal()" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 focus:outline-none">
+          <i class="fas fa-times text-xl"></i>
+        </button>
+      </div>
+
+      <!-- Modal Content -->
+      <div class="p-6 overflow-y-auto max-h-[calc(90vh-8rem)]">
+        <div id="logDetailsContent" class="space-y-6">
+          <!-- Content will be loaded dynamically -->
+          <div class="flex justify-center items-center py-12">
+            <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="bg-gray-50 dark:bg-gray-700 px-6 py-4 border-t border-gray-200 dark:border-gray-600 flex justify-end">
+        <button type="button" onclick="closeLogDetailsModal()" class="px-4 py-2 bg-gray-200 text-gray-800 dark:bg-gray-600 dark:text-white rounded-lg hover:bg-gray-300 dark:hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors duration-200">
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Delete Confirmation Modal -->
+  <div id="deleteModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50">
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-xl max-w-md w-full overflow-hidden">
+      <!-- Modal Header -->
+      <div class="bg-gray-50 dark:bg-gray-700 px-6 py-4 border-b border-gray-200 dark:border-gray-600 flex justify-between items-center">
+        <h3 class="text-lg font-semibold text-gray-800 dark:text-white flex items-center">
+          <i class="fas fa-exclamation-triangle text-red-500 mr-2"></i>
+          <span>Confirm Deletion</span>
+        </h3>
+        <button type="button" id="closeDeleteModal" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 focus:outline-none">
+          <i class="fas fa-times text-xl"></i>
+        </button>
+      </div>
+
+      <!-- Modal Content -->
+      <div class="p-6">
+        <p class="text-gray-700 dark:text-gray-300 mb-6">Are you sure you want to delete this log entry? This action cannot be undone.</p>
+
+        <div class="flex justify-end space-x-3">
+          <button id="cancelDelete" class="px-4 py-2 bg-gray-200 text-gray-800 dark:bg-gray-700 dark:text-white rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors duration-200">
+            Cancel
+          </button>
+          <form id="deleteForm" method="post">
+            {% csrf_token %}
+            <button type="submit" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-colors duration-200">
+              <i class="fas fa-trash-alt mr-1"></i> Delete
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Initialize filter form functionality
+      initFilterForm();
+
+      // Initialize modals
+      initModals();
+
+      // Department change handler to update activity types
+      const departmentSelect = document.getElementById('department');
+      const activityTypeSelect = document.getElementById('activity_type');
+
+      departmentSelect.addEventListener('change', function() {
+        // Clear activity type selection when department changes
+        activityTypeSelect.value = '';
+      });
+    });
+
+    // Initialize filter form functionality
+    function initFilterForm() {
+      const filterForm = document.getElementById('filterForm');
+      const resetFiltersBtn = document.getElementById('resetFilters');
+      const resetAllFiltersBtn = document.getElementById('resetAllFilters');
+      const clearSearchBtn = document.getElementById('clearSearch');
+      const searchInput = document.getElementById('search');
+
+      // Clear search input
+      if (clearSearchBtn && searchInput) {
+        clearSearchBtn.addEventListener('click', function() {
+          searchInput.value = '';
+          searchInput.focus();
+        });
+      }
+
+      // Reset filters button
+      if (resetFiltersBtn) {
+        resetFiltersBtn.addEventListener('click', function() {
+          // Reset all select elements to their first option
+          filterForm.querySelectorAll('select').forEach(select => {
+            select.selectedIndex = 0;
+          });
+
+          // Clear search input
+          if (searchInput) {
+            searchInput.value = '';
+          }
+
+          // Submit the form
+          filterForm.submit();
+        });
+      }
+
+      // Reset all filters button (on empty state)
+      if (resetAllFiltersBtn) {
+        resetAllFiltersBtn.addEventListener('click', function() {
+          window.location.href = window.location.pathname;
+        });
+      }
+
+      // Show loading state when form is submitted
+      if (filterForm) {
+        filterForm.addEventListener('submit', function() {
+          showTableLoading();
+        });
+      }
+    }
+
+    // Initialize modal functionality
+    function initModals() {
+      // Delete confirmation modal
+      const deleteModal = document.getElementById('deleteModal');
+      const deleteForm = document.getElementById('deleteForm');
+      const cancelDelete = document.getElementById('cancelDelete');
+
+      // Log details modal
+      const logDetailsModal = document.getElementById('logDetailsModal');
+
+      // Close modals when clicking cancel buttons
+      if (cancelDelete) {
+        cancelDelete.addEventListener('click', function() {
+          deleteModal.classList.add('hidden');
+        });
+      }
+
+      // Close delete modal when clicking the X button
+      const closeDeleteModal = document.getElementById('closeDeleteModal');
+      if (closeDeleteModal) {
+        closeDeleteModal.addEventListener('click', function() {
+          deleteModal.classList.add('hidden');
+        });
+      }
+
+      // Close modals when clicking outside
+      document.querySelectorAll('.fixed.inset-0').forEach(modal => {
+        modal.addEventListener('click', function(event) {
+          if (event.target === modal) {
+            modal.classList.add('hidden');
+          }
+        });
+      });
+
+      // Close on escape key
+      document.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape') {
+          document.querySelectorAll('.fixed.inset-0').forEach(modal => {
+            modal.classList.add('hidden');
+          });
+        }
+      });
+    }
+
+    // Function to show delete confirmation modal
+    function confirmDelete(logId) {
+      const deleteModal = document.getElementById('deleteModal');
+      const deleteForm = document.getElementById('deleteForm');
+
+      // Set the form action to the delete URL with the log ID
+      deleteForm.action = `/student_section/delete-log/${logId}/`;
+
+      // Show the modal
+      deleteModal.classList.remove('hidden');
+
+      // Center the modal
+      centerModal(deleteModal);
+    }
+
+    // Function to show log details modal
+    function showLogDetails(logId) {
+      const logDetailsModal = document.getElementById('logDetailsModal');
+      const logDetailsContent = document.getElementById('logDetailsContent');
+
+      // Show loading state
+      logDetailsContent.innerHTML = `
+        <div class="flex justify-center items-center py-12">
+          <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+        </div>
+      `;
+
+      // Show the modal
+      logDetailsModal.classList.remove('hidden');
+
+      // Center the modal
+      centerModal(logDetailsModal);
+
+      // Fetch log details from the API
+      fetch(`/student_section/get-log-details/${logId}/`)
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Network response was not ok');
+          }
+          return response.json();
+        })
+        .then(data => {
+          console.log('Log details:', data); // Debug log
+
+          // Ensure data has the expected structure
+          if (!data || !data.basic_info) {
+            throw new Error('Invalid data format received from server');
+          }
+
+          // Render the log details with actual data
+          const statusClass = data.basic_info.status === 'Pending' ?
+            'border-yellow-400 text-yellow-800 dark:text-yellow-500' :
+            (data.basic_info.is_approved ?
+              'border-green-400 text-green-800 dark:text-green-500' :
+              'border-red-400 text-red-800 dark:text-red-500');
+
+          const statusIcon = data.basic_info.status === 'Pending' ?
+            'fas fa-clock' :
+            (data.basic_info.is_approved ? 'fas fa-check-circle' : 'fas fa-times-circle');
+
+          const statusText = data.basic_info.status === 'Pending' ?
+            'Pending' :
+            (data.basic_info.is_approved ? 'Approved' : 'Rejected');
+
+          // Helper function to safely get values
+          const safeGet = (obj, path, defaultValue = 'N/A') => {
+            try {
+              const parts = path.split('.');
+              let result = obj;
+              for (const part of parts) {
+                result = result[part];
+                if (result === undefined || result === null) return defaultValue;
+              }
+              return result;
+            } catch (e) {
+              return defaultValue;
+            }
+          };
+
+          logDetailsContent.innerHTML = `
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <h4 class="text-lg font-semibold text-gray-800 dark:text-white mb-4">Basic Information</h4>
+                <div class="space-y-3">
+                  <div>
+                    <span class="text-gray-500 dark:text-gray-400 block text-sm">Date</span>
+                    <span class="font-medium text-gray-800 dark:text-white">${safeGet(data, 'basic_info.date')}</span>
+                  </div>
+                  <div>
+                    <span class="text-gray-500 dark:text-gray-400 block text-sm">Department</span>
+                    <span class="font-medium text-gray-800 dark:text-white">${safeGet(data, 'basic_info.department')}</span>
+                  </div>
+                  <div>
+                    <span class="text-gray-500 dark:text-gray-400 block text-sm">Activity Type</span>
+                    <span class="font-medium text-gray-800 dark:text-white">${safeGet(data, 'basic_info.activity_type')}</span>
+                  </div>
+                  <div>
+                    <span class="text-gray-500 dark:text-gray-400 block text-sm">Core Diagnosis</span>
+                    <span class="font-medium text-gray-800 dark:text-white">${safeGet(data, 'basic_info.core_diagnosis')}</span>
+                  </div>
+                  <div>
+                    <span class="text-gray-500 dark:text-gray-400 block text-sm">Tutor</span>
+                    <span class="font-medium text-gray-800 dark:text-white">${safeGet(data, 'basic_info.tutor')}</span>
+                  </div>
+                  <div>
+                    <span class="text-gray-500 dark:text-gray-400 block text-sm">Training Site</span>
+                    <span class="font-medium text-gray-800 dark:text-white">${safeGet(data, 'basic_info.training_site')}</span>
+                  </div>
+                  <div>
+                    <span class="text-gray-500 dark:text-gray-400 block text-sm">Status</span>
+                    <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-white border ${statusClass}" style="text-shadow: 0px 0px 1px rgba(0,0,0,0.2);">
+                      <i class="${statusIcon} mr-1"></i> <strong>${statusText}</strong>
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <h4 class="text-lg font-semibold text-gray-800 dark:text-white mb-4">Patient Information</h4>
+                <div class="space-y-3">
+                  <div>
+                    <span class="text-gray-500 dark:text-gray-400 block text-sm">Patient ID</span>
+                    <span class="font-medium text-gray-800 dark:text-white">${safeGet(data, 'patient_info.patient_id')}</span>
+                  </div>
+                  <div>
+                    <span class="text-gray-500 dark:text-gray-400 block text-sm">Age</span>
+                    <span class="font-medium text-gray-800 dark:text-white">${safeGet(data, 'patient_info.age')}</span>
+                  </div>
+                  <div>
+                    <span class="text-gray-500 dark:text-gray-400 block text-sm">Gender</span>
+                    <span class="font-medium text-gray-800 dark:text-white">${safeGet(data, 'patient_info.gender')}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="mt-6">
+              <h4 class="text-lg font-semibold text-gray-800 dark:text-white mb-4">Description</h4>
+              <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+                <p class="text-gray-700 dark:text-gray-300">${safeGet(data, 'description', 'No description provided.')}</p>
+              </div>
+            </div>
+
+            <div class="mt-6">
+              <h4 class="text-lg font-semibold text-gray-800 dark:text-white mb-4">Reviewer Comments</h4>
+              <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+                ${safeGet(data, 'reviewer_comments') !== 'N/A' && safeGet(data, 'reviewer_comments') !== '' ?
+                  `<p class="text-gray-700 dark:text-gray-300">${safeGet(data, 'reviewer_comments')}</p>` :
+                  `<p class="text-gray-500 dark:text-gray-400 italic">No comments yet. This log is pending review.</p>`
+                }
+              </div>
+            </div>
+          `;
+        })
+        .catch(error => {
+          console.error('Error fetching log details:', error);
+          logDetailsContent.innerHTML = `
+            <div class="p-6 text-center">
+              <div class="text-red-500 text-xl mb-4"><i class="fas fa-exclamation-circle"></i></div>
+              <h4 class="text-lg font-semibold text-gray-800 dark:text-white mb-2">Error Loading Data</h4>
+              <p class="text-gray-600 dark:text-gray-400">There was a problem loading the log details. Please try again.</p>
+            </div>
+          `;
+        });
+    }
+
+    // Function to close log details modal
+    function closeLogDetailsModal() {
+      const logDetailsModal = document.getElementById('logDetailsModal');
+      logDetailsModal.classList.add('hidden');
+    }
+
+    // Function to center a modal
+    function centerModal(modal) {
+      if (!modal) return;
+
+      // Add flex classes to center the modal content
+      modal.classList.add('flex', 'items-center', 'justify-center', 'p-4');
+    }
+
+    // Function to show table loading state
+    function showTableLoading() {
+      const tableLoading = document.getElementById('tableLoading');
+      if (tableLoading) {
+        tableLoading.classList.remove('hidden');
+      }
+    }
+  </script>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const exportExcelBtn = document.getElementById('export-excel');
+  if (exportExcelBtn) {
+    exportExcelBtn.addEventListener('click', function() {
+      const params = new URLSearchParams(window.location.search);
+      window.open(`{% url 'student_section:export_final_records_excel' %}?${params.toString()}`, '_blank');
+    });
+  }
+});
+</script>
+{% endblock %}

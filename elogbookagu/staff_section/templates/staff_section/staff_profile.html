@@ -1,0 +1,185 @@
+{% extends 'base.html' %}
+
+{% block title %}Staff Profile{% endblock %}
+
+{% block navbar %}
+  {% include 'components/staff_auth_navbar.html' %}
+{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+  <!-- Page Header -->
+  <div class="text-center mb-10">
+    <h1 class="text-3xl font-bold text-gray-800 dark:text-white">Staff Profile</h1>
+    <p class="text-gray-600 dark:text-gray-400 mt-2">Manage your personal information and settings</p>
+  </div>
+
+  <!-- Profile Content -->
+  <div class="max-w-6xl mx-auto">
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden">
+      <!-- Profile Header with Cover Image -->
+      <div class="h-48 bg-gradient-to-r from-blue-500 to-purple-600 relative">
+        <!-- Profile Picture (Positioned to overlap the cover and content) -->
+        <div class="absolute -bottom-16 left-8">
+          <div class="relative group">
+            <img src="{{ profile_photo }}" alt="Profile Photo"
+                 onerror="this.src='/media/profiles/default.jpg';"
+                 class="w-32 h-32 rounded-full border-4 border-white dark:border-gray-800 object-cover shadow-lg"/>
+
+            <!-- Edit Photo Overlay -->
+            <label for="profile-photo-input" class="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 rounded-full opacity-0 group-hover:opacity-100 cursor-pointer transition-opacity duration-300">
+              <span class="text-white text-sm font-medium">Change Photo</span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main Content -->
+      <div class="pt-20 px-8 pb-8">
+        <div class="grid md:grid-cols-3 gap-8">
+          <!-- Left Column: Basic Info -->
+          <div class="md:col-span-1 space-y-6">
+            <!-- Name and Role -->
+            <div>
+              <h2 class="text-2xl font-bold text-gray-900 dark:text-white">{{ full_name }}</h2>
+              <p class="text-blue-600 dark:text-blue-400 font-medium">Staff Member</p>
+            </div>
+
+            <!-- Contact Information -->
+            <div class="bg-gray-50 dark:bg-gray-700 p-5 rounded-lg shadow-sm">
+              <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Contact Information</h3>
+              <ul class="space-y-3">
+                <li class="flex items-start">
+                  <svg class="w-5 h-5 text-gray-500 dark:text-gray-400 mt-0.5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                  </svg>
+                  <div>
+                    <p class="text-sm font-medium text-gray-900 dark:text-white">Email</p>
+                    <p class="text-sm text-gray-600 dark:text-gray-300">{{ user_email }}</p>
+                  </div>
+                </li>
+                <li class="flex items-start">
+                  <svg class="w-5 h-5 text-gray-500 dark:text-gray-400 mt-0.5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path>
+                  </svg>
+                  <div>
+                    <p class="text-sm font-medium text-gray-900 dark:text-white">Phone</p>
+                    <p class="text-sm text-gray-600 dark:text-gray-300">{{ user_phone|default:"Not provided" }}</p>
+                  </div>
+                </li>
+                <li class="flex items-start">
+                  <svg class="w-5 h-5 text-gray-500 dark:text-gray-400 mt-0.5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                  </svg>
+                  <div>
+                    <p class="text-sm font-medium text-gray-900 dark:text-white">Location</p>
+                    <p class="text-sm text-gray-600 dark:text-gray-300">{{ user_city|default:"" }}{% if user_city and user_country %}, {% endif %}{{ user_country|default:"Not provided" }}</p>
+                  </div>
+                </li>
+              </ul>
+            </div>
+
+            <!-- Departments -->
+            <div class="bg-gray-50 dark:bg-gray-700 p-5 rounded-lg shadow-sm">
+              <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Departments</h3>
+              {% if departments %}
+                <div class="flex flex-wrap gap-2">
+                  {% for dept in departments %}
+                    <span class="px-3 py-1 bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 rounded-full text-sm font-medium">
+                      {{ dept.name }}
+                    </span>
+                  {% endfor %}
+                </div>
+              {% else %}
+                <p class="text-sm text-gray-600 dark:text-gray-300">No departments assigned</p>
+              {% endif %}
+            </div>
+          </div>
+
+          <!-- Right Column: Edit Profile Form -->
+          <div class="md:col-span-2">
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm">
+              <div class="p-6">
+                <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-6">Edit Profile</h3>
+
+                <form method="post" enctype="multipart/form-data" class="space-y-6">
+                  {% csrf_token %}
+
+                  <!-- Hidden file input for profile photo -->
+                  {{ form.profile_photo }}
+
+                  <!-- City and Country in one row -->
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                      <label for="{{ form.city.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">City</label>
+                      {{ form.city }}
+                      {% if form.city.errors %}
+                        <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.city.errors.0 }}</p>
+                      {% endif %}
+                    </div>
+
+                    <div>
+                      <label for="{{ form.country.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Country</label>
+                      {{ form.country }}
+                      {% if form.country.errors %}
+                        <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.country.errors.0 }}</p>
+                      {% endif %}
+                    </div>
+                  </div>
+
+                  <!-- Phone Number -->
+                  <div>
+                    <label for="{{ form.phone_no.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Phone Number</label>
+                    {{ form.phone_no }}
+                    {% if form.phone_no.errors %}
+                      <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.phone_no.errors.0 }}</p>
+                    {% endif %}
+                  </div>
+
+                  <!-- Bio -->
+                  <div>
+                    <label for="{{ form.bio.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Bio</label>
+                    {{ form.bio }}
+                    {% if form.bio.errors %}
+                      <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.bio.errors.0 }}</p>
+                    {% endif %}
+                    <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Write a short bio about yourself. This will be visible to others.</p>
+                  </div>
+
+                  <!-- Submit Button -->
+                  <div class="flex justify-end">
+                    <button type="submit" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors duration-300">
+                      Save Changes
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- JavaScript for Profile Photo Preview -->
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const photoInput = document.getElementById('profile-photo-input');
+    const photoPreview = document.querySelector('img[alt="Profile Photo"]');
+
+    photoInput.addEventListener('change', function() {
+      if (this.files && this.files[0]) {
+        const reader = new FileReader();
+
+        reader.onload = function(e) {
+          photoPreview.src = e.target.result;
+        };
+
+        reader.readAsDataURL(this.files[0]);
+      }
+    });
+  });
+</script>
+{% endblock %}

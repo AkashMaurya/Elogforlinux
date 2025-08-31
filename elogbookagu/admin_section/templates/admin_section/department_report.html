@@ -1,0 +1,685 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Department Report{% endblock %}
+
+{% block navbar %}
+{% include 'components/admin_auth_navbar.html' %}
+{% endblock %}
+
+{% block content %}
+<div class="px-4 sm:px-6 lg:px-8 py-8 transition-all duration-300 w-full mx-auto" x-data="{ darkMode: localStorage.getItem('darkMode') === 'true' }" :class="{ 'dark': darkMode }">
+  
+  <!-- Header Section -->
+  <div class="relative bg-gradient-to-r from-blue-600 to-blue-800 dark:from-blue-800 dark:to-blue-900 rounded-xl shadow-lg overflow-hidden mb-8 print:shadow-none print:bg-white print:text-black">
+    <div class="absolute inset-0 bg-black opacity-10"></div>
+    <div class="absolute top-0 right-0 transform translate-x-16 -translate-y-8 print:hidden">
+      <i class="fas fa-building text-white text-9xl transform rotate-12 translate-x-8 -translate-y-8"></i>
+    </div>
+    <div class="relative z-10 px-6 py-8">
+      <h2 class="text-3xl font-bold text-white mb-2 flex items-center print:text-black">
+        <i class="fas fa-chart-bar mr-3"></i> Department Report
+      </h2>
+      <p class="text-white text-lg max-w-3xl font-medium print:text-gray-700">
+        Comprehensive overview of department performance, log statistics, and resource allocation.
+      </p>
+    </div>
+  </div>
+
+  <!-- Filters Section -->
+  <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg mb-8 print:hidden">
+    <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+      <h3 class="text-lg font-semibold text-gray-900 dark:text-white flex items-center">
+        <i class="fas fa-filter text-blue-600 dark:text-blue-400 mr-2"></i> Filters
+      </h3>
+    </div>
+    <div class="p-6">
+      <form method="GET" class="grid grid-cols-1 md:grid-cols-4 gap-4" id="filterForm">
+        <div>
+          <label for="department" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Department</label>
+          <select name="department" id="department" class="w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50" onchange="updateCharts()">
+            <option value="">All Departments</option>
+            {% for dept in departments %}
+              <option value="{{ dept.id }}" {% if selected_department == dept.id|stringformat:"s" %}selected{% endif %}>
+                {{ dept.name }}
+              </option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div>
+          <label for="year" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Year</label>
+          <select name="year" id="year" class="w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50">
+            <option value="">All Years</option>
+            {% for year in years %}
+              <option value="{{ year.id }}" {% if selected_year == year.id|stringformat:"s" %}selected{% endif %}>
+                {{ year.year_name }}
+              </option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div>
+          <label for="section" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Section</label>
+          <select name="section" id="section" class="w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50">
+            <option value="">All Sections</option>
+            {% for section in sections %}
+              <option value="{{ section.id }}" {% if selected_section == section.id|stringformat:"s" %}selected{% endif %}>
+                {{ section.year_section_name }}
+              </option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="flex items-end">
+          <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md transition-colors duration-200">
+            <i class="fas fa-search mr-2"></i>Apply Filters
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Data Summary Info (for debugging) -->
+  {% if total_logs == 0 %}
+  <div class="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4 mb-6">
+    <div class="flex items-center">
+      <i class="fas fa-info-circle text-yellow-600 dark:text-yellow-400 mr-2"></i>
+      <p class="text-yellow-800 dark:text-yellow-200">
+        <strong>No log data found.</strong>
+        {% if selected_department %}
+          No logs found for the selected department and filters.
+        {% else %}
+          No student logs are available in the system yet.
+        {% endif %}
+        Charts will show placeholder data until logs are submitted.
+      </p>
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Summary Cards -->
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border-l-4 border-blue-500">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Total Cases</p>
+          <p class="text-2xl font-bold text-gray-900 dark:text-white" id="totalCases">{{ total_logs }}</p>
+        </div>
+        <div class="p-3 rounded-full bg-blue-100 dark:bg-blue-900/50">
+          <i class="fas fa-file-medical text-blue-600 dark:text-blue-400"></i>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border-l-4 border-green-500">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Total Doctors</p>
+          <p class="text-2xl font-bold text-gray-900 dark:text-white" id="totalDoctors">{{ total_doctors }}</p>
+        </div>
+        <div class="p-3 rounded-full bg-green-100 dark:bg-green-900/50">
+          <i class="fas fa-user-md text-green-600 dark:text-green-400"></i>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border-l-4 border-purple-500">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Training Sites</p>
+          <p class="text-2xl font-bold text-gray-900 dark:text-white" id="totalTrainingSites">{{ total_training_sites }}</p>
+        </div>
+        <div class="p-3 rounded-full bg-purple-100 dark:bg-purple-900/50">
+          <i class="fas fa-hospital text-purple-600 dark:text-purple-400"></i>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border-l-4 border-orange-500">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Activity Types</p>
+          <p class="text-2xl font-bold text-gray-900 dark:text-white" id="totalActivityTypes">{{ total_activity_types }}</p>
+        </div>
+        <div class="p-3 rounded-full bg-orange-100 dark:bg-orange-900/50">
+          <i class="fas fa-tasks text-orange-600 dark:text-orange-400"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Charts and Visualizations -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+
+    <!-- Case Types Pie Chart -->
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden">
+      <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+        <h3 class="text-lg font-semibold text-gray-900 dark:text-white flex items-center">
+          <i class="fas fa-chart-pie text-blue-600 dark:text-blue-400 mr-2"></i> Case Types Distribution
+        </h3>
+      </div>
+      <div class="p-6">
+        <div class="h-64 relative">
+          <canvas id="caseTypesChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Training Sites Pie Chart -->
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden">
+      <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+        <h3 class="text-lg font-semibold text-gray-900 dark:text-white flex items-center">
+          <i class="fas fa-chart-pie text-purple-600 dark:text-purple-400 mr-2"></i> Training Sites Distribution
+        </h3>
+      </div>
+      <div class="p-6">
+        <div class="h-64 relative">
+          <canvas id="trainingSitesChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Activity Types with Filter -->
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden">
+      <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
+        <h3 class="text-lg font-semibold text-gray-900 dark:text-white flex items-center">
+          <i class="fas fa-chart-pie text-orange-600 dark:text-orange-400 mr-2"></i> Activity Types
+        </h3>
+        <select id="activityTypeFilter" class="text-sm rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white" onchange="updateActivityTypeChart()">
+          <option value="">All Activity Types</option>
+        </select>
+      </div>
+      <div class="p-6">
+        <div class="h-64 relative">
+          <canvas id="activityTypesChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Participation Types with Filter -->
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden">
+      <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
+        <h3 class="text-lg font-semibold text-gray-900 dark:text-white flex items-center">
+          <i class="fas fa-chart-pie text-green-600 dark:text-green-400 mr-2"></i> Participation Types
+        </h3>
+        <select id="participationFilter" class="text-sm rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white" onchange="updateParticipationChart()">
+          <option value="">All Participation Types</option>
+          <option value="observed">Observed</option>
+          <option value="assisted">Assisted</option>
+          <option value="performed">Performed</option>
+        </select>
+      </div>
+      <div class="p-6">
+        <div class="h-64 relative">
+          <canvas id="participationChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Monthly Cases Line Chart -->
+  <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden mb-8">
+    <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+      <h3 class="text-lg font-semibold text-gray-900 dark:text-white flex items-center">
+        <i class="fas fa-chart-line text-indigo-600 dark:text-indigo-400 mr-2"></i> Cases Encountered by Month
+      </h3>
+    </div>
+    <div class="p-6">
+      <div class="h-80 relative">
+        <canvas id="monthlyChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Approval Status Chart -->
+  <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden mb-8">
+    <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+      <h3 class="text-lg font-semibold text-gray-900 dark:text-white flex items-center">
+        <i class="fas fa-chart-bar text-emerald-600 dark:text-emerald-400 mr-2"></i> Approval Status Overview
+      </h3>
+    </div>
+    <div class="p-6">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="h-64 relative">
+          <canvas id="approvalStatusChart"></canvas>
+        </div>
+        <div class="space-y-4">
+          <div class="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg">
+            <div class="flex items-center justify-between">
+              <span class="text-green-800 dark:text-green-200 font-medium">Approved Cases</span>
+              <span class="text-2xl font-bold text-green-600 dark:text-green-400" id="approvedCount">0</span>
+            </div>
+          </div>
+          <div class="bg-yellow-50 dark:bg-yellow-900/20 p-4 rounded-lg">
+            <div class="flex items-center justify-between">
+              <span class="text-yellow-800 dark:text-yellow-200 font-medium">Pending Cases</span>
+              <span class="text-2xl font-bold text-yellow-600 dark:text-yellow-400" id="pendingCount">0</span>
+            </div>
+          </div>
+          <div class="bg-red-50 dark:bg-red-900/20 p-4 rounded-lg">
+            <div class="flex items-center justify-between">
+              <span class="text-red-800 dark:text-red-200 font-medium">Rejected Cases</span>
+              <span class="text-2xl font-bold text-red-600 dark:text-red-400" id="rejectedCount">0</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Department Statistics Table -->
+  <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden">
+    <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+      <h3 class="text-lg font-semibold text-gray-900 dark:text-white flex items-center">
+        <i class="fas fa-table text-blue-600 dark:text-blue-400 mr-2"></i> Department Statistics
+      </h3>
+    </div>
+    
+    <div class="overflow-x-auto">
+      <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+        <thead class="bg-gray-50 dark:bg-gray-700">
+          <tr>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Department</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Total Logs</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Reviewed</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Pending</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Approved</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Rejected</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Doctors</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Students</th>
+          </tr>
+        </thead>
+        <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+          {% for stat in department_stats %}
+          <tr class="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200">
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div class="flex items-center">
+                <div class="flex-shrink-0 h-10 w-10">
+                  <div class="h-10 w-10 rounded-full bg-blue-100 dark:bg-blue-900/50 flex items-center justify-center">
+                    <i class="fas fa-building text-blue-600 dark:text-blue-400"></i>
+                  </div>
+                </div>
+                <div class="ml-4">
+                  <div class="text-sm font-medium text-gray-900 dark:text-white">{{ stat.department.name }}</div>
+                </div>
+              </div>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
+              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200">
+                {{ stat.total_logs }}
+              </span>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
+              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 dark:bg-blue-900/50 text-blue-800 dark:text-blue-200">
+                {{ stat.reviewed_logs }}
+              </span>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
+              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 dark:bg-yellow-900/50 text-yellow-800 dark:text-yellow-200">
+                {{ stat.pending_logs }}
+              </span>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
+              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 dark:bg-green-900/50 text-green-800 dark:text-green-200">
+                {{ stat.approved_logs }}
+              </span>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
+              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 dark:bg-red-900/50 text-red-800 dark:text-red-200">
+                {{ stat.rejected_logs }}
+              </span>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ stat.doctors_count }}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ stat.students_count }}</td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="8" class="px-6 py-4 text-center text-gray-500 dark:text-gray-400">
+              <i class="fas fa-inbox text-4xl mb-2"></i>
+              <p>No departments found</p>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  // Chart instances
+  let caseTypesChart, trainingSitesChart, activityTypesChart, participationChart, monthlyChart, approvalStatusChart;
+
+  // Chart data from the backend
+  const chartData = {
+    caseTypes: {{ case_types_data|safe }},
+    trainingSites: {{ training_sites_data|safe }},
+    activityTypes: {{ activity_types_data|safe }},
+    participation: {{ participation_data|safe }},
+    monthly: {{ monthly_data|safe }},
+    approvalStatus: {{ approval_status_data|safe }},
+    coreDiagnosis: {{ core_diagnosis_data|safe }},
+    gender: {{ gender_data|safe }},
+    deptCase: {{ dept_case_data|safe }}
+  };
+
+  // Initialize all charts
+  document.addEventListener('DOMContentLoaded', function() {
+    // Debug: Log chart data to console
+    console.log('Chart Data:', chartData);
+
+    initializeCaseTypesChart();
+    initializeTrainingSitesChart();
+    initializeActivityTypesChart();
+    initializeParticipationChart();
+    initializeMonthlyChart();
+    initializeApprovalStatusChart();
+    updateSummaryCards();
+    populateActivityTypeFilter();
+  });
+
+  function initializeCaseTypesChart() {
+    const ctx = document.getElementById('caseTypesChart').getContext('2d');
+    const hasData = chartData.caseTypes.labels && chartData.caseTypes.labels.length > 0;
+
+    caseTypesChart = new Chart(ctx, {
+      type: 'pie',
+      data: {
+        labels: hasData ? chartData.caseTypes.labels : ['No Data Available'],
+        datasets: [{
+          data: hasData ? chartData.caseTypes.data : [1],
+          backgroundColor: hasData ? [
+            '#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6',
+            '#06B6D4', '#84CC16', '#F97316', '#EC4899', '#6366F1'
+          ] : ['#E5E7EB'],
+          borderWidth: 2,
+          borderColor: '#ffffff'
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: 'bottom',
+            labels: {
+              padding: 20,
+              usePointStyle: true,
+              color: hasData ? '#374151' : '#9CA3AF'
+            }
+          },
+          tooltip: {
+            enabled: hasData
+          }
+        }
+      }
+    });
+  }
+
+  function initializeTrainingSitesChart() {
+    const ctx = document.getElementById('trainingSitesChart').getContext('2d');
+    const hasData = chartData.trainingSites.labels && chartData.trainingSites.labels.length > 0;
+
+    trainingSitesChart = new Chart(ctx, {
+      type: 'pie',
+      data: {
+        labels: hasData ? chartData.trainingSites.labels : ['No Data Available'],
+        datasets: [{
+          data: hasData ? chartData.trainingSites.data : [1],
+          backgroundColor: hasData ? [
+            '#8B5CF6', '#06B6D4', '#84CC16', '#F97316', '#EC4899',
+            '#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#6366F1'
+          ] : ['#E5E7EB'],
+          borderWidth: 2,
+          borderColor: '#ffffff'
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: 'bottom',
+            labels: {
+              padding: 20,
+              usePointStyle: true,
+              color: hasData ? '#374151' : '#9CA3AF'
+            }
+          },
+          tooltip: {
+            enabled: hasData
+          }
+        }
+      }
+    });
+  }
+
+  function initializeActivityTypesChart() {
+    const ctx = document.getElementById('activityTypesChart').getContext('2d');
+    activityTypesChart = new Chart(ctx, {
+      type: 'pie',
+      data: {
+        labels: chartData.activityTypes.labels || ['No Data'],
+        datasets: [{
+          data: chartData.activityTypes.data || [1],
+          backgroundColor: [
+            '#F97316', '#EC4899', '#6366F1', '#3B82F6', '#10B981',
+            '#F59E0B', '#EF4444', '#8B5CF6', '#06B6D4', '#84CC16'
+          ],
+          borderWidth: 2,
+          borderColor: '#ffffff'
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: 'bottom',
+            labels: {
+              padding: 20,
+              usePointStyle: true
+            }
+          }
+        }
+      }
+    });
+  }
+
+  function initializeParticipationChart() {
+    const ctx = document.getElementById('participationChart').getContext('2d');
+    participationChart = new Chart(ctx, {
+      type: 'pie',
+      data: {
+        labels: chartData.participation.labels || ['No Data'],
+        datasets: [{
+          data: chartData.participation.data || [1],
+          backgroundColor: [
+            '#10B981', '#F59E0B', '#EF4444', '#3B82F6', '#8B5CF6'
+          ],
+          borderWidth: 2,
+          borderColor: '#ffffff'
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: 'bottom',
+            labels: {
+              padding: 20,
+              usePointStyle: true
+            }
+          }
+        }
+      }
+    });
+  }
+
+  function initializeMonthlyChart() {
+    const ctx = document.getElementById('monthlyChart').getContext('2d');
+    const hasData = chartData.monthly.labels && chartData.monthly.labels.length > 0;
+
+    monthlyChart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: hasData ? chartData.monthly.labels : ['No Data Available'],
+        datasets: [{
+          label: 'Cases per Month',
+          data: hasData ? chartData.monthly.data : [0],
+          borderColor: hasData ? '#6366F1' : '#E5E7EB',
+          backgroundColor: hasData ? 'rgba(99, 102, 241, 0.1)' : 'rgba(229, 231, 235, 0.1)',
+          borderWidth: 3,
+          fill: true,
+          tension: 0.4,
+          pointBackgroundColor: hasData ? '#6366F1' : '#E5E7EB',
+          pointBorderColor: '#ffffff',
+          pointBorderWidth: 2,
+          pointRadius: hasData ? 6 : 0
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: hasData
+          },
+          tooltip: {
+            enabled: hasData
+          }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            grid: {
+              color: 'rgba(0, 0, 0, 0.1)'
+            },
+            ticks: {
+              color: hasData ? '#374151' : '#9CA3AF'
+            }
+          },
+          x: {
+            grid: {
+              color: 'rgba(0, 0, 0, 0.1)'
+            },
+            ticks: {
+              color: hasData ? '#374151' : '#9CA3AF'
+            }
+          }
+        }
+      }
+    });
+  }
+
+  function initializeApprovalStatusChart() {
+    const ctx = document.getElementById('approvalStatusChart').getContext('2d');
+    approvalStatusChart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: ['Approved', 'Pending', 'Rejected'],
+        datasets: [{
+          data: [
+            chartData.approvalStatus.approved || 0,
+            chartData.approvalStatus.pending || 0,
+            chartData.approvalStatus.rejected || 0
+          ],
+          backgroundColor: ['#10B981', '#F59E0B', '#EF4444'],
+          borderWidth: 0,
+          borderRadius: 8
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: false
+          }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            grid: {
+              color: 'rgba(0, 0, 0, 0.1)'
+            }
+          },
+          x: {
+            grid: {
+              display: false
+            }
+          }
+        }
+      }
+    });
+  }
+
+  function updateSummaryCards() {
+    if (chartData.approvalStatus) {
+      document.getElementById('approvedCount').textContent = chartData.approvalStatus.approved || 0;
+      document.getElementById('pendingCount').textContent = chartData.approvalStatus.pending || 0;
+      document.getElementById('rejectedCount').textContent = chartData.approvalStatus.rejected || 0;
+    }
+  }
+
+  function populateActivityTypeFilter() {
+    const filter = document.getElementById('activityTypeFilter');
+    // Clear existing options except the first one
+    while (filter.children.length > 1) {
+      filter.removeChild(filter.lastChild);
+    }
+
+    if (chartData.activityTypes && chartData.activityTypes.labels && chartData.activityTypes.labels.length > 0) {
+      chartData.activityTypes.labels.forEach(label => {
+        if (label && label !== 'Unknown' && label !== 'No Data Available') {
+          const option = document.createElement('option');
+          option.value = label;
+          option.textContent = label;
+          filter.appendChild(option);
+        }
+      });
+    }
+  }
+
+  function updateActivityTypeChart() {
+    const selectedType = document.getElementById('activityTypeFilter').value;
+    // This would typically make an AJAX call to get filtered data
+    // For now, we'll just update the chart with the same data
+    if (activityTypesChart) {
+      activityTypesChart.update();
+    }
+  }
+
+  function updateParticipationChart() {
+    const selectedType = document.getElementById('participationFilter').value;
+    // This would typically make an AJAX call to get filtered data
+    // For now, we'll just update the chart with the same data
+    if (participationChart) {
+      participationChart.update();
+    }
+  }
+
+  function updateCharts() {
+    // This function would be called when department filter changes
+    // It would make AJAX calls to get new data and update all charts
+    console.log('Updating charts for department change...');
+  }
+
+  // Print functionality
+  function printReport() {
+    window.print();
+  }
+
+  // Export functionality (placeholder)
+  function exportReport() {
+    alert('Export functionality will be implemented soon');
+  }
+</script>
+{% endblock %}

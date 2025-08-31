@@ -1,0 +1,250 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}500 - Server Error | MedLogBook{% endblock %}
+
+{% block extra_head %}
+<style>
+  @keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-20px); }
+  }
+
+  @keyframes glitch {
+    0%, 100% { transform: translate(0); }
+    20% { transform: translate(-2px, 2px); }
+    40% { transform: translate(-2px, -2px); }
+    60% { transform: translate(2px, 2px); }
+    80% { transform: translate(2px, -2px); }
+  }
+
+  @keyframes pulse-glow {
+    0%, 100% { box-shadow: 0 0 20px rgba(168, 85, 247, 0.3); }
+    50% { box-shadow: 0 0 40px rgba(168, 85, 247, 0.6); }
+  }
+
+  @keyframes slide-in {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes spin-slow {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+
+  .animate-float { animation: float 3s ease-in-out infinite; }
+  .animate-glitch { animation: glitch 0.3s ease-in-out infinite; }
+  .animate-pulse-glow { animation: pulse-glow 2s ease-in-out infinite; }
+  .animate-slide-in { animation: slide-in 0.6s ease-out; }
+  .animate-spin-slow { animation: spin-slow 3s linear infinite; }
+
+  .bg-pattern {
+    background-image:
+      radial-gradient(circle at 25% 25%, rgba(168, 85, 247, 0.1) 0%, transparent 50%),
+      radial-gradient(circle at 75% 75%, rgba(139, 69, 19, 0.1) 0%, transparent 50%);
+  }
+
+  .glass-effect {
+    backdrop-filter: blur(10px);
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+  }
+
+  .dark .glass-effect {
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+</style>
+{% endblock %}
+
+{% block content_container %}
+<!-- Full-width 500 Section -->
+<section class="w-full min-h-screen bg-gradient-to-br from-purple-50 via-white to-indigo-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 bg-pattern relative overflow-hidden">
+  <!-- Animated Background Elements -->
+  <div class="absolute inset-0 overflow-hidden pointer-events-none">
+    <div class="absolute top-20 left-10 w-32 h-32 bg-purple-200 dark:bg-purple-800 rounded-full opacity-20 animate-float"></div>
+    <div class="absolute top-40 right-20 w-24 h-24 bg-indigo-200 dark:bg-indigo-800 rounded-full opacity-20 animate-float" style="animation-delay: 1s;"></div>
+    <div class="absolute bottom-20 left-1/4 w-40 h-40 bg-violet-200 dark:bg-violet-800 rounded-full opacity-20 animate-float" style="animation-delay: 2s;"></div>
+    <div class="absolute bottom-40 right-1/3 w-28 h-28 bg-blue-200 dark:bg-blue-800 rounded-full opacity-20 animate-float" style="animation-delay: 0.5s;"></div>
+  </div>
+
+  <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-16 relative z-10">
+    <div class="max-w-6xl mx-auto">
+
+      <!-- Header with AGU Logo -->
+      <div class="text-center mb-12 animate-slide-in">
+        <div class="flex flex-col items-center justify-center mb-6">
+          <img src="/media/agulogo.png" alt="Arabian Gulf University Logo" class="h-20 w-auto mb-4 animate-pulse-glow rounded-lg shadow-lg">
+          <div class="text-center">
+            <h1 class="text-2xl md:text-3xl font-bold text-gray-800 dark:text-white">Arabian Gulf University</h1>
+            <p class="text-sm md:text-base text-gray-600 dark:text-gray-300 mt-1">MedLogBook Platform</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main 500 Content -->
+      <div class="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+
+        <!-- Left Side - 500 Illustration -->
+        <div class="text-center animate-slide-in order-2 lg:order-1" style="animation-delay: 0.2s;">
+          <div class="relative flex flex-col items-center justify-center">
+            <!-- Large 500 Text -->
+            <div class="text-center mb-8">
+              <h2 class="text-8xl md:text-9xl lg:text-[10rem] font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-600 via-indigo-600 to-blue-600 dark:from-purple-400 dark:via-indigo-400 dark:to-blue-400 leading-none animate-glitch">
+                500
+              </h2>
+              <div class="absolute inset-0 text-8xl md:text-9xl lg:text-[10rem] font-black text-purple-100 dark:text-gray-800 leading-none -z-10 transform translate-x-2 translate-y-2">
+                500
+              </div>
+            </div>
+
+
+          </div>
+        </div>
+
+        <!-- Right Side - Error Message and Actions -->
+        <div class="space-y-6 lg:space-y-8 animate-slide-in order-1 lg:order-2" style="animation-delay: 0.4s;">
+
+          <!-- Error Message -->
+          <div class="glass-effect rounded-2xl p-8 shadow-2xl">
+            <div class="text-center lg:text-left">
+              <h3 class="text-3xl md:text-4xl font-bold text-gray-800 dark:text-white mb-4">
+                Internal Server Error
+              </h3>
+              <p class="text-lg text-gray-600 dark:text-gray-300 mb-6 leading-relaxed">
+                Oops! Something went wrong on our servers. Our technical team has been notified and is working to fix this issue. Please try again in a few moments.
+              </p>
+
+              <!-- Error Details -->
+              <div class="bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800 rounded-lg p-4 mb-6">
+                <div class="flex items-center">
+                  <i class="fas fa-server text-purple-500 mr-3"></i>
+                  <div>
+                    <p class="text-sm font-medium text-purple-800 dark:text-purple-200">Error Code: 500</p>
+                    <p class="text-sm text-purple-600 dark:text-purple-300">The server encountered an unexpected condition.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Quick Actions -->
+          <div class="glass-effect rounded-2xl p-8 shadow-2xl">
+            <h4 class="text-xl font-semibold text-gray-800 dark:text-white mb-6">
+              What You Can Do
+            </h4>
+
+            <div class="space-y-4 mb-6">
+              <div class="p-3 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
+                <p class="font-medium text-gray-800 dark:text-white">Wait a moment</p>
+                <p class="text-sm text-gray-600 dark:text-gray-300">The issue might be temporary and resolve itself</p>
+              </div>
+
+              <div class="p-3 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
+                <p class="font-medium text-gray-800 dark:text-white">Try refreshing</p>
+                <p class="text-sm text-gray-600 dark:text-gray-300">Reload the page to see if the problem persists</p>
+              </div>
+            </div>
+
+            <div class="grid sm:grid-cols-2 gap-4">
+              <button onclick="window.location.reload()" class="group flex items-center justify-center p-4 bg-purple-500 hover:bg-purple-600 text-white rounded-xl transition-all duration-300 transform hover:scale-105 hover:shadow-lg">
+                <div class="text-center">
+                  <div class="font-semibold">Refresh Page</div>
+                  <div class="text-sm opacity-90">Try again</div>
+                </div>
+              </button>
+
+              <a href="{% url 'home_page' %}" class="group flex items-center justify-center p-4 bg-blue-500 hover:bg-blue-600 text-white rounded-xl transition-all duration-300 transform hover:scale-105 hover:shadow-lg">
+                <div class="text-center">
+                  <div class="font-semibold">Home Page</div>
+                  <div class="text-sm opacity-90">Safe harbor</div>
+                </div>
+              </a>
+            </div>
+          </div>
+
+          <!-- Status & Support -->
+          <div class="glass-effect rounded-2xl p-8 shadow-2xl">
+            <h4 class="text-xl font-semibold text-gray-800 dark:text-white mb-4">
+              Technical Support
+            </h4>
+            <p class="text-gray-600 dark:text-gray-300 mb-4">
+              Our technical team has been automatically notified. If the problem persists, please contact our support team with the error details.
+            </p>
+
+            <div class="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4 mb-4">
+              <div>
+                <p class="text-sm font-medium text-green-800 dark:text-green-200">System Status</p>
+                <p class="text-sm text-green-600 dark:text-green-300">Our team is working to resolve this issue</p>
+              </div>
+            </div>
+
+            <div class="flex flex-col sm:flex-row gap-3">
+              <a href="mailto:support@agu.edu.bh" class="flex items-center justify-center px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg transition-all duration-300 hover:shadow-lg">
+                Report Issue
+              </a>
+              <button onclick="window.history.back()" class="flex items-center justify-center px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-lg transition-all duration-300 hover:shadow-lg">
+                Go Back
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer Message -->
+      <div class="text-center mt-16 animate-slide-in" style="animation-delay: 0.6s;">
+        <div class="glass-effect rounded-xl p-6 inline-block">
+          <p class="text-gray-600 dark:text-gray-300">
+            We're working hard to keep MedLogBook running smoothly for you
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Add hover effects to floating icons
+  const floatingIcons = document.querySelectorAll('.animate-float');
+  floatingIcons.forEach(icon => {
+    icon.addEventListener('mouseenter', function() {
+      this.style.animationPlayState = 'paused';
+      this.style.transform = 'translateY(-10px) scale(1.2)';
+    });
+
+    icon.addEventListener('mouseleave', function() {
+      this.style.animationPlayState = 'running';
+      this.style.transform = '';
+    });
+  });
+
+  // Add click effect to the server icon
+  const serverIcon = document.querySelector('.animate-spin-slow');
+  if (serverIcon) {
+    serverIcon.addEventListener('click', function() {
+      this.style.animation = 'none';
+      setTimeout(() => {
+        this.style.animation = 'spin-slow 3s linear infinite';
+      }, 100);
+    });
+  }
+
+  // Auto-refresh functionality (optional)
+  let refreshTimer;
+  const startAutoRefresh = () => {
+    refreshTimer = setTimeout(() => {
+      if (confirm('Would you like to try refreshing the page? The server issue might be resolved.')) {
+        window.location.reload();
+      } else {
+        startAutoRefresh(); // Ask again later
+      }
+    }, 30000); // Ask after 30 seconds
+  };
+
+  // Uncomment the line below to enable auto-refresh prompts
+  // startAutoRefresh();
+});
+</script>
+{% endblock %}
