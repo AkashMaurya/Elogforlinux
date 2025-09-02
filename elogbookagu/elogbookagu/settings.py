@@ -14,6 +14,8 @@ from pathlib import Path
 import os
 from decouple import config
 import dj_database_url
+import warnings
+from django.utils.deprecation import RemovedInDjango60Warning
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -27,11 +29,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = config("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 # DEBUG = os.getenv("DEBUG", "False") == "True"
-ALLOWED_HOSTS = ['54.89.232.120', 'localhost', '127.0.0.1', 'yourdomain.com', 'app.nuvishr.com']
-
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost', '54.89.232.120', 'app.nuvishr.com']
 
 # Application definition
 
@@ -42,17 +43,14 @@ INSTALLED_APPS = [
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
-    "django.contrib.staticfiles",
-    
+    "django.contrib.staticfiles",  
     "publicpage",
     "accounts",
     "doctor_section",
     "admin_section",
     "student_section",
-    "staff_section",
-   
+    "staff_section",   
     "django_extensions",
-   
     "allauth",
     "allauth.account",
     "allauth.socialaccount",
@@ -104,7 +102,7 @@ WSGI_APPLICATION = "elogbookagu.wsgi.application"
 
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
-
+"""
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
@@ -116,15 +114,15 @@ DATABASES = {
     }
 } 
 
-
 """
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
-"""
+
 
 # DATABASES = {
 #     'default': dj_database_url.config(
@@ -151,7 +149,15 @@ AUTH_PASSWORD_VALIDATORS = [
         "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
     },
 ]
+AUTHENTICATION_BACKENDS = [
 
+    # Needed to login by username in Django admin, regardless of `allauth`
+    'django.contrib.auth.backends.ModelBackend',
+
+    # `allauth` specific authentication methods, such as login by email
+    'allauth.account.auth_backends.AuthenticationBackend',
+
+]
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
@@ -226,23 +232,29 @@ else:
     SECURE_CONTENT_TYPE_NOSNIFF = True
     X_FRAME_OPTIONS = "DENY"
 
-AUTHENTICATION_BACKENDS = (
-    "django.contrib.auth.backends.ModelBackend",  # Default backend for Django Admin
-    "allauth.account.auth_backends.AuthenticationBackend",  # allauth backend
-)
+AUTHENTICATION_BACKENDS = [
+    "django.contrib.auth.backends.ModelBackend",
+    "allauth.account.auth_backends.AuthenticationBackend",
+]
 
-#ACCOUNT_EMAIL_REQUIRED = True
-#ACCOUNT_EMAIL_VERIFICATION = "mandatory"
-
+AUTHENTICATION_BACKENDS = [
+    "django.contrib.auth.backends.ModelBackend",
+    "allauth.account.auth_backends.AuthenticationBackend",
+]
 
 LOGIN_REDIRECT_URL = "/"
-ACCOUNT_AUTHENTICATION_METHOD = "email"
-ACCOUNT_USERNAME_REQUIRED = False
-ACCOUNT_EMAIL_REQUIRED = True
-ACCOUNT_EMAIL_VERIFICATION = "none"  # dev के लिए
 
+# Signup/login ke liye fields define karo
+ACCOUNT_SIGNUP_FIELDS  = [
+    "email*",
+    "password1*",
+    "password2*",
+    "first_name",
+    "last_name",
+    "phone_no",
+]
 
-
+ACCOUNT_EMAIL_VERIFICATION = "none"  # Development ke liye
 
 # email Reset
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
@@ -251,3 +263,10 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = "dailyhackshindi@gmail.com"  # Your Gmail address
 EMAIL_HOST_PASSWORD = "zobm otwz nymq emiq"  # Your generated app password
+
+
+warnings.filterwarnings(
+    "ignore",
+    category=UserWarning,
+    message=r".*ACCOUNT_LOGIN_METHODS conflicts with ACCOUNT_SIGNUP_FIELDS.*",
+)
