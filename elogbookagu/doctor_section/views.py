@@ -999,8 +999,57 @@ def batch_review(request):
                 email_thread.start()
 
     count = logs.count()
+    # If this was an AJAX request, return JSON
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest' or request.is_ajax():
+        return JsonResponse({
+            'success': True,
+            'count': count,
+            'message': f"{count} log entries have been {'approved' if action == 'approve' else 'rejected'}."
+        })
+
     messages.success(request, f"{count} log entries have been {'approved' if action == 'approve' else 'rejected'}.")
     return redirect('doctor_section:doctor_reviews')
+
+
+@login_required
+def get_log_ids(request):
+    """Return a JSON array of log IDs matching current filters for the logged-in doctor."""
+    try:
+        doctor = request.user.doctor_profile
+    except AttributeError:
+        return JsonResponse({'log_ids': []})
+
+    department_id = request.GET.get('department')
+    status = request.GET.get('status', 'all')
+    search_query = request.GET.get('q', '').strip()
+
+    logs = StudentLogFormModel.objects.filter(department__in=doctor.departments.all())
+
+    if status == 'pending':
+        logs = logs.filter(is_reviewed=False)
+    elif status == 'approved':
+        logs = logs.filter(is_reviewed=True).filter(
+            models.Q(reviewer_comments__isnull=True) |
+            ~models.Q(reviewer_comments__startswith='REJECTED:')
+        )
+    elif status == 'rejected':
+        logs = logs.filter(is_reviewed=True, reviewer_comments__startswith='REJECTED:')
+
+    if department_id:
+        logs = logs.filter(department_id=department_id)
+
+    if search_query:
+        logs = logs.filter(
+            models.Q(student__user__first_name__icontains=search_query) |
+            models.Q(student__user__last_name__icontains=search_query) |
+            models.Q(student__student_id__icontains=search_query) |
+            models.Q(description__icontains=search_query) |
+            models.Q(patient_id__icontains=search_query)
+        )
+
+    # Return only IDs
+    ids = list(logs.values_list('id', flat=True))
+    return JsonResponse({'log_ids': ids})
 
 
 @login_required

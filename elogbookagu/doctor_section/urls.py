@@ -21,6 +21,7 @@ urlpatterns = [
     path("delete-support-ticket/<int:ticket_id>/", views.delete_support_ticket, name="delete_support_ticket"),
     path("review-log/<int:log_id>/", views.review_log, name="review_log"),
     path("batch-review/", views.batch_review, name="batch_review"),
+    path("get-log-ids/", views.get_log_ids, name="get_log_ids"),
     path("notifications/", views.notifications, name="notifications"),
     path("export-logs/", views.export_logs, name="export_logs"),
 
@@ -34,7 +35,3 @@ urlpatterns = [
     path("debug-doctor-status/", attendance_views.debug_doctor_status, name="debug_doctor_status"),
     path("debug-doctor-reviews/", views.debug_doctor_reviews, name="debug_doctor_reviews"),
 ]
-
-
-
-

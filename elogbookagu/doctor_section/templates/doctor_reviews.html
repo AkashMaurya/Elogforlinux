@@ -312,11 +312,34 @@
             </div>
           </div>
 
+          <!-- Bulk action controls -->
+          <div class="px-4 py-3 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <input type="checkbox" id="select-all-visible" class="rounded border-gray-300 text-blue-600 shadow-sm focus:ring focus:ring-blue-200 focus:ring-opacity-50">
+              <label for="select-all-visible" class="text-sm text-gray-700 dark:text-gray-300">Select all on page</label>
+              <button type="button" id="select-all-matching" class="ml-3 px-3 py-1 bg-gray-600 text-white rounded hover:bg-gray-700 text-sm">Select all matching</button>
+              <button type="button" id="clear-selection-top" class="ml-2 text-sm text-blue-600 hover:text-blue-800">Clear</button>
+            </div>
+            <form id="bulk-action-form" method="post" action="{% url 'doctor_section:batch_review' %}" class="flex items-center gap-3">
+              {% csrf_token %}
+              <input type="hidden" name="log_ids" id="log-ids-input" value="">
+              <select name="action" id="bulk-action-select" class="rounded border-gray-300 px-2 py-1 dark:bg-gray-700 dark:text-white">
+                <option value="">Action</option>
+                <option value="approve">Approve</option>
+                <option value="reject">Reject</option>
+              </select>
+              <button type="submit" id="bulk-apply-btn" class="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50" disabled>Apply</button>
+            </form>
+          </div>
+
           <!-- Table with Responsive Scroll -->
           <div class="overflow-x-auto">
             <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
               <thead class="bg-gray-50 dark:bg-gray-700">
                 <tr>
+                  <th scope="col" class="px-4 sm:px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                    <input type="checkbox" id="select-all" class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50">
+                  </th>
                   <th scope="col" class="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Student</th>
                   <th scope="col" class="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Date</th>
                   <th scope="col" class="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Department</th>
@@ -329,6 +352,9 @@
               <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                 {% for log in logs %}
                   <tr class="{% cycle 'bg-white' 'bg-gray-50' %} dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-150">
+                    <td class="px-4 sm:px-6 py-4 whitespace-nowrap text-center">
+                      <input type="checkbox" class="row-checkbox log-checkbox" value="{{ log.id }}" />
+                    </td>
                     <td class="px-4 sm:px-6 py-4 whitespace-nowrap">
                       <div class="flex items-center">
                         <div class="flex-shrink-0 h-10 w-10">
@@ -496,14 +522,167 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Search on Enter key
-    const searchInput = document.getElementById('search');
-    if (searchInput) {
-        searchInput.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                this.form.submit();
-            }
-        });
+  const searchInput = document.getElementById('search');
+  if (searchInput) {
+    searchInput.addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        this.form.submit();
+      }
+    });
+  }
+
+  // Bulk selection logic
+  const selectAll = document.getElementById('select-all');
+  const selectAllVisible = document.getElementById('select-all-visible');
+  const selectAllMatching = document.getElementById('select-all-matching');
+  const clearSelectionTop = document.getElementById('clear-selection-top');
+  const rowCheckboxes = Array.from(document.querySelectorAll('.row-checkbox'));
+  const logIdsInput = document.getElementById('log-ids-input');
+  const bulkForm = document.getElementById('bulk-action-form');
+  const bulkApplyBtn = document.getElementById('bulk-apply-btn');
+  const bulkActionSelect = document.getElementById('bulk-action-select');
+  const tableLoading = document.getElementById('tableLoading');
+
+  // selected IDs set
+  const selectedIds = new Set();
+
+  function updateUI() {
+    // update hidden input
+    logIdsInput.value = Array.from(selectedIds).join(',');
+    // enable/disable apply
+    bulkApplyBtn.disabled = selectedIds.size === 0 || !bulkActionSelect.value;
+    // update header checkboxes
+    if (selectAll) {
+      selectAll.checked = rowCheckboxes.length > 0 && rowCheckboxes.every(cb => cb.checked);
+      selectAll.indeterminate = [...rowCheckboxes].some(cb => cb.checked) && !selectAll.checked;
     }
+    if (selectAllVisible) {
+      selectAllVisible.checked = rowCheckboxes.length > 0 && rowCheckboxes.every(cb => cb.checked);
+    }
+  }
+
+  // wire row checkboxes
+  rowCheckboxes.forEach(cb => {
+    cb.addEventListener('change', () => {
+      if (cb.checked) selectedIds.add(cb.value);
+      else selectedIds.delete(cb.value);
+      updateUI();
+    });
+    // initialize from any pre-checked
+    if (cb.checked) selectedIds.add(cb.value);
+  });
+
+  // select-all (table header) toggles all visible
+  if (selectAll) {
+    selectAll.addEventListener('change', () => {
+      const checked = selectAll.checked;
+      rowCheckboxes.forEach(cb => { cb.checked = checked; if (checked) selectedIds.add(cb.value); else selectedIds.delete(cb.value); });
+      updateUI();
+    });
+  }
+
+  // select-all-visible (controls bar) toggles visible too
+  if (selectAllVisible) {
+    selectAllVisible.addEventListener('change', () => {
+      const checked = selectAllVisible.checked;
+      rowCheckboxes.forEach(cb => { cb.checked = checked; if (checked) selectedIds.add(cb.value); else selectedIds.delete(cb.value); });
+      updateUI();
+    });
+  }
+
+  // clear selection
+  if (clearSelectionTop) {
+    clearSelectionTop.addEventListener('click', () => {
+      selectedIds.clear();
+      rowCheckboxes.forEach(cb => cb.checked = false);
+      updateUI();
+    });
+  }
+
+  // select all matching (server-side) - fetches all matching IDs for current filters
+  if (selectAllMatching) {
+    selectAllMatching.addEventListener('click', async () => {
+      try {
+        if (tableLoading) tableLoading.classList.remove('hidden');
+        const params = new URLSearchParams(window.location.search);
+        const resp = await fetch(`{% url 'doctor_section:get_log_ids' %}?${params.toString()}`, { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+        if (!resp.ok) throw new Error('Failed to fetch matching IDs');
+        const data = await resp.json();
+        if (!Array.isArray(data.log_ids)) throw new Error('Invalid response');
+        // mark selection set
+        selectedIds.clear();
+        data.log_ids.forEach(id => selectedIds.add(String(id)));
+        // update visible checkboxes
+        rowCheckboxes.forEach(cb => cb.checked = selectedIds.has(cb.value));
+        updateUI();
+      } catch (err) {
+        console.error(err);
+        alert('Could not select all matching logs.');
+      } finally {
+        if (tableLoading) tableLoading.classList.add('hidden');
+      }
+    });
+  }
+
+  // enable apply when action selected
+  if (bulkActionSelect) {
+    bulkActionSelect.addEventListener('change', updateUI);
+  }
+
+  // bulk form submit - AJAX POST to batch_review
+  if (bulkForm) {
+    bulkForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (selectedIds.size === 0) { alert('Select at least one log'); return; }
+
+      const action = bulkActionSelect.value;
+      if (!action) { alert('Select an action'); return; }
+
+      // Prepare form data
+      const fd = new FormData();
+      fd.append('log_ids', Array.from(selectedIds).join(','));
+      fd.append('action', action);
+      // include comments if textarea exists
+      const commentsEl = bulkForm.querySelector('textarea[name="comments"]');
+      if (commentsEl) fd.append('comments', commentsEl.value);
+
+      // CSRF
+      const csrfEl = bulkForm.querySelector('input[name="csrfmiddlewaretoken"]');
+      const csrf = csrfEl ? csrfEl.value : (document.querySelector('input[name="csrfmiddlewaretoken"]') ? document.querySelector('input[name="csrfmiddlewaretoken"]').value : '');
+
+      try {
+        if (tableLoading) tableLoading.classList.remove('hidden');
+        const resp = await fetch('{% url "doctor_section:batch_review" %}', {
+          method: 'POST',
+          headers: {
+            'X-CSRFToken': csrf,
+            'X-Requested-With': 'XMLHttpRequest'
+          },
+          body: fd
+        });
+
+        if (!resp.ok) {
+          // Try to parse error message
+          const text = await resp.text();
+          throw new Error(text || 'Request failed');
+        }
+
+        const data = await resp.json().catch(() => ({}));
+        if (data.success) {
+          alert(data.message || 'Bulk action completed');
+          // reload to get updated statuses
+          window.location.reload();
+        } else {
+          alert(data.message || 'Bulk action failed');
+        }
+      } catch (err) {
+        console.error(err);
+        alert('Error performing bulk action.');
+      } finally {
+        if (tableLoading) tableLoading.classList.add('hidden');
+      }
+    });
+  }
 });
 </script>
 {% endblock %}
