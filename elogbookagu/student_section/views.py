@@ -18,6 +18,7 @@ from django.contrib import messages
 from doctor_section.models import Notification
 import openpyxl
 from openpyxl.drawing.image import Image as OpenpyxlImage
+from io import BytesIO
 
 # Create your views here.
 
@@ -693,60 +694,87 @@ def generate_records_pdf(request):
 
 @login_required
 def export_final_records_excel(request):
-    student = request.user.student
-    department_id = request.GET.get('department')
-    activity_type_id = request.GET.get('activity_type')
-    review_status = request.GET.get('status', 'pending')
-    search_query = request.GET.get('q', '').strip()
-    logs = StudentLogFormModel.objects.filter(student=student)
-    if review_status == 'pending':
-        logs = logs.filter(is_reviewed=False)
-    elif review_status == 'reviewed':
-        logs = logs.filter(is_reviewed=True)
-    if department_id:
-        logs = logs.filter(department_id=department_id)
-    if activity_type_id:
-        logs = logs.filter(activity_type_id=activity_type_id)
-    if search_query:
-        logs = logs.filter(
-            models.Q(description__icontains=search_query) |
-            models.Q(patient_id__icontains=search_query) |
-            models.Q(core_diagnosis__name__icontains=search_query)
+    try:
+        student = request.user.student
+        department_id = request.GET.get('department')
+        activity_type_id = request.GET.get('activity_type')
+        review_status = request.GET.get('status', 'pending')
+        search_query = request.GET.get('q', '').strip()
+
+        # Use select_related to avoid N+1 queries
+        logs = StudentLogFormModel.objects.filter(student=student).select_related(
+            'department', 'activity_type', 'core_diagnosis', 'tutor', 'tutor__user'
         )
-    logs = logs.order_by('-date', '-created_at')
-    wb = openpyxl.Workbook()
-    ws = wb.active
-    ws.title = "Student Records"
-    # Insert AGU logo
-    logo_path = os.path.join(settings.MEDIA_ROOT, 'agulogo.png')
-    if os.path.exists(logo_path):
-        img = OpenpyxlImage(logo_path)
-        img.height = 80
-        img.width = 80
-        ws.add_image(img, 'A1')
-    ws.append(["Student Records Export"])
-    ws.append([""])
-    ws.append([
-        'Date', 'Department', 'Activity Type', 'Core Diagnosis', 'Tutor', 'Status', 'Review Date', 'Comments'
-    ])
-    for log in logs:
-        status = 'Pending'
-        if log.is_reviewed:
-            status = 'Rejected' if log.reviewer_comments and log.reviewer_comments.startswith('REJECTED:') else 'Approved'
+        if review_status == 'pending':
+            logs = logs.filter(is_reviewed=False)
+        elif review_status == 'reviewed':
+            logs = logs.filter(is_reviewed=True)
+        if department_id:
+            logs = logs.filter(department_id=department_id)
+        if activity_type_id:
+            logs = logs.filter(activity_type_id=activity_type_id)
+        if search_query:
+            logs = logs.filter(
+                models.Q(description__icontains=search_query) |
+                models.Q(patient_id__icontains=search_query) |
+                models.Q(core_diagnosis__name__icontains=search_query)
+            )
+        logs = logs.order_by('-date', '-created_at')
+
+        # Create workbook in memory
+        output = BytesIO()
+        wb = openpyxl.Workbook()
+        ws = wb.active
+        ws.title = "Student Records"
+
+        # Insert AGU logo if exists (safe)
+        logo_path = os.path.join(settings.MEDIA_ROOT or '', 'agulogo.png')
+        if logo_path and os.path.exists(logo_path):
+            try:
+                img = OpenpyxlImage(logo_path)
+                img.height = 80
+                img.width = 80
+                ws.add_image(img, 'A1')
+            except Exception:
+                # don't block export if image fails
+                pass
+
+        ws.append(["Student Records Export"])
+        ws.append([""])
         ws.append([
-            log.date.strftime('%Y-%m-%d'),
-            log.department.name,
-            log.activity_type.name,
-            getattr(log.core_diagnosis, 'name', ''),
-            log.tutor.user.get_full_name() if log.tutor else '',
-            status,
-            log.review_date.strftime('%Y-%m-%d') if log.review_date else '',
-            log.reviewer_comments or ''
+            'Date', 'Department', 'Activity Type', 'Core Diagnosis', 'Tutor', 'Status', 'Review Date', 'Comments'
         ])
-    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-    response['Content-Disposition'] = f'attachment; filename="student_records_{student.student_id}_{review_status}.xlsx"'
-    wb.save(response)
-    return response
+
+        for log in logs:
+            status = 'Pending'
+            if log.is_reviewed:
+                status = 'Rejected' if log.reviewer_comments and log.reviewer_comments.startswith('REJECTED:') else 'Approved'
+            ws.append([
+                log.date.strftime('%Y-%m-%d') if getattr(log, 'date', None) else '',
+                log.department.name if getattr(log, 'department', None) else '',
+                log.activity_type.name if getattr(log, 'activity_type', None) else '',
+                getattr(log.core_diagnosis, 'name', ''),
+                log.tutor.user.get_full_name() if getattr(log, 'tutor', None) and getattr(log.tutor, 'user', None) else '',
+                status,
+                log.review_date.strftime('%Y-%m-%d') if getattr(log, 'review_date', None) else '',
+                log.reviewer_comments or ''
+            ])
+
+        wb.save(output)
+        output.seek(0)
+
+        filename = f'student_records_{student.student_id}_{review_status}.xlsx'
+        response = HttpResponse(
+            output.getvalue(),
+            content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        )
+        response['Content-Disposition'] = f'attachment; filename="{filename}"'
+        response['Content-Length'] = output.getbuffer().nbytes
+        return response
+    except Exception as e:
+        # Log and return a friendly HTTP error
+        print(f"Error exporting Excel: {e}")
+        return HttpResponse('Error generating Excel file', status=500)
 
 
 @login_required
