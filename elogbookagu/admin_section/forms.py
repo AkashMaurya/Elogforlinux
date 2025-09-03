@@ -39,6 +39,8 @@ class LogYearSectionForm(forms.ModelForm):
         # Validate that the year section name is either 'Year 5' or 'Year 6'
         if year_section_name and year_section_name not in ['Year 5', 'Year 6']:
             self.add_error('year_section_name', "Year section name must be either 'Year 5' or 'Year 6'.")
+            # Return early to avoid duplicate check when name is invalid
+            return cleaned_data
 
         # Check for duplicate year sections
         if year_section_name and year_name:

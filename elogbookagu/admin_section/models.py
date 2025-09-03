@@ -19,10 +19,7 @@ class LogYearSection(models.Model):
     year_name = models.ForeignKey(LogYear, on_delete=models.CASCADE, related_name="log_year_sections")
     is_deleted = models.BooleanField(default=False)
 
-    def clean(self):
-        valid_sections = ["Year 5", "Year 6"]
-        if self.year_section_name not in valid_sections:
-            raise ValidationError(f"{self.year_section_name} is not a valid section name. It should be 'Year 5' or 'Year 6'.")
+    # Validation moved to LogYearSectionForm to avoid duplication
 
     def __str__(self):
         return self.year_section_name

@@ -1,6 +1,6 @@
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from .models import LogYearSection, Department, Group
+from .models import LogYearSection, Department, Group,TrainingSite
 
 # Define the departments for each year section
 YEAR_5_DEPARTMENTS = [
@@ -34,20 +34,13 @@ def create_departments_and_groups_for_year_section(sender, instance, created, **
             # If it's not Year 5 or Year 6, don't create any departments or groups
             return
 
-        # Define training sites
-        training_sites = ['KHUH', 'Salmania', 'Arbian Gulf University', 'AMH']
-
         # Create each department
         for dept_name in departments_to_create:
-            department = Department.objects.create(
+            Department.objects.create(
                 name=dept_name,
                 log_year=instance.year_name,
                 log_year_section=instance
             )
-
-            # Assign training sites to the department
-            department.training_sites.set(training_sites)
-            department.save()
 
         # Create each group
         for group_name in groups_to_create:
