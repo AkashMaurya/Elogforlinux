@@ -36,7 +36,7 @@ class Department(models.Model):
         related_name="department_log_year_section",
         db_index=True,
     )
-
+    
     def __str__(self):
         return f"{self.name}"
 

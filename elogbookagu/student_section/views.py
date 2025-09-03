@@ -206,7 +206,6 @@ def student_elog(request):
     }
     return render(request, "student_elog.html", context)
 
-
 @login_required
 def student_profile(request):
     # Get the current user
@@ -503,31 +502,27 @@ def get_departments_by_year(request):
 
 @login_required
 def get_activity_types(request):
-    department_id = request.GET.get("department")
-    if not department_id:
-        print("No department_id provided in get_activity_types")  # Debug
+    try:
+        department_id = request.GET.get("department")
+        if not department_id:
+            print("No department_id provided in get_activity_types")
+            return JsonResponse([], safe=False)
+
+        # Get activity types for the selected department
+        activity_types = ActivityType.objects.filter(
+            department_id=department_id
+        ).order_by("name")
+
+        print(f"Activity Types for department {department_id}: {list(activity_types)}")
+
+        activity_type_data = [
+            {"id": activity.id, "name": activity.name} for activity in activity_types
+        ]
+        return JsonResponse(activity_type_data, safe=False)
+    
+    except Exception as e:
+        print(f"Error in get_activity_types: {str(e)}")
         return JsonResponse([], safe=False)
-
-    student = request.user.student
-    log_year_section = student.group.log_year_section if student.group else None
-    print(f"Student: {student}, Log Year Section: {log_year_section}")  # Debug
-
-    activity_types = (
-        ActivityType.objects.filter(
-            department_id=department_id, department__log_year_section=log_year_section
-        )
-        .distinct()
-        .order_by("name")
-    )
-
-    print(
-        f"Activity Types for department {department_id}: {list(activity_types)}"
-    )  # Debug
-
-    activity_type_data = [
-        {"id": activity.id, "name": activity.name} for activity in activity_types
-    ]
-    return JsonResponse(activity_type_data, safe=False)
 
 
 @login_required

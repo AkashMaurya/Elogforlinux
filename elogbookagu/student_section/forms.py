@@ -6,6 +6,8 @@ from admin_section.models import Department, ActivityType, CoreDiaProSession, Da
 from accounts.models import Doctor, Student
 
 
+
+
 class StudentLogFormModelForm(forms.ModelForm):
     department = forms.ModelChoiceField(
         queryset=Department.objects.none(),
@@ -72,26 +74,24 @@ class StudentLogFormModelForm(forms.ModelForm):
             log_year_section = student.group.log_year_section if student.group else None
 
             if log_year_section:
-                # Department की queryset सेट करें
+                # Department queryset
                 self.fields["department"].queryset = Department.objects.filter(
-                    log_year_section=log_year_section
+                    log_year=student.group.log_year
                 )
 
-                # Training Site की queryset सेट करें - केवल वे training sites जहाँ student का group mapped है
+                # Training Site queryset
                 if student.group:
-                    # Get training sites where the student's group is mapped
                     mapped_training_sites = MappedAttendance.objects.filter(
                         groups=student.group,
                         is_active=True
                     ).values_list('training_site', flat=True).distinct()
-
                     self.fields["training_site"].queryset = TrainingSite.objects.filter(
                         id__in=mapped_training_sites
                     ).order_by('name')
                 else:
                     self.fields["training_site"].queryset = TrainingSite.objects.none()
 
-                # अगर फॉर्म में पहले से डेटा है (जैसे एडिटिंग के दौरान) या POST डेटा में department चुना गया है
+                # Department selection logic
                 department = None
                 if self.instance.pk and self.instance.department:
                     department = self.instance.department
@@ -103,15 +103,16 @@ class StudentLogFormModelForm(forms.ModelForm):
                         pass
 
                 if department:
-                    # Activity Type और Tutor की queryset सेट करें
+                    # Activity Type queryset based on department
                     self.fields["activity_type"].queryset = ActivityType.objects.filter(
                         department=department
-                    )
+                    ).order_by('name')
+                    # Tutor queryset based on department
                     self.fields["tutor"].queryset = Doctor.objects.filter(
                         departments=department
                     ).distinct()
-
-                    # अगर Activity Type चुना गया है, तो Core Diagnosis की queryset सेट करें
+                    
+                    # Activity Type selection logic
                     activity_type = None
                     if self.instance.pk and self.instance.activity_type:
                         activity_type = self.instance.activity_type
@@ -138,6 +139,7 @@ class StudentLogFormModelForm(forms.ModelForm):
                 self.fields["core_diagnosis"].queryset = CoreDiaProSession.objects.none()
                 self.fields["tutor"].queryset = Doctor.objects.none()
                 self.fields["training_site"].queryset = TrainingSite.objects.none()
+
     def clean(self):
         cleaned_data = super().clean()
         department = cleaned_data.get("department")
@@ -167,71 +169,60 @@ class StudentLogFormModelForm(forms.ModelForm):
             today = timezone.now().date()
             request = self.request if hasattr(self, 'request') else None
 
-            # Get date restriction settings or use defaults
             try:
                 settings = DateRestrictionSettings.objects.first()
                 if not settings:
-                    # Create default settings if none exist
                     settings = DateRestrictionSettings.objects.create(
                         past_days_limit=7,
                         allow_future_dates=False,
                         future_days_limit=0
                     )
 
-                # Get active status from session or use default
                 is_active = True
                 if request and hasattr(request, 'session'):
                     is_active = request.session.get('date_restrictions_active', True)
                 else:
                     is_active = True
 
-                # Skip validation if date restrictions are inactive
                 if not is_active:
                     return cleaned_data
 
             except Exception:
-                # Use default values if there's an error
                 past_days_limit = 7
                 allow_future_dates = False
                 future_days_limit = 0
-                allowed_days = [0, 1, 2, 3, 4, 5, 6]  # All days allowed by default
+                allowed_days = [0, 1, 2, 3, 4, 5, 6]
                 is_active = True
             else:
                 past_days_limit = settings.past_days_limit
                 allow_future_dates = settings.allow_future_dates
                 future_days_limit = settings.future_days_limit
 
-                # Get allowed days from session or use default
                 if request and hasattr(request, 'session'):
                     allowed_days_str = request.session.get('allowed_days_for_students', '0,1,2,3,4,5,6')
                     allowed_days = [int(day) for day in allowed_days_str.split(',') if day.strip()]
                 else:
-                    allowed_days = [0, 1, 2, 3, 4, 5, 6]  # All days allowed by default
+                    allowed_days = [0, 1, 2, 3, 4, 5, 6]
 
-            # Skip further validation if restrictions are inactive
-            if not is_active:
-                return cleaned_data
+                if not is_active:
+                    return cleaned_data
 
-            # Check if the day of week is allowed
-            day_of_week = date.weekday()  # 0=Monday, 6=Sunday
-            if day_of_week not in allowed_days:
-                day_names = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
-                self.add_error("date", f"Logs cannot be submitted on {day_names[day_of_week]}. Please select an allowed day.")
+                day_of_week = date.weekday()
+                if day_of_week not in allowed_days:
+                    day_names = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+                    self.add_error("date", f"Logs cannot be submitted on {day_names[day_of_week]}. Please select an allowed day.")
 
-            # Check if date is in the past beyond the limit
-            earliest_allowed_date = today - timedelta(days=past_days_limit)
-            if date < earliest_allowed_date:
-                self.add_error("date", f"Date cannot be more than {past_days_limit} days in the past.")
+                earliest_allowed_date = today - timedelta(days=past_days_limit)
+                if date < earliest_allowed_date:
+                    self.add_error("date", f"Date cannot be more than {past_days_limit} days in the past.")
 
-            # Check if date is in the future when not allowed
-            if date > today and not allow_future_dates:
-                self.add_error("date", "Future dates are not allowed.")
+                if date > today and not allow_future_dates:
+                    self.add_error("date", "Future dates are not allowed.")
 
-            # Check if date is too far in the future
-            if date > today and allow_future_dates:
-                latest_allowed_date = today + timedelta(days=future_days_limit)
-                if date > latest_allowed_date:
-                    self.add_error("date", f"Date cannot be more than {future_days_limit} days in the future.")
+                if date > today and allow_future_dates:
+                    latest_allowed_date = today + timedelta(days=future_days_limit)
+                    if date > latest_allowed_date:
+                        self.add_error("date", f"Date cannot be more than {future_days_limit} days in the future.")
 
         # Check attendance validation
         if date and self.user and hasattr(self.user, 'student'):
@@ -239,10 +230,7 @@ class StudentLogFormModelForm(forms.ModelForm):
             training_site = cleaned_data.get('training_site')
 
             if training_site:
-                # Import here to avoid circular imports
                 from doctor_section.models import StudentAttendance
-
-                # Check if student was marked present for this date and training site
                 attendance = StudentAttendance.objects.filter(
                     student=student,
                     training_site=training_site,
@@ -251,7 +239,6 @@ class StudentLogFormModelForm(forms.ModelForm):
                 ).first()
 
                 if not attendance:
-                    # Check if any attendance was marked for this date and training site
                     any_attendance = StudentAttendance.objects.filter(
                         student=student,
                         training_site=training_site,
@@ -264,6 +251,7 @@ class StudentLogFormModelForm(forms.ModelForm):
                         self.add_error("date", f"No attendance record found for {date.strftime('%B %d, %Y')} at {training_site.name}. Please ensure your attendance was marked as present before submitting logs by your Tutor Or Arabian Gulf University.")
 
         return cleaned_data
+
     class Meta:
         model = StudentLogFormModel
         fields = [
@@ -318,7 +306,6 @@ class StudentLogFormModelForm(forms.ModelForm):
                 }
             ),
         }
-
 
 class SupportTicketForm(forms.ModelForm):
     class Meta:
