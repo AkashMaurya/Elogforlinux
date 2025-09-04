@@ -103,6 +103,25 @@
                         </form>
                     </div>
 
+                    <!-- Bulk Upload Section -->
+                    <div class="bg-white dark:bg-gray-800 shadow-lg rounded-lg p-6 mt-6 border-t-4 border-gray-300">
+                        <h3 class="text-lg font-semibold mb-3 text-gray-800 dark:text-gray-100">Bulk Upload Activity Types</h3>
+                        <p class="text-sm text-gray-500 dark:text-gray-400 mb-3">Upload a CSV or Excel file with the following columns (exact names): <code>name</code>, <code>department</code>. Department must match an existing department name.</p>
+
+                        <form method="post" enctype="multipart/form-data" class="space-y-3">
+                            {% csrf_token %}
+                            <div>
+                                <input type="file" name="bulk_file" id="bulk-file" accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 dark:file:bg-gray-700/30" />
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500">Upload</button>
+                                <a href="?download=activity_template&format=csv" class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg border border-gray-300 hover:bg-gray-200">Download CSV Template</a>
+                                <a href="?download=activity_template&format=xlsx" class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg border border-gray-300 hover:bg-gray-200">Download XLSX Template</a>
+                            </div>
+                            <p class="text-xs text-gray-400 mt-1">Tip: Use the template to avoid column mismatches. Rows with missing departments will be skipped and reported.</p>
+                        </form>
+                    </div>
+
                     <!-- Messages -->
                     {% if messages %}
                     <div class="mt-4">

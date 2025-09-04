@@ -185,6 +185,33 @@
       </div>
     </div>
 
+    <!-- Bulk Upload Card -->
+    <div class="max-w-2xl mx-auto bg-white dark:bg-gray-800 shadow-lg rounded-lg overflow-hidden mb-8 border-t-4 border-indigo-500">
+      <div class="p-6 sm:p-8">
+        <div class="flex items-center mb-4">
+          <div class="flex-shrink-0 mr-3 text-indigo-500">
+            <i class="fas fa-file-upload text-2xl"></i>
+          </div>
+          <div>
+            <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-100">Bulk Upload Sessions</h3>
+            <p class="text-sm text-gray-500 dark:text-gray-400">Upload a CSV or XLSX file to create multiple sessions at once. Download a template to avoid mismatches.</p>
+          </div>
+        </div>
+
+        <form method="post" action="{% url 'admin_section:core_dia_pro_session_list' %}" enctype="multipart/form-data" class="flex items-center gap-3">
+          {% csrf_token %}
+          <input type="file" name="bulk_file" accept=".csv, .xlsx, .xls" class="block w-64 text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700" required />
+          <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">Upload</button>
+          <div class="ml-4 text-sm">
+            <a href="{% url 'admin_section:core_dia_pro_session_list' %}?download=session_template&format=csv" class="text-indigo-600 hover:underline mr-3">Download CSV template</a>
+            <a href="{% url 'admin_section:core_dia_pro_session_list' %}?download=session_template&format=xlsx" class="text-indigo-600 hover:underline">Download XLSX template</a>
+          </div>
+        </form>
+
+        <p class="mt-3 text-xs text-gray-500 dark:text-gray-400">Required columns (case-insensitive): <code>name</code>, <code>department</code>, <code>activity_type</code>. Use exact department and activity type names from the system to avoid mismatches.</p>
+      </div>
+    </div>
+
     <!-- Sessions Table with CRUD -->
     <div class="bg-white dark:bg-gray-800 shadow-lg rounded-lg overflow-hidden border-t-4 border-green-500">
       <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
