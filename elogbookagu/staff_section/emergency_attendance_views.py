@@ -54,9 +54,28 @@ def emergency_attendance(request):
 
             # Process attendance if submitted
             if 'submit_attendance' in request.POST:
+                # If no students found, inform user and don't attempt to save
+                if not students_data:
+                    messages.info(request, 'No students found for the selected department/training site/date.')
+                    # Re-render the form with context so staff can adjust selections
+                    context = {
+                        'form': form,
+                        'students_data': students_data,
+                        'selected_department': selected_department,
+                        'selected_training_site': selected_training_site,
+                        'selected_date': selected_date,
+                    }
+                    return render(request, 'staff_section/emergency_attendance.html', context)
+
                 return process_emergency_attendance_submission(
                     request, staff, department, training_site, attendance_date
                 )
+        else:
+            # Surface form validation errors to the user to aid debugging
+            field_errors = []
+            for field, errs in form.errors.items():
+                field_errors.append(f"{field}: {', '.join(errs)}")
+            messages.error(request, 'Invalid form input: ' + '; '.join(field_errors))
 
     else:
         form = EmergencyAttendanceForm(staff=staff)
@@ -78,9 +97,21 @@ def get_students_for_emergency_attendance(staff, department, training_site, atte
 
     # Get all groups that have the same log_year_section as the selected department
     # This is how students are related to departments - through log_year_section
-    groups = Group.objects.filter(
-        log_year_section=department.log_year_section
-    ).select_related('log_year', 'log_year_section')
+    if getattr(department, 'log_year_section', None):
+        groups = Group.objects.filter(
+            log_year_section=department.log_year_section
+        ).select_related('log_year', 'log_year_section')
+    else:
+        # Fallback: if department has no log_year_section set, try to find groups by log_year
+        groups = Group.objects.filter(
+            log_year=department.log_year
+        ).select_related('log_year', 'log_year_section')
+
+    # If still no groups, attempt to include groups with null log_year_section for the same log_year
+    if not groups.exists():
+        groups = Group.objects.filter(
+            log_year=department.log_year
+        ).select_related('log_year', 'log_year_section')
 
     # If training site is specified, we could filter further, but for now we'll get all groups
     # in the department's log_year_section

@@ -171,7 +171,7 @@
             <div class="border-t border-gray-200 dark:border-gray-700 pt-6">
               <div class="flex items-center justify-between mb-6">
                 <h4 class="text-lg font-semibold text-gray-900 dark:text-white">
-                  Emergency Attendance - {{ selected_department.department_name }}
+                  Emergency Attendance - {{ selected_department.name }}
                   {% if selected_training_site %} | {{ selected_training_site.name }}{% endif %}
                   <br><span class="text-sm text-gray-500">Date: {{ selected_date|date:"F d, Y" }}</span>
                 </h4>
@@ -229,13 +229,13 @@
                           <label class="flex items-center cursor-pointer">
                             <input type="radio" name="student_{{ student_data.student.id }}_status" value="present" 
                                    class="attendance-radio text-green-600 focus:ring-green-500"
-                                   {% if student_data.existing_attendance.status == 'present' %}checked{% endif %}>
+                                   {% if student_data.existing_attendance and student_data.existing_attendance.status == 'present' %}checked{% endif %}>
                             <span class="ml-2 text-sm font-medium text-green-700 dark:text-green-400">Present</span>
                           </label>
                           <label class="flex items-center cursor-pointer">
                             <input type="radio" name="student_{{ student_data.student.id }}_status" value="absent" 
                                    class="attendance-radio text-red-600 focus:ring-red-500"
-                                   {% if student_data.existing_attendance.status == 'absent' %}checked{% endif %}>
+                                   {% if student_data.existing_attendance and student_data.existing_attendance.status == 'absent' %}checked{% endif %}>
                             <span class="ml-2 text-sm font-medium text-red-700 dark:text-red-400">Absent</span>
                           </label>
                         </div>
@@ -256,7 +256,7 @@
                       {% if student_data.existing_attendance %}
                         <div class="mt-2 text-xs text-red-600 dark:text-red-400">
                           <i class="fas fa-exclamation-triangle mr-1"></i>
-                          Previously marked as {{ student_data.existing_attendance.status }} (Emergency)
+                          Previously marked as {{ student_data.existing_attendance.status|default:"(status unknown)" }} (Emergency)
                         </div>
                       {% endif %}
                     </div>
@@ -288,81 +288,58 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Mark all present functionality
-    document.getElementById('mark-all-present')?.addEventListener('click', function() {
-        const presentRadios = document.querySelectorAll('input[type="radio"][value="present"]');
-        presentRadios.forEach(radio => {
-            radio.checked = true;
-            updateCardStyle(radio);
-        });
+  // Update card styling based on a radio selection
+  function updateCardStyle(radio) {
+    if (!radio) return;
+    const studentCard = radio.closest('.student-card');
+    if (!studentCard) return;
+
+    // Remove all status classes
+    studentCard.classList.remove('present-selected', 'absent-selected');
+
+    // Add appropriate class based on selection
+    if (radio.value === 'present' && radio.checked) {
+      studentCard.classList.add('present-selected');
+    } else if (radio.value === 'absent' && radio.checked) {
+      studentCard.classList.add('absent-selected');
+    }
+  }
+
+  // Mark all present functionality
+  const markAllPresentBtn = document.getElementById('mark-all-present');
+  if (markAllPresentBtn) {
+    markAllPresentBtn.addEventListener('click', function() {
+      const presentRadios = document.querySelectorAll('input[type="radio"][value="present"]');
+      presentRadios.forEach(radio => {
+        radio.checked = true;
+        updateCardStyle(radio);
+      });
+    });
+  }
+
+  // Mark all absent functionality
+  const markAllAbsentBtn = document.getElementById('mark-all-absent');
+  if (markAllAbsentBtn) {
+    markAllAbsentBtn.addEventListener('click', function() {
+      const absentRadios = document.querySelectorAll('input[type="radio"][value="absent"]');
+      absentRadios.forEach(radio => {
+        radio.checked = true;
+        updateCardStyle(radio);
+      });
+    });
+  }
+
+  // Add event listeners to individual radio buttons to keep card styles in sync
+  document.querySelectorAll('input[type="radio"][name*="_status"]').forEach(radio => {
+    radio.addEventListener('change', function() {
+      updateCardStyle(this);
     });
 
-    // Mark all absent functionality
-    document.getElementById('mark-all-absent')?.addEventListener('click', function() {
-        const absentRadios = document.querySelectorAll('input[type="radio"][value="absent"]');
-        absentRadios.forEach(radio => {
-            radio.checked = true;
-            updateCardStyle(radio);
-        });
-    });
-
-    // Update card styling based on selection
-    function updateCardStyle(radio) {
-        const studentCard = radio.closest('.student-card');
-        const studentId = studentCard.dataset.studentId;
-        
-        // Remove all status classes
-        studentCard.classList.remove('present-selected', 'absent-selected');
-        
-        // Add appropriate class based on selection
-        if (radio.value === 'present' && radio.checked) {
-            studentCard.classList.add('present-selected');
-        } else if (radio.value === 'absent' && radio.checked) {
-            studentCard.classList.add('absent-selected');
-        }
+    // Initialize card styling on page load
+    if (radio.checked) {
+      updateCardStyle(radio);
     }
-
-    // Add event listeners to all radio buttons
-    document.querySelectorAll('input[type="radio"][name*="_status"]').forEach(radio => {
-        radio.addEventListener('change', function() {
-            updateCardStyle(this);
-        });
-        
-        // Initialize card styling
-        if (radio.checked) {
-            updateCardStyle(radio);
-        }
-    });
-
-    // Auto-submit form when any required field changes
-    const departmentSelect = document.getElementById('{{ form.department.id_for_label }}');
-    const dateSelect = document.getElementById('{{ form.attendance_date.id_for_label }}');
-    const trainingSiteSelect = document.getElementById('{{ form.training_site.id_for_label }}');
-
-    function checkAndSubmitForm() {
-        const department = departmentSelect?.value;
-        const date = dateSelect?.value;
-
-        // Auto-submit if both department and date are selected
-        if (department && date) {
-            document.getElementById('emergency-attendance-form').submit();
-        }
-    }
-
-    if (departmentSelect) {
-        departmentSelect.addEventListener('change', checkAndSubmitForm);
-    }
-
-    if (dateSelect) {
-        dateSelect.addEventListener('change', checkAndSubmitForm);
-    }
-
-    if (trainingSiteSelect) {
-        trainingSiteSelect.addEventListener('change', function() {
-            // Only auto-submit if department and date are already selected
-            checkAndSubmitForm();
-        });
-    }
+  });
 });
 </script>
 {% endblock %}

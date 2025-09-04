@@ -109,7 +109,7 @@
               <option value="">All Departments</option>
               {% for dept in departments %}
                 <option value="{{ dept.id }}" {% if dept.id|stringformat:"s" == selected_department %}selected{% endif %}>
-                  {{ dept.department_name }}
+                    {{ dept.name }}
                 </option>
               {% endfor %}
             </select>
@@ -260,7 +260,7 @@
                   </td>
                   <td class="px-6 py-4 whitespace-nowrap">
                     <div class="text-sm text-gray-900 dark:text-white">
-                      {{ attendance.department.department_name }}
+                      {{ attendance.department.name }}
                     </div>
                   </td>
                   <td class="px-6 py-4 whitespace-nowrap">
