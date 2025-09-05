@@ -147,35 +147,28 @@ def core_dia_pro_session_list(request):
 
 @login_required
 def core_dia_pro_session_create(request):
-    """Create a single CoreDiaProSession from the form (not bulk upload)."""
+    """Handle creation of a single CoreDiaProSession via the form on the list page."""
     try:
-        if request.method == 'POST':
-            form = CoreDiaProSessionForm(request.POST)
-            if form.is_valid():
-                new_session = form.save()
-                messages.success(request, f'Session "{new_session.name}" created successfully!')
-                return redirect('admin_section:core_dia_pro_session_list')
-            else:
-                # Invalid form: render list with errors
-                sessions = CoreDiaProSession.objects.all().order_by('name')
-                search_query = request.GET.get('q', '').strip()
-                if search_query:
-                    sessions = sessions.filter(
-                        Q(name__icontains=search_query) |
-                        Q(activity_type__name__icontains=search_query) |
-                        Q(department__name__icontains=search_query)
-                    )
-                paginator = Paginator(sessions, 10)
-                page_obj = paginator.get_page(request.GET.get('page'))
-                context = {
-                    'core_sessions': page_obj,
-                    'form': form,
-                    'editing': False,
-                    'search_query': search_query,
-                }
-                return render(request, 'admin_section/core_dia_pro_session_list.html', context)
-        else:
+        if request.method != 'POST':
             return redirect('admin_section:core_dia_pro_session_list')
+
+        form = CoreDiaProSessionForm(request.POST)
+        if form.is_valid():
+            session = form.save()
+            messages.success(request, f'Session "{session.name}" created successfully!')
+            return redirect('admin_section:core_dia_pro_session_list')
+        else:
+            # If invalid, re-render the list view with the form errors visible
+            sessions = CoreDiaProSession.objects.all().order_by('name')
+            paginator = Paginator(sessions, 10)
+            page_obj = paginator.get_page(request.GET.get('page'))
+            context = {
+                'core_sessions': page_obj,
+                'form': form,
+                'editing': False,
+                'search_query': request.GET.get('q', '').strip(),
+            }
+            return render(request, 'admin_section/core_dia_pro_session_list.html', context)
     except Exception as exc:
         logger.error(f'Error creating session: {exc}')
         messages.error(request, 'An error occurred while creating the session.')

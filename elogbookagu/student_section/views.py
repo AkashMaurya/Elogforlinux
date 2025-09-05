@@ -19,7 +19,7 @@ from doctor_section.models import Notification
 import openpyxl
 from openpyxl.drawing.image import Image as OpenpyxlImage
 from io import BytesIO
-
+from urllib.parse import quote
 # Create your views here.
 
 
@@ -432,6 +432,44 @@ def student_final_records(request):
         "group_name": student.group.group_name if student.group else "",
     }
 
+    # Logo path for PDF (absolute file URI preferred by xhtml2pdf)
+    logo_path = ''
+    try:
+        possible = os.path.join(getattr(settings, 'MEDIA_ROOT', '') or '', 'agulogo.png')
+        if possible and os.path.exists(possible):
+            if os.name == 'nt':
+                logo_path = 'file:///' + possible.replace('\\', '/')
+            else:
+                logo_path = 'file://' + possible
+    except Exception:
+        logo_path = ''
+
+    # Prepare logo path for PDF rendering (xhtml2pdf prefers absolute file URIs)
+    logo_path = ''
+    try:
+        possible = os.path.join(getattr(settings, 'MEDIA_ROOT', '') or '', 'agulogo.png')
+        if possible and os.path.exists(possible):
+            if os.name == 'nt':
+                logo_path = 'file:///' + possible.replace('\\', '/')
+            else:
+                logo_path = 'file://' + possible
+    except Exception:
+        logo_path = ''
+
+    # Prepare logo path for PDF rendering. xhtml2pdf generally needs a file:// absolute path
+    logo_path = ''
+    try:
+        possible = os.path.join(getattr(settings, 'MEDIA_ROOT', '') or '', 'agulogo.png')
+        if possible and os.path.exists(possible):
+            # Ensure file URI format works on Windows and Unix
+            if os.name == 'nt':
+                # Convert backslashes to forward slashes and prepend file:/// for Windows
+                logo_path = 'file:///' + possible.replace('\\', '/')
+            else:
+                logo_path = 'file://' + possible
+    except Exception:
+        logo_path = ''
+
     context = {
         'logs': page_obj,
         'departments': departments,
@@ -610,34 +648,148 @@ def get_date_restrictions(request):
         })
 
 
+# @login_required
+# def generate_records_pdf(request):
+#     # Get the current student
+#     student = request.user.student
+
+#     # Get filter parameters (same as in student_final_records)
+#     department_id = request.GET.get('department')
+#     activity_type_id = request.GET.get('activity_type')
+#     review_status = request.GET.get('status', 'pending')
+#     search_query = request.GET.get('q', '').strip()
+
+#     # Base queryset - filter by student
+#     logs = StudentLogFormModel.objects.filter(student=student)
+
+#     # Filter by review status if specified
+#     if review_status == 'pending':
+#         logs = logs.filter(is_reviewed=False)
+#     elif review_status == 'reviewed':
+#         logs = logs.filter(is_reviewed=True)
+#     # If 'all' is selected, don't apply any filter
+
+#     # Apply filters if provided
+#     if department_id:
+#         logs = logs.filter(department_id=department_id)
+
+#     if activity_type_id:
+#         logs = logs.filter(activity_type_id=activity_type_id)
+
+#     if search_query:
+#         logs = logs.filter(
+#             models.Q(description__icontains=search_query) |
+#             models.Q(patient_id__icontains=search_query) |
+#             models.Q(core_diagnosis__name__icontains=search_query)
+#         )
+
+#     # Order by most recent first
+#     logs = logs.order_by('-date', '-created_at')
+
+#     # Student info for PDF
+#     student_info = {
+#         "student_name": student.user.get_full_name(),
+#         "student_id": student.student_id,
+#         "year_name": student.group.log_year.year_name if student.group else "",
+#         "section_name": student.group.log_year_section.year_section_name if student.group else "",
+#         "group_name": student.group.group_name if student.group else "",
+#     }
+
+#     # Prepare logo path for PDF rendering with proper URI encoding
+#     logo_path = ''
+#     try:
+#         logo_file = 'agulogo.png'
+#         media_root = getattr(settings, 'MEDIA_ROOT', '') or ''
+#         possible = os.path.join(media_root, logo_file)
+#         if possible and os.path.exists(possible):
+#             # Get absolute path and convert to URI
+#             abs_path = os.path.abspath(possible)
+#             if os.name == 'nt':
+#                 # Windows paths need special handling: file:///C:/path/to/file
+#                 abs_path = abs_path.replace('\\', '/')
+#                 # Remove any existing file: prefix
+#                 abs_path = abs_path.replace('file:', '')
+#                 logo_path = 'file:///' + abs_path
+#             else:
+#                 # Unix-like systems: file:///path/to/file
+#                 logo_path = 'file://' + abs_path
+#     except Exception as e:
+#         print(f"Error getting logo path: {e}")
+#         logo_path = ''
+
+#     # Create context for PDF template
+#     context = {
+#         'logs': logs,
+#         'student_info': student_info,
+#         'generated_date': datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+#         'status_type': review_status,
+#         'MEDIA_URL': settings.MEDIA_URL,
+#         'AGU_LOGO_PATH': logo_path,
+#     }
+
+#     # Render HTML content
+#     html_string = render_to_string('student_records_pdf.html', context)
+
+#     # Create HTTP response with PDF
+#     response = HttpResponse(content_type='application/pdf')
+
+#     # Create a filename that reflects the status
+#     if review_status == 'pending':
+#         status_text = 'pending'
+#     elif review_status == 'reviewed':
+#         status_text = 'reviewed'
+#     else:
+#         status_text = 'all'
+
+#     response['Content-Disposition'] = f'attachment; filename="student_records_{student.student_id}_{status_text}.pdf"'
+
+#     # Generate PDF
+#     pisa_status = pisa.CreatePDF(html_string, dest=response)
+
+#     # Return PDF response if successful
+#     if pisa_status.err:
+#         return HttpResponse('Error generating PDF', status=500)
+
+#     return response
+
+
+
+
+def link_callback(uri, rel):
+    """
+    Convert HTML URIs to absolute system paths so xhtml2pdf can access those resources
+    """
+    if uri.startswith(settings.MEDIA_URL):
+        path = os.path.join(settings.MEDIA_ROOT, uri.replace(settings.MEDIA_URL, ""))
+    elif uri.startswith(settings.STATIC_URL):
+        path = os.path.join(settings.STATIC_ROOT, uri.replace(settings.STATIC_URL, ""))
+    else:
+        return uri
+    if not os.path.isfile(path):
+        raise Exception(f'Media file not found: {uri} at {path}')
+    return path
+
 @login_required
 def generate_records_pdf(request):
-    # Get the current student
     student = request.user.student
-
-    # Get filter parameters (same as in student_final_records)
     department_id = request.GET.get('department')
     activity_type_id = request.GET.get('activity_type')
     review_status = request.GET.get('status', 'pending')
     search_query = request.GET.get('q', '').strip()
 
-    # Base queryset - filter by student
-    logs = StudentLogFormModel.objects.filter(student=student)
+    logs = StudentLogFormModel.objects.filter(student=student).select_related(
+        'department', 'activity_type', 'core_diagnosis', 'tutor', 'tutor__user'
+    )
 
-    # Filter by review status if specified
     if review_status == 'pending':
         logs = logs.filter(is_reviewed=False)
     elif review_status == 'reviewed':
         logs = logs.filter(is_reviewed=True)
-    # If 'all' is selected, don't apply any filter
 
-    # Apply filters if provided
     if department_id:
         logs = logs.filter(department_id=department_id)
-
     if activity_type_id:
         logs = logs.filter(activity_type_id=activity_type_id)
-
     if search_query:
         logs = logs.filter(
             models.Q(description__icontains=search_query) |
@@ -645,10 +797,8 @@ def generate_records_pdf(request):
             models.Q(core_diagnosis__name__icontains=search_query)
         )
 
-    # Order by most recent first
     logs = logs.order_by('-date', '-created_at')
 
-    # Student info for PDF
     student_info = {
         "student_name": student.user.get_full_name(),
         "student_id": student.student_id,
@@ -657,22 +807,31 @@ def generate_records_pdf(request):
         "group_name": student.group.group_name if student.group else "",
     }
 
-    # Create context for PDF template
+    logo_path = ''
+    try:
+        logo_file = 'agulogo.png'
+        media_root = getattr(settings, 'MEDIA_ROOT', '')
+        possible = os.path.join(media_root, logo_file)
+        if possible and os.path.exists(possible):
+            logo_path = f"{settings.MEDIA_URL}{logo_file}"
+            logo_path = quote(logo_path, safe='/:')
+        else:
+            print(f"Logo file not found at: {possible}")
+    except Exception as e:
+        print(f"Error getting logo path: {e}")
+
     context = {
         'logs': logs,
         'student_info': student_info,
         'generated_date': datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         'status_type': review_status,
         'MEDIA_URL': settings.MEDIA_URL,
+        'AGU_LOGO_PATH': logo_path,
     }
 
-    # Render HTML content
     html_string = render_to_string('student_records_pdf.html', context)
-
-    # Create HTTP response with PDF
     response = HttpResponse(content_type='application/pdf')
 
-    # Create a filename that reflects the status
     if review_status == 'pending':
         status_text = 'pending'
     elif review_status == 'reviewed':
@@ -681,15 +840,13 @@ def generate_records_pdf(request):
         status_text = 'all'
 
     response['Content-Disposition'] = f'attachment; filename="student_records_{student.student_id}_{status_text}.pdf"'
+    pisa_status = pisa.CreatePDF(html_string, dest=response, link_callback=link_callback)
 
-    # Generate PDF
-    pisa_status = pisa.CreatePDF(html_string, dest=response)
-
-    # Return PDF response if successful
     if pisa_status.err:
         return HttpResponse('Error generating PDF', status=500)
 
     return response
+
 
 
 @login_required
