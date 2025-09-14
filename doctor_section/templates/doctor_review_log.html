@@ -1,0 +1,158 @@
+{% extends 'base.html' %}
+{% load custom_filters %}
+
+{% block title %}
+  Doctor Dashboard
+{% endblock %}
+
+{% block navbar %}
+  {% include './components/doc_auth_navbar.html' %}
+{% endblock %}
+
+{% block content %}
+  <div class="container mx-auto px-4 py-8">
+    <div class="mb-6">
+      <a href="{% url 'doctor_section:doctor_reviews' %}" class="inline-flex items-center text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300">
+        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+        </svg>
+        Back to Reviews
+      </a>
+    </div>
+
+    <!-- Messages section -->
+    {% if messages %}
+      <div class="mb-6">
+        {% for message in messages %}
+          <div class="p-4 mb-4 rounded-lg {% if message.tags == 'success' %}bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100{% elif message.tags == 'error' %}bg-red-100 text-red-800 dark:bg-red-800 dark:text-red-100{% else %}bg-blue-100 text-blue-800 dark:bg-blue-800 dark:text-blue-100{% endif %}">
+            {{ message }}
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    <!-- Review Deadline Information -->
+    {% if log.review_deadline %}
+      <div class="mb-6 p-4 rounded-lg {% if log.review_deadline < now %}bg-red-50 border-red-200 dark:bg-red-900/20 dark:border-red-800{% elif log.days_remaining <= 3 %}bg-yellow-50 border-yellow-200 dark:bg-yellow-900/20 dark:border-yellow-800{% else %}bg-blue-50 border-blue-200 dark:bg-blue-900/20 dark:border-blue-800{% endif %} border">
+        <div class="flex items-start">
+          <div class="flex-shrink-0 mt-0.5">
+            {% if log.review_deadline < now %}
+              <i class="fas fa-exclamation-circle text-red-500"></i>
+            {% elif log.days_remaining <= 3 %}
+              <i class="fas fa-exclamation-triangle text-yellow-500"></i>
+            {% else %}
+              <i class="fas fa-info-circle text-blue-500"></i>
+            {% endif %}
+          </div>
+          <div class="ml-3">
+            <h3 class="text-sm font-medium {% if log.review_deadline < now %}text-red-800 dark:text-red-300{% elif log.days_remaining <= 3 %}text-yellow-800 dark:text-yellow-300{% else %}text-blue-800 dark:text-blue-300{% endif %}">
+              {% if log.review_deadline < now %}
+                Review Deadline Passed
+              {% elif log.days_remaining <= 3 %}
+                Review Deadline Approaching
+              {% else %}
+                Review Deadline Information
+              {% endif %}
+            </h3>
+            <p class="text-sm text-gray-600 dark:text-gray-300 mt-1">
+              {% if log.review_deadline < now %}
+                The review period for this log has expired. You can no longer submit a review.
+              {% elif log.days_remaining <= 3 %}
+                This log must be reviewed within <strong>{{ log.days_remaining }} days</strong>. After this period, you will no longer be able to review it.
+              {% else %}
+                This log must be reviewed by <strong>{{ log.review_deadline|date:"F j, Y" }}</strong> ({{ log.days_remaining }} days from now).
+              {% endif %}
+            </p>
+          </div>
+        </div>
+      </div>
+    {% endif %}
+
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
+      <h2 class="text-2xl font-bold mb-6 text-gray-800 dark:text-white">Review Student Log</h2>
+
+      <!-- Log Details -->
+      <div class="mb-6 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+          <div>
+            <span class="font-semibold text-gray-700 dark:text-gray-300">Student:</span>
+            <span class="text-gray-800 dark:text-white">{{ log.student.user.get_full_name }}</span>
+          </div>
+          <div>
+            <span class="font-semibold text-gray-700 dark:text-gray-300">Student ID:</span>
+            <span class="text-gray-800 dark:text-white">{{ log.student.student_id }}</span>
+          </div>
+          <div>
+            <span class="font-semibold text-gray-700 dark:text-gray-300">Date:</span>
+            <span class="text-gray-800 dark:text-white">{{ log.date }}</span>
+          </div>
+          <div>
+            <span class="font-semibold text-gray-700 dark:text-gray-300">Department:</span>
+            <span class="text-gray-800 dark:text-white">{{ log.department.name }}</span>
+          </div>
+          <div>
+            <span class="font-semibold text-gray-700 dark:text-gray-300">Activity Type:</span>
+            <span class="text-gray-800 dark:text-white">{{ log.activity_type.name }}</span>
+          </div>
+          <div>
+            <span class="font-semibold text-gray-700 dark:text-gray-300">Core Diagnosis:</span>
+            <span class="text-gray-800 dark:text-white">{{ log.core_diagnosis.name }}</span>
+          </div>
+          <div>
+            <span class="font-semibold text-gray-700 dark:text-gray-300">Participation:</span>
+            <span class="text-gray-800 dark:text-white">{{ log.participation_type }}</span>
+          </div>
+          <div>
+            <span class="font-semibold text-gray-700 dark:text-gray-300">Patient ID:</span>
+            <span class="text-gray-800 dark:text-white">{{ log.patient_id }}</span>
+          </div>
+        </div>
+        <div>
+          <span class="font-semibold text-gray-700 dark:text-gray-300">Description:</span>
+          <p class="mt-1 text-gray-800 dark:text-white">{{ log.description }}</p>
+        </div>
+      </div>
+
+      <!-- Review Form -->
+      <form method="post" class="space-y-4">
+        {% csrf_token %}
+
+        <div class="mb-4">
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Review Decision:</label>
+          <div class="flex space-x-4">
+            {% for value, text in form.is_approved.field.choices %}
+              <div class="flex items-center">
+                <input type="radio" name="is_approved" id="id_is_approved_{{ forloop.counter0 }}" value="{{ value }}"
+                       class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                       {% if form.is_approved.value == value %}checked{% endif %}>
+                <label for="id_is_approved_{{ forloop.counter0 }}" class="ml-2 block text-sm text-gray-700 dark:text-gray-300">
+                  {{ text }}
+                </label>
+              </div>
+            {% endfor %}
+          </div>
+          {% if form.is_approved.errors %}
+            <p class="text-red-500 text-sm mt-1">{{ form.is_approved.errors.0 }}</p>
+          {% endif %}
+        </div>
+
+        <div>
+          <label for="id_reviewer_comments" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Comments (Optional)</label>
+          {{ form.reviewer_comments }}
+          {% if form.reviewer_comments.errors %}
+            <p class="text-red-500 text-sm mt-1">{{ form.reviewer_comments.errors.0 }}</p>
+          {% endif %}
+        </div>
+
+        <div class="pt-4 flex justify-end space-x-3">
+          <a href="{% url 'doctor_section:doctor_reviews' %}" class="py-2 px-4 bg-gray-200 text-gray-800 dark:bg-gray-700 dark:text-white rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors duration-200">
+            Cancel
+          </a>
+          <button type="submit" class="py-2 px-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-75 transition-colors duration-200">
+            Submit Review
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+{% endblock %}

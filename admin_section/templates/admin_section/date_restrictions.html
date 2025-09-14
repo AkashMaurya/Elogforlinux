@@ -1,0 +1,386 @@
+{% extends 'base.html' %}
+
+{% block title %}
+  Manage Date Restrictions
+{% endblock %}
+
+{% block navbar %}
+  {% include 'components/admin_auth_navbar.html' %}
+{% endblock %}
+
+{% block content %}
+  <div class="p-4 sm:p-6 md:p-8 lg:p-10 max-w-7xl mx-auto">
+    <!-- Page Header -->
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+      <div>
+        <h2 class="text-2xl sm:text-3xl font-bold text-gray-800 dark:text-white flex items-center">
+          <i class="fas fa-calendar-alt text-blue-500 mr-2"></i> Date Restrictions Management
+        </h2>
+        <p class="text-gray-600 dark:text-gray-400 mt-1">Configure when students can submit logs and doctors can review them</p>
+      </div>
+
+      {% if settings %}
+        <div class="flex items-center">
+          <span class="mr-2 {% if settings.is_active %}text-green-500{% else %}text-red-500{% endif %}">
+            <i class="fas {% if settings.is_active %}fa-check-circle{% else %}fa-times-circle{% endif %}"></i>
+          </span>
+          <span class="font-medium">
+            {% if settings.is_active %}
+              Active
+            {% else %}
+              Inactive
+            {% endif %}
+          </span>
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- Messages -->
+    {% if messages %}
+      <div class="mb-6">
+        {% for message in messages %}
+          <div class="p-4 rounded-lg {% if message.tags == 'success' %}bg-green-100 text-green-700{% elif message.tags == 'error' %}bg-red-100 text-red-700{% else %}bg-blue-100 text-blue-700{% endif %}">
+            {{ message }}
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    <!-- Main Form -->
+    <div class="bg-white dark:bg-gray-800 shadow-md rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden transition-all duration-300 hover:shadow-lg">
+      <div class="bg-gray-50 dark:bg-gray-700 px-6 py-4 border-b border-gray-200 dark:border-gray-600">
+        <h3 class="text-lg font-semibold text-gray-800 dark:text-white">Date Restriction Settings</h3>
+      </div>
+
+      <form method="post" class="p-6">
+        {% csrf_token %}
+
+        <!-- Status Toggle -->
+        <div class="mb-6">
+          <div class="flex items-center">
+            <label class="inline-flex relative items-center cursor-pointer">
+              <input type="checkbox" name="is_active" class="sr-only peer" {% if settings.is_active %}checked{% endif %}>
+              <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+              <span class="ml-3 text-sm font-medium text-gray-900 dark:text-gray-300">Enable Date Restrictions</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Student and Doctor Restrictions Tabs -->
+        <div class="mb-6">
+          <div class="border-b border-gray-200 dark:border-gray-700">
+            <ul class="flex flex-wrap -mb-px" id="restrictionTabs" role="tablist">
+              <li class="mr-2" role="presentation">
+                <button class="inline-block py-2 px-4 text-sm font-medium text-center text-gray-500 rounded-t-lg border-b-2 border-transparent hover:text-gray-600 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300 active" id="student-tab" data-tabs-target="#student-content" type="button" role="tab" aria-controls="student-content" aria-selected="true">
+                  <i class="fas fa-user-graduate mr-2"></i>Student Restrictions
+                </button>
+              </li>
+              <li class="mr-2" role="presentation">
+                <button class="inline-block py-2 px-4 text-sm font-medium text-center text-gray-500 rounded-t-lg border-b-2 border-transparent hover:text-gray-600 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300" id="doctor-tab" data-tabs-target="#doctor-content" type="button" role="tab" aria-controls="doctor-content" aria-selected="false">
+                  <i class="fas fa-user-md mr-2"></i>Doctor Restrictions
+                </button>
+              </li>
+            </ul>
+          </div>
+
+          <!-- Tab Content -->
+          <div id="restrictionTabContent">
+            <!-- Student Restrictions -->
+            <div class="p-4 rounded-lg bg-gray-50 dark:bg-gray-800" id="student-content" role="tabpanel" aria-labelledby="student-tab">
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Past Days Limit -->
+                <div>
+                  <label for="student_past_days_limit" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    Past Days Limit
+                  </label>
+                  <div class="relative">
+                    <input type="number" name="student_past_days_limit" id="student_past_days_limit" min="0" max="365" value="{{ settings.student_past_days_limit }}" class="block w-full pl-10 pr-4 py-2 text-base border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white transition-colors duration-200">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <i class="fas fa-history text-gray-400"></i>
+                    </div>
+                  </div>
+                  <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Maximum number of days in the past a student can select for logs</p>
+                </div>
+
+                <!-- Future Dates Toggle -->
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    Allow Future Dates
+                  </label>
+                  <div class="flex items-center">
+                    <label class="inline-flex relative items-center cursor-pointer">
+                      <input type="checkbox" name="student_allow_future_dates" id="student_allow_future_dates" class="sr-only peer" {% if settings.student_allow_future_dates %}checked{% endif %}>
+                      <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+                      <span class="ml-3 text-sm font-medium text-gray-900 dark:text-gray-300">Allow students to select future dates</span>
+                    </label>
+                  </div>
+                </div>
+
+                <!-- Future Days Limit -->
+                <div id="student_future_days_container" class="{% if not settings.student_allow_future_dates %}opacity-50{% endif %}">
+                  <label for="student_future_days_limit" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    Future Days Limit
+                  </label>
+                  <div class="relative">
+                    <input type="number" name="student_future_days_limit" id="student_future_days_limit" min="0" max="365" value="{{ settings.student_future_days_limit }}" class="block w-full pl-10 pr-4 py-2 text-base border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white transition-colors duration-200" {% if not settings.student_allow_future_dates %}disabled{% endif %}>
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <i class="fas fa-calendar-plus text-gray-400"></i>
+                    </div>
+                  </div>
+                  <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Maximum number of days in the future a student can select</p>
+                </div>
+
+                <!-- Allowed Days of Week -->
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    Allowed Days of Week
+                  </label>
+                  <div class="bg-gray-50 dark:bg-gray-700 p-3 rounded-lg border border-gray-200 dark:border-gray-600">
+                    {% for day_value, day_name in settings.DAYS_OF_WEEK %}
+                      <div class="flex items-center mb-2 last:mb-0">
+                        <input type="checkbox" name="student_days_{{ day_value }}" id="student_days_{{ day_value }}" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 dark:bg-gray-700 dark:border-gray-600" {% if day_value in settings.get_allowed_days_for_students %}checked{% endif %}>
+                        <label for="student_days_{{ day_value }}" class="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">{{ day_name }}</label>
+                      </div>
+                    {% endfor %}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Doctor Restrictions -->
+            <div class="hidden p-4 rounded-lg bg-gray-50 dark:bg-gray-800" id="doctor-content" role="tabpanel" aria-labelledby="doctor-tab">
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Past Days Limit -->
+                <div>
+                  <label for="doctor_past_days_limit" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    Past Days Limit
+                  </label>
+                  <div class="relative">
+                    <input type="number" name="doctor_past_days_limit" id="doctor_past_days_limit" min="0" max="365" value="{{ settings.doctor_past_days_limit }}" class="block w-full pl-10 pr-4 py-2 text-base border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white transition-colors duration-200">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <i class="fas fa-history text-gray-400"></i>
+                    </div>
+                  </div>
+                  <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Maximum number of days in the past a doctor can review logs</p>
+                </div>
+
+                <!-- Future Dates Toggle -->
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    Allow Future Dates
+                  </label>
+                  <div class="flex items-center">
+                    <label class="inline-flex relative items-center cursor-pointer">
+                      <input type="checkbox" name="doctor_allow_future_dates" id="doctor_allow_future_dates" class="sr-only peer" {% if settings.doctor_allow_future_dates %}checked{% endif %}>
+                      <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+                      <span class="ml-3 text-sm font-medium text-gray-900 dark:text-gray-300">Allow doctors to review future-dated logs</span>
+                    </label>
+                  </div>
+                </div>
+
+                <!-- Future Days Limit -->
+                <div id="doctor_future_days_container" class="{% if not settings.doctor_allow_future_dates %}opacity-50{% endif %}">
+                  <label for="doctor_future_days_limit" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    Future Days Limit
+                  </label>
+                  <div class="relative">
+                    <input type="number" name="doctor_future_days_limit" id="doctor_future_days_limit" min="0" max="365" value="{{ settings.doctor_future_days_limit }}" class="block w-full pl-10 pr-4 py-2 text-base border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white transition-colors duration-200" {% if not settings.doctor_allow_future_dates %}disabled{% endif %}>
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <i class="fas fa-calendar-plus text-gray-400"></i>
+                    </div>
+                  </div>
+                  <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Maximum number of days in the future a doctor can review logs</p>
+                </div>
+
+                <!-- Allowed Days of Week -->
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    Allowed Days of Week
+                  </label>
+                  <div class="bg-gray-50 dark:bg-gray-700 p-3 rounded-lg border border-gray-200 dark:border-gray-600">
+                    {% for day_value, day_name in settings.DAYS_OF_WEEK %}
+                      <div class="flex items-center mb-2 last:mb-0">
+                        <input type="checkbox" name="doctor_days_{{ day_value }}" id="doctor_days_{{ day_value }}" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 dark:bg-gray-700 dark:border-gray-600" {% if day_value in settings.get_allowed_days_for_doctors %}checked{% endif %}>
+                        <label for="doctor_days_{{ day_value }}" class="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">{{ day_name }}</label>
+                      </div>
+                    {% endfor %}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Submit Button -->
+        <div class="flex justify-end">
+          <button type="submit" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors duration-200">
+            <i class="fas fa-save mr-2"></i> Save Settings
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Current Settings Summary -->
+    {% if settings %}
+      <div class="mt-8 bg-white dark:bg-gray-800 shadow-md rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
+        <div class="bg-gray-50 dark:bg-gray-700 px-6 py-4 border-b border-gray-200 dark:border-gray-600">
+          <h3 class="text-lg font-semibold text-gray-800 dark:text-white">Current Settings Summary</h3>
+        </div>
+
+        <div class="p-6">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Student Settings -->
+            <div class="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg border border-blue-100 dark:border-blue-800">
+              <h4 class="text-lg font-medium text-blue-800 dark:text-blue-300 mb-3 flex items-center">
+                <i class="fas fa-user-graduate mr-2"></i> Student Settings
+              </h4>
+
+              <ul class="space-y-2 text-sm">
+                <li class="flex items-start">
+                  <i class="fas fa-calendar-day mt-1 mr-2 text-blue-600 dark:text-blue-400"></i>
+                  <div>
+                    <span class="font-medium">Past Days Limit:</span>
+                    <span class="ml-1">{{ settings.student_past_days_limit }} days</span>
+                  </div>
+                </li>
+                <li class="flex items-start">
+                  <i class="fas fa-calendar-plus mt-1 mr-2 text-blue-600 dark:text-blue-400"></i>
+                  <div>
+                    <span class="font-medium">Future Dates:</span>
+                    <span class="ml-1">{% if settings.student_allow_future_dates %}Allowed (up to {{ settings.student_future_days_limit }} days){% else %}Not allowed{% endif %}</span>
+                  </div>
+                </li>
+                <li class="flex items-start">
+                  <i class="fas fa-calendar-week mt-1 mr-2 text-blue-600 dark:text-blue-400"></i>
+                  <div>
+                    <span class="font-medium">Allowed Days:</span>
+                    <span class="ml-1">
+                      {% with allowed_days=settings.get_allowed_days_for_students %}
+                        {% if allowed_days|length == 7 %}
+                          All days
+                        {% else %}
+                          {% for day_value, day_name in settings.DAYS_OF_WEEK %}
+                            {% if day_value in allowed_days %}
+                              {{ day_name }}{% if not forloop.last %}, {% endif %}
+                            {% endif %}
+                          {% endfor %}
+                        {% endif %}
+                      {% endwith %}
+                    </span>
+                  </div>
+                </li>
+              </ul>
+            </div>
+
+            <!-- Doctor Settings -->
+            <div class="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg border border-green-100 dark:border-green-800">
+              <h4 class="text-lg font-medium text-green-800 dark:text-green-300 mb-3 flex items-center">
+                <i class="fas fa-user-md mr-2"></i> Doctor Settings
+              </h4>
+
+              <ul class="space-y-2 text-sm">
+                <li class="flex items-start">
+                  <i class="fas fa-calendar-day mt-1 mr-2 text-green-600 dark:text-green-400"></i>
+                  <div>
+                    <span class="font-medium">Past Days Limit:</span>
+                    <span class="ml-1">{{ settings.doctor_past_days_limit }} days</span>
+                  </div>
+                </li>
+                <li class="flex items-start">
+                  <i class="fas fa-calendar-plus mt-1 mr-2 text-green-600 dark:text-green-400"></i>
+                  <div>
+                    <span class="font-medium">Future Dates:</span>
+                    <span class="ml-1">{% if settings.doctor_allow_future_dates %}Allowed (up to {{ settings.doctor_future_days_limit }} days){% else %}Not allowed{% endif %}</span>
+                  </div>
+                </li>
+                <li class="flex items-start">
+                  <i class="fas fa-calendar-week mt-1 mr-2 text-green-600 dark:text-green-400"></i>
+                  <div>
+                    <span class="font-medium">Allowed Days:</span>
+                    <span class="ml-1">
+                      {% with allowed_days=settings.get_allowed_days_for_doctors %}
+                        {% if allowed_days|length == 7 %}
+                          All days
+                        {% else %}
+                          {% for day_value, day_name in settings.DAYS_OF_WEEK %}
+                            {% if day_value in allowed_days %}
+                              {{ day_name }}{% if not forloop.last %}, {% endif %}
+                            {% endif %}
+                          {% endfor %}
+                        {% endif %}
+                      {% endwith %}
+                    </span>
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- Last Updated Info -->
+          <div class="mt-4 text-sm text-gray-500 dark:text-gray-400">
+            <p>Last updated: {{ settings.updated_at|date:"F j, Y, g:i a" }} by {{ settings.updated_by.get_full_name|default:settings.updated_by.username }}</p>
+          </div>
+        </div>
+      </div>
+    {% endif %}
+  </div>
+
+  <!-- JavaScript for Tab Functionality and Toggle Logic -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Tab functionality
+      const tabs = document.querySelectorAll('[data-tabs-target]');
+      const tabContents = document.querySelectorAll('[role="tabpanel"]');
+
+      tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+          const target = document.querySelector(tab.dataset.tabsTarget);
+
+          tabContents.forEach(tc => {
+            tc.classList.add('hidden');
+          });
+
+          tabs.forEach(t => {
+            t.classList.remove('active', 'border-blue-600', 'text-blue-600');
+            t.classList.add('border-transparent');
+            t.setAttribute('aria-selected', false);
+          });
+
+          tab.classList.add('active', 'border-blue-600', 'text-blue-600');
+          tab.classList.remove('border-transparent');
+          tab.setAttribute('aria-selected', true);
+
+          target.classList.remove('hidden');
+        });
+      });
+
+      // Student future dates toggle
+      const studentAllowFutureDates = document.getElementById('student_allow_future_dates');
+      const studentFutureDaysLimit = document.getElementById('student_future_days_limit');
+      const studentFutureDaysContainer = document.getElementById('student_future_days_container');
+
+      studentAllowFutureDates.addEventListener('change', function() {
+        studentFutureDaysLimit.disabled = !this.checked;
+        if (this.checked) {
+          studentFutureDaysContainer.classList.remove('opacity-50');
+        } else {
+          studentFutureDaysContainer.classList.add('opacity-50');
+        }
+      });
+
+      // Doctor future dates toggle
+      const doctorAllowFutureDates = document.getElementById('doctor_allow_future_dates');
+      const doctorFutureDaysLimit = document.getElementById('doctor_future_days_limit');
+      const doctorFutureDaysContainer = document.getElementById('doctor_future_days_container');
+
+      doctorAllowFutureDates.addEventListener('change', function() {
+        doctorFutureDaysLimit.disabled = !this.checked;
+        if (this.checked) {
+          doctorFutureDaysContainer.classList.remove('opacity-50');
+        } else {
+          doctorFutureDaysContainer.classList.add('opacity-50');
+        }
+      });
+    });
+  </script>
+{% endblock %}

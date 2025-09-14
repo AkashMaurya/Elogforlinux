@@ -1,0 +1,585 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+  Student ELog
+{% endblock %}
+
+{% block extra_head %}
+<style>
+  /* Animations for toast notifications and loading overlays */
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes fadeOut {
+    from { opacity: 1; transform: translateY(0); }
+    to { opacity: 0; transform: translateY(-20px); }
+  }
+
+  .animate-fadeIn {
+    animation: fadeIn 0.3s ease-out forwards;
+  }
+
+  .animate-fadeOut {
+    animation: fadeOut 0.3s ease-in forwards;
+  }
+
+  /* Optimize form inputs for faster rendering */
+  select, input, textarea {
+    backface-visibility: hidden;
+    transform: translateZ(0);
+    -webkit-font-smoothing: subpixel-antialiased;
+  }
+
+  /* Smooth transitions */
+  .transition-all {
+    transition-property: all;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 150ms;
+  }
+</style>
+{% endblock %}
+
+{% block navbar %}
+  {% include './components/student_auth_navbar.html' %}
+{% endblock %}
+
+{% block content %}
+  <div class="text-center p-10 mt-10">
+    <div class="max-w-3xl mx-auto bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
+      <h2 class="text-2xl font-bold mb-6 text-gray-900 dark:text-white">Student Log Form</h2>
+
+      {% if messages %}
+        <div class="max-w-3xl mx-auto mb-6">
+          {% for message in messages %}
+            <div class="p-4 rounded-lg {% if message.tags == 'success' %}
+                bg-green-100 text-green-700
+              {% else %}
+                bg-red-100 text-red-700
+              {% endif %}">{{ message }}</div>
+          {% endfor %}
+        </div>
+      {% endif %}
+
+      <!-- Debug CSRF -->
+      <div style="display:none">
+        CSRF Token present:{% if csrf_token %}
+          Yes
+        {% else %}
+          No
+        {% endif %}
+      </div>
+      <!-- Form Errors -->
+      {% if form.errors %}
+        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-6" role="alert">
+          <strong class="font-bold">Please be attention to the following errors:</strong>
+          <ul class="list-disc list-inside">
+            {% for field in form %}
+              {% for error in field.errors %}
+                <li>{{ field.label }}: {{ error }}</li>
+              {% endfor %}
+            {% endfor %}
+          </ul>
+        </div>
+      {% endif %}
+
+      <!-- Student Info -->
+      <div class="mb-6 bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <strong>Student:</strong> {{ student_name }}
+          </div>
+          <div>
+            <strong>ID:</strong> {{ student_id }}
+          </div>
+          <div>
+            <strong>Year:</strong> {{ year_name }}
+          </div>
+          <div>
+            <strong>Section:</strong> {{ section_name }}
+          </div>
+          <div>
+            <strong>Group:</strong> {{ group_name }}
+          </div>
+        </div>
+      </div>
+
+      <!-- Main Form -->
+      <form method="post" class="space-y-6" id="elog-form">
+        {% csrf_token %}
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label for="{{ form.department.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Department</label>
+            {{ form.department }}
+          </div>
+
+          <div>
+            <label for="{{ form.activity_type.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Activity Type</label>
+            {{ form.activity_type }}
+          </div>
+
+          <div>
+            <label for="{{ form.core_diagnosis.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Core Diagnosis</label>
+            {{ form.core_diagnosis }}
+          </div>
+
+          <div>
+            <label for="{{ form.tutor.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Tutor</label>
+            {{ form.tutor }}
+          </div>
+
+          <div>
+            <label for="{{ form.date.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Date</label>
+            <div class="relativev cursor-pointer">
+              {{ form.date }}
+              <div class="absolute right-2 top-2 text-gray-400 ">
+
+
+              </div>
+            </div>
+            <p class="text-gray-500 text-xs mt-1" id="date-restrictions-info">Loading date restrictions...</p>
+          </div>
+
+          <div>
+            <label for="{{ form.patient_id.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Patient ID</label>
+            {{ form.patient_id }}
+          </div>
+
+          <div>
+            <label for="{{ form.patient_age.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Patient Age</label>
+            {{ form.patient_age }}
+          </div>
+
+          <div>
+            <label for="{{ form.patient_gender.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Patient Gender</label>
+            {{ form.patient_gender }}
+          </div>
+
+          <div>
+            <label for="{{ form.training_site.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Training Site</label>
+            {{ form.training_site }}
+          </div>
+
+          <div>
+            <label for="{{ form.participation_type.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Participation Type</label>
+            {{ form.participation_type }}
+          </div>
+
+          <div class="md:col-span-2">
+            <label for="{{ form.description.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Description</label>
+            {{ form.description }}
+          </div>
+        </div>
+
+        <div class="flex justify-end mt-6">
+          <button type="submit" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:bg-blue-500 dark:hover:bg-blue-600">Submit Log</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const form = document.getElementById('elog-form')
+      const departmentSelect = document.getElementById('id_department')
+      const activityTypeSelect = document.getElementById('id_activity_type')
+      const coreDiagnosisSelect = document.getElementById('id_core_diagnosis')
+      const tutorSelect = document.getElementById('id_tutor')
+      const dateInput = document.getElementById('id_date')
+      const dateRestrictionsInfo = document.getElementById('date-restrictions-info')
+
+      // Set today's date as default if not already set
+      if (!dateInput.value) {
+        const today = new Date()
+        const year = today.getFullYear()
+        const month = String(today.getMonth() + 1).padStart(2, '0')
+        const day = String(today.getDate()).padStart(2, '0')
+        dateInput.value = `${year}-${month}-${day}`
+      }
+
+      // Reset dependent fields with a placeholder message
+      const resetDependentFields = (exceptField = null) => {
+        const fields = [
+          { select: activityTypeSelect, text: 'Choose Department ' },
+          { select: coreDiagnosisSelect, text: 'Choose Activity Type ' },
+          { select: tutorSelect, text: 'Choose Department' }
+        ]
+
+        fields.forEach(({ select, text }) => {
+          if (select !== exceptField) {
+            select.innerHTML = `<option value="">${text}</option>`
+            select.disabled = true
+          }
+        })
+      }
+
+      // Show loading state
+      const showLoading = (selectElement, message = 'Loading...') => {
+        selectElement.innerHTML = `<option value="">${message}</option>`
+        selectElement.disabled = true
+      }
+
+      // Department change handler
+      departmentSelect.addEventListener('change', async function () {
+        const departmentId = this.value
+        resetDependentFields()
+
+        if (!departmentId) return
+
+        try {
+          // Show loading state
+          showLoading(activityTypeSelect)
+          showLoading(tutorSelect)
+
+          // Fetch activity types and tutors in parallel
+          const [activityTypesResponse, tutorsResponse] = await Promise.all([
+            fetch(`/student_section/get-activity-types/?department=${departmentId}`, {
+              headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            }),
+            fetch(`/student_section/get-tutors/?department=${departmentId}`, {
+              headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            })
+          ])
+
+          const activityTypes = await activityTypesResponse.json()
+          const tutors = await tutorsResponse.json()
+
+          // Update activity types
+          activityTypeSelect.innerHTML = '<option value="">Choose Activity Type</option>'
+          activityTypes.forEach((type) => {
+            activityTypeSelect.add(new Option(type.name, type.id))
+          })
+          activityTypeSelect.disabled = false
+
+          // Update tutors
+          tutorSelect.innerHTML = '<option value="">Choose Tutor</option>'
+          tutors.forEach((tutor) => {
+            tutorSelect.add(new Option(tutor.name, tutor.id))
+          })
+          tutorSelect.disabled = false
+        } catch (error) {
+          console.error('Error fetching dependent data:', error)
+          activityTypeSelect.innerHTML = '<option value="">error: data is not loaded</option>'
+          tutorSelect.innerHTML = '<option value="">error: data is not loaded</option>'
+        }
+      })
+
+      // Activity type change handler
+      activityTypeSelect.addEventListener('change', async function () {
+        const activityTypeId = this.value
+        coreDiagnosisSelect.innerHTML = '<option value="">Choose Core Diagnosis</option>'
+        coreDiagnosisSelect.disabled = true
+
+        if (!activityTypeId) return
+
+        try {
+          // Show loading state
+          showLoading(coreDiagnosisSelect)
+
+          const response = await fetch(`/student_section/get-core-diagnosis/?activity_type=${activityTypeId}`, {
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+          })
+          const diagnoses = await response.json()
+
+          coreDiagnosisSelect.innerHTML = '<option value="">Choose Core Diagnosis </option>'
+          diagnoses.forEach((diagnosis) => {
+            coreDiagnosisSelect.add(new Option(diagnosis.name, diagnosis.id))
+          })
+          coreDiagnosisSelect.disabled = false
+        } catch (error) {
+          console.error('Error fetching core diagnoses:', error)
+          coreDiagnosisSelect.innerHTML = '<option value="">error: data is not loaded</option>'
+        }
+      })
+
+      // Date restrictions handler
+      let dateSettings = {
+        pastDaysLimit: 7,
+        allowFutureDates: false,
+        futureDaysLimit: 0,
+        isCurrentDayAllowed: true,
+        allowedDays: [0, 1, 2, 3, 4, 5, 6],
+        isActive: true
+      }
+
+      // Function to fetch date restriction settings
+      const fetchDateRestrictions = async () => {
+        try {
+          const response = await fetch('/student_section/get-date-restrictions/', {
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+          })
+
+          if (!response.ok) {
+            throw new Error('Failed to fetch date restrictions')
+          }
+
+          const data = await response.json()
+          dateSettings = data
+
+          // Update the date input min and max attributes
+          updateDateRestrictions()
+
+          // Update the info text
+          updateDateRestrictionsInfo()
+        } catch (error) {
+          console.error('Error fetching date restrictions:', error)
+          dateRestrictionsInfo.textContent = 'Using default date restrictions (7 days past, no future dates)'
+          // Use default settings
+          updateDateRestrictions()
+        }
+      }
+
+      // Function to update date input restrictions
+      const updateDateRestrictions = () => {
+        const today = new Date()
+
+        // Calculate earliest allowed date
+        const earliestDate = new Date(today)
+        earliestDate.setDate(today.getDate() - dateSettings.pastDaysLimit)
+
+        // Calculate latest allowed date
+        const latestDate = new Date(today)
+        if (dateSettings.allowFutureDates) {
+          latestDate.setDate(today.getDate() + dateSettings.futureDaysLimit)
+        } else {
+          // If future dates are not allowed, max date is today
+          latestDate.setDate(today.getDate())
+        }
+
+        // Format dates for the date input (YYYY-MM-DD)
+        const formatDate = (date) => {
+          const year = date.getFullYear()
+          const month = String(date.getMonth() + 1).padStart(2, '0')
+          const day = String(date.getDate()).padStart(2, '0')
+          return `${year}-${month}-${day}`
+        }
+
+        // Set min and max attributes
+        dateInput.min = formatDate(earliestDate)
+        dateInput.max = formatDate(latestDate)
+
+        // Set today's date as default value if empty
+        if (!dateInput.value) {
+          dateInput.value = formatDate(today)
+        }
+      }
+
+      // Function to update the date restrictions info text
+      const updateDateRestrictionsInfo = () => {
+        const today = new Date()
+        const earliestDate = new Date(today)
+        earliestDate.setDate(today.getDate() - dateSettings.pastDaysLimit)
+
+        const formatDateForDisplay = (date) => {
+          return date.toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric'
+          })
+        }
+
+        // Check if date restrictions are active
+        if (!dateSettings.isActive) {
+          dateRestrictionsInfo.textContent = 'Date restrictions are currently inactive.'
+          return
+        }
+
+        // Check if today is an allowed day
+        if (!dateSettings.isCurrentDayAllowed) {
+          dateRestrictionsInfo.innerHTML = '<span class="text-red-500">Logs cannot be submitted today. Please try on an allowed day.</span>'
+          return
+        }
+
+        // Format allowed days of week
+        const dayNames = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+        const allowedDayNames = dateSettings.allowedDays.map(day => dayNames[day])
+
+        let infoText = `You can select dates from ${formatDateForDisplay(earliestDate)} to `
+
+        if (dateSettings.allowFutureDates) {
+          const latestDate = new Date(today)
+          latestDate.setDate(today.getDate() + dateSettings.futureDaysLimit)
+          infoText += formatDateForDisplay(latestDate)
+        } else {
+          infoText += formatDateForDisplay(today) + ' (today)'
+        }
+
+        // Add allowed days info if not all days are allowed
+        if (dateSettings.allowedDays.length < 7) {
+          infoText += `<br><span class="text-xs">Allowed days: ${allowedDayNames.join(', ')}</span>`
+        }
+
+        dateRestrictionsInfo.innerHTML = infoText
+      }
+
+      // Fetch date restrictions when the page loads
+      fetchDateRestrictions()
+
+      // Add event listener for date input
+      dateInput.addEventListener('change', function() {
+        if (!dateSettings.isActive) {
+          // If date restrictions are inactive, allow any date
+          return
+        }
+
+        const selectedDate = new Date(this.value)
+        const today = new Date()
+        today.setHours(0, 0, 0, 0) // Reset time part for comparison
+
+        const earliestDate = new Date(today)
+        earliestDate.setDate(today.getDate() - dateSettings.pastDaysLimit)
+
+        const latestDate = new Date(today)
+        if (dateSettings.allowFutureDates) {
+          latestDate.setDate(today.getDate() + dateSettings.futureDaysLimit)
+        }
+
+        // Get day of week (0=Monday, 6=Sunday)
+        const selectedDay = selectedDate.getDay()
+        // Convert from Sunday=0 to Monday=0 format
+        const adjustedDay = selectedDay === 0 ? 6 : selectedDay - 1
+
+        // Format date for setting value if needed
+        const formatDate = (date) => {
+          const year = date.getFullYear()
+          const month = String(date.getMonth() + 1).padStart(2, '0')
+          const day = String(date.getDate()).padStart(2, '0')
+          return `${year}-${month}-${day}`
+        }
+
+        // Validate the selected date
+        if (selectedDate < earliestDate) {
+          alert(`Date cannot be more than ${dateSettings.pastDaysLimit} days in the past.`)
+          this.value = formatDate(today) // Set to today's date instead of clearing
+        } else if (selectedDate > today && !dateSettings.allowFutureDates) {
+          alert('Future dates are not allowed.')
+          this.value = formatDate(today) // Set to today's date instead of clearing
+        } else if (selectedDate > latestDate) {
+          alert(`Date cannot be more than ${dateSettings.futureDaysLimit} days in the future.`)
+          this.value = formatDate(today) // Set to today's date instead of clearing
+        } else if (!dateSettings.allowedDays.includes(adjustedDay)) {
+          const dayNames = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+          alert(`Logs cannot be submitted on ${dayNames[adjustedDay]}. Please select an allowed day.`)
+
+          // Find the closest allowed day
+          let closestDate = new Date(today)
+          for (let i = 0; i < 7; i++) {
+            const checkDay = (today.getDay() + i) % 7
+            const adjustedCheckDay = checkDay === 0 ? 6 : checkDay - 1
+            if (dateSettings.allowedDays.includes(adjustedCheckDay)) {
+              closestDate.setDate(today.getDate() + i)
+              break
+            }
+          }
+          this.value = formatDate(closestDate)
+        }
+      })
+
+      // Form submission handler with loading indicator
+      form.addEventListener('submit', function (e) {
+        console.log('Form submission attempted')
+
+        // Check if date restrictions are active and today is not an allowed day
+        if (dateSettings.isActive && !dateSettings.isCurrentDayAllowed) {
+          e.preventDefault()
+          alert('Logs cannot be submitted today. Please try on an allowed day.')
+          return false
+        }
+
+        const requiredFields = [
+          { field: departmentSelect, name: 'Department' },
+          { field: activityTypeSelect, name: 'Activity Type' },
+          { field: coreDiagnosisSelect, name: 'Core Diagnosis' },
+          { field: tutorSelect, name: 'Tutor' },
+          { field: dateInput, name: 'Date' }
+        ]
+
+        // Debug: Log the values of all required fields
+        requiredFields.forEach(({ field, name }) => {
+          console.log(`${name} value:`, field.value)
+        })
+
+        const emptyFields = requiredFields.filter(({ field }) => !field.value).map(({ name }) => name)
+
+        if (emptyFields.length > 0) {
+          e.preventDefault()
+          e.stopPropagation()
+          alert(`Please fill in the following fields: ${emptyFields.join(', ')}`)
+          console.log('Form submission prevented due to empty fields:', emptyFields)
+          return false
+        }
+
+        // Show loading indicator
+        const submitBtn = form.querySelector('button[type="submit"]')
+        const originalBtnText = submitBtn.innerHTML
+        submitBtn.disabled = true
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Submitting...'
+
+        // Add a hidden loading overlay to the form
+        const loadingOverlay = document.createElement('div')
+        loadingOverlay.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50'
+        loadingOverlay.innerHTML = `
+          <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-xl text-center">
+            <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 mx-auto mb-4"></div>
+            <p class="text-gray-700 dark:text-gray-300 font-medium">Submitting your log entry...</p>
+          </div>
+        `
+        document.body.appendChild(loadingOverlay)
+
+        // Set a timeout to remove the loading overlay if the form submission takes too long
+        setTimeout(() => {
+          if (document.body.contains(loadingOverlay)) {
+            document.body.removeChild(loadingOverlay)
+            submitBtn.disabled = false
+            submitBtn.innerHTML = originalBtnText
+          }
+        }, 10000) // 10 seconds timeout
+
+        console.log('Form submission allowed - all fields filled')
+      })
+
+      // Check for success message in URL parameters and show a toast notification
+      document.addEventListener('DOMContentLoaded', function() {
+        const urlParams = new URLSearchParams(window.location.search)
+        if (urlParams.has('success')) {
+          // Create and show a success toast
+          const toast = document.createElement('div')
+          toast.className = 'fixed top-4 right-4 bg-green-100 border-l-4 border-green-500 text-green-700 p-4 rounded shadow-md z-50 animate-fadeIn'
+          toast.innerHTML = `
+            <div class="flex items-center">
+              <div class="py-1"><i class="fas fa-check-circle text-green-500 mr-2"></i></div>
+              <div>
+                <p class="font-bold">Success!</p>
+                <p>Log entry created successfully.</p>
+              </div>
+              <button class="ml-4 text-green-500 hover:text-green-700" onclick="this.parentElement.parentElement.remove()">
+                <i class="fas fa-times"></i>
+              </button>
+            </div>
+          `
+          document.body.appendChild(toast)
+
+          // Remove the toast after 5 seconds
+          setTimeout(() => {
+            if (document.body.contains(toast)) {
+              toast.classList.add('animate-fadeOut')
+              setTimeout(() => {
+                if (document.body.contains(toast)) {
+                  document.body.removeChild(toast)
+                }
+              }, 300)
+            }
+          }, 5000)
+
+          // Remove the success parameter from the URL without refreshing the page
+          const url = new URL(window.location.href)
+          url.searchParams.delete('success')
+          window.history.replaceState({}, document.title, url.toString())
+        }
+      })
+    })
+  </script>
+{% endblock %}

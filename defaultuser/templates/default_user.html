@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block title %}Default User Section{% endblock %}
+
+
+
+
+{% block content_container %}
+   <div class="card">
+      <h1>Welcome</h1>
+      <p>Thank you for trying to sign in. Our team will add you to the directory soon.</p>
+      <p>If you believe this is an error, please contact the administration.</p>
+   <p><a href="{% url 'account_logout' %}">Logout</a></p>
+    </div>
+{% endblock %}
+

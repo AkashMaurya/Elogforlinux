@@ -1,0 +1,430 @@
+{% extends 'base.html' %}
+
+{% block title %}Staff Dashboard{% endblock %}
+
+{% block navbar %}
+  {% include 'components/staff_auth_navbar.html' %}
+{% endblock %}
+
+{% block content %}
+  <div class="p-6 md:p-10 mt-2 max-w-7xl mx-auto">
+    <!-- Dashboard Header -->
+    <div class="flex flex-col md:flex-row justify-between items-center my-6 animate-slide-in">
+      <div class="text-center md:text-left mb-4 md:mb-0">
+        <h2 class="text-3xl md:text-4xl font-bold dark:text-white bg-gradient-to-r from-purple-500 to-indigo-500 dark:from-purple-400 dark:to-indigo-400 text-transparent bg-clip-text">Welcome, {{ request.session.first_name }}</h2>
+        <p class="text-gray-600 dark:text-gray-300 mt-2">Review student records and manage your tasks efficiently.</p>
+      </div>
+      <div class="flex items-center space-x-2 bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg border border-blue-100 dark:border-blue-800">
+        <i class="fas fa-info-circle text-blue-500 text-xl"></i>
+        <div class="text-sm text-blue-800 dark:text-blue-300">
+          <p><span class="font-semibold">Today:</span> {{ today|date:"F j, Y" }}</p>
+          <p><span class="font-semibold">Departments:</span> {{ departments|length }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dashboard Stats -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+      <!-- Total Records to Review -->
+      <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg flex items-center space-x-4 transform transition-all duration-300 hover:scale-105 animate-pulse-card">
+        <img src="https://cdn-icons-png.flaticon.com/512/1160/1160758.png" class="w-14 h-14" alt="Records Icon" />
+        <div>
+          <h3 class="text-xl font-semibold dark:text-white">Total Records</h3>
+          <p class="text-3xl font-bold text-purple-600 dark:text-purple-400">{{ total_records|default:0 }}</p>
+        </div>
+      </div>
+
+      <!-- Records Left to Review -->
+      <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg flex items-center space-x-4 transform transition-all duration-300 hover:scale-105 animate-pulse-card">
+        <img src="https://cdn-icons-png.flaticon.com/512/1008/1008928.png" alt="Pending Icon" class="w-14 h-14" />
+        <div>
+          <h3 class="text-xl font-semibold dark:text-white">Left to Review</h3>
+          <p class="text-3xl font-bold text-red-600 dark:text-red-400">{{ left_to_review|default:0 }}</p>
+        </div>
+      </div>
+
+      <!-- Reviewed Records -->
+      <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg flex items-center space-x-4 transform transition-all duration-300 hover:scale-105 animate-pulse-card">
+        <img src="https://cdn-icons-png.flaticon.com/512/190/190411.png" alt="Reviewed Icon" class="w-14 h-14" />
+        <div>
+          <h3 class="text-xl font-semibold dark:text-white">Reviewed</h3>
+          <p class="text-3xl font-bold text-green-600 dark:text-green-400">{{ reviewed|default:0 }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Staff Info and Quick Links -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
+      <!-- Staff Info with Progress Circle -->
+      <div class="bg-white dark:bg-gray-800 p-8 rounded-xl shadow-lg flex flex-col items-center justify-center min-h-[250px] transform transition-all duration-300 hover:shadow-xl">
+        <h3 class="text-2xl font-semibold dark:text-white mb-4 text-center">Your Progress</h3>
+        <!-- Progress Circle with JavaScript-based calculation -->
+        <div class="relative w-32 h-32 flex items-center justify-center">
+          <svg class="w-full h-full" viewBox="0 0 100 100">
+            <circle class="text-gray-200 dark:text-gray-600 stroke-current" stroke-width="10" cx="50" cy="50" r="40" fill="transparent"></circle>
+            <circle id="progress-circle" class="text-indigo-500 progress-ring stroke-current" stroke-width="10" stroke-linecap="round" cx="50" cy="50" r="40" fill="transparent" stroke-dasharray="251.2" stroke-dashoffset="251.2"></circle>
+          </svg>
+          <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-2xl font-bold dark:text-white">
+            {{ review_percentage }}%
+          </div>
+        </div>
+
+        <!-- Script to update progress circle -->
+        <script>
+          document.addEventListener('DOMContentLoaded', function() {
+            const progressCircle = document.getElementById('progress-circle');
+            const percentage = {{ review_percentage }};
+            const dashArray = 251.2;
+            const dashOffset = dashArray - (dashArray * percentage) / 100;
+
+            if (progressCircle) {
+              progressCircle.style.strokeDashoffset = dashOffset;
+            }
+          });
+        </script>
+        <p class="text-gray-800 dark:text-gray-200 mt-4 text-center">{{ reviewed }} reviewed out of {{ total_records }} total records</p>
+      </div>
+
+      <!-- Quick Links -->
+      <div class="bg-white dark:bg-gray-800 p-8 rounded-xl shadow-lg transform transition-all duration-300 hover:shadow-xl">
+        <h3 class="text-2xl font-semibold dark:text-white mb-4">Quick Actions</h3>
+        <div class="space-y-3">
+          <a href="{% url 'staff_section:staff_reviews' %}" class="block py-3 px-6 bg-gradient-to-r from-purple-500 to-indigo-700 dark:from-purple-600 dark:to-indigo-800 text-white rounded-lg hover:from-purple-600 hover:to-indigo-800 dark:hover:from-purple-700 dark:hover:to-indigo-900 transition duration-300 transform hover:-translate-y-1"><i class="fas fa-clipboard-check mr-2"></i> Review Records</a>
+          <a href="{% url 'staff_section:staff_support' %}" class="block py-3 px-6 bg-gradient-to-r from-blue-500 to-blue-700 dark:from-blue-600 dark:to-blue-800 text-white rounded-lg hover:from-blue-600 hover:to-blue-800 dark:hover:from-blue-700 dark:hover:to-blue-900 transition duration-300 transform hover:-translate-y-1"><i class="fas fa-headset mr-2"></i> Support</a>
+          <a href="{% url 'staff_section:staff_profile' %}" class="block py-3 px-6 bg-gradient-to-r from-green-500 to-green-700 dark:from-green-600 dark:to-green-800 text-white rounded-lg hover:from-green-600 hover:to-green-800 dark:hover:from-green-700 dark:hover:to-green-900 transition duration-300 transform hover:-translate-y-1"><i class="fas fa-user-tie mr-2"></i> Update Profile</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filters Section -->
+    <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg mb-10">
+      <h3 class="text-2xl font-semibold dark:text-white mb-4">Dashboard Filters</h3>
+
+      <!-- Department Filter -->
+      <div class="mb-6">
+        <h4 class="text-lg font-medium dark:text-white mb-2">Department Filter</h4>
+        <div class="flex flex-wrap gap-4">
+          <a href="{% url 'staff_section:staff_dash' %}{% if selected_doctor %}?doctor={{ selected_doctor }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}"
+             class="py-2 px-4 {% if not selected_department %}bg-indigo-600 text-white{% else %}bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white{% endif %} rounded-lg hover:bg-indigo-700 hover:text-white transition duration-300">
+            All Departments
+          </a>
+          {% for dept in departments %}
+            <a href="{% url 'staff_section:staff_dash' %}?department={{ dept.id }}{% if selected_doctor %}&doctor={{ selected_doctor }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}"
+               class="py-2 px-4 {% if selected_department == dept.id|stringformat:'s' %}bg-indigo-600 text-white{% else %}bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white{% endif %} rounded-lg hover:bg-indigo-700 hover:text-white transition duration-300">
+              {{ dept.name }}
+            </a>
+          {% endfor %}
+        </div>
+      </div>
+
+
+
+      <!-- Doctor Search -->
+      <div class="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg border border-blue-100 dark:border-blue-800">
+        <h4 class="text-lg font-medium text-blue-800 dark:text-blue-300 mb-2">Search Doctors</h4>
+        <form action="{% url 'staff_section:staff_dash' %}" method="get" class="flex flex-col sm:flex-row gap-2">
+          {% if selected_department %}<input type="hidden" name="department" value="{{ selected_department }}">{% endif %}
+          <div class="relative flex-grow">
+            <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+              <i class="fas fa-search text-gray-400"></i>
+            </div>
+            <input type="text" name="search" placeholder="Search by name, email, or speciality" value="{{ search_query }}"
+                   class="w-full pl-10 px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+          </div>
+          <div class="flex gap-2">
+            <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 whitespace-nowrap">
+              <i class="fas fa-search mr-1"></i> Search
+            </button>
+            {% if search_query %}
+            <a href="{% url 'staff_section:staff_dash' %}{% if selected_department %}?department={{ selected_department }}{% endif %}"
+               class="px-4 py-2 bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 whitespace-nowrap">
+              <i class="fas fa-times mr-1"></i> Clear
+            </a>
+            {% endif %}
+          </div>
+        </form>
+        {% if search_query %}
+        <div class="mt-2 text-sm text-blue-600 dark:text-blue-400">
+          <p><i class="fas fa-info-circle mr-1"></i> Showing results for: <span class="font-semibold">"{{ search_query }}"</span></p>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Department Doctors with Performance Metrics -->
+    <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg mb-10">
+      <div class="flex flex-col md:flex-row justify-between items-center mb-4">
+        <h3 class="text-2xl font-semibold dark:text-white">Doctor Performance</h3>
+        <p class="text-sm text-gray-500 dark:text-gray-400 mt-1 md:mt-0">Showing {{ doctors|length }} doctor{% if doctors|length != 1 %}s{% endif %} from your departments</p>
+      </div>
+      {% if doctors %}
+        <div class="overflow-x-auto rounded-lg border border-gray-200 dark:border-gray-700">
+          <table id="doctorTable" class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+            <thead class="bg-gray-50 dark:bg-gray-700">
+              <tr>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider cursor-pointer" onclick="sortTable(0)">
+                  <div class="flex items-center">
+                    Name <i class="fas fa-sort ml-1 text-gray-400"></i>
+                  </div>
+                </th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider cursor-pointer" onclick="sortTable(1)">
+                  <div class="flex items-center">
+                    Email <i class="fas fa-sort ml-1 text-gray-400"></i>
+                  </div>
+                </th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider cursor-pointer" onclick="sortTable(2)">
+                  <div class="flex items-center">
+                    Speciality <i class="fas fa-sort ml-1 text-gray-400"></i>
+                  </div>
+                </th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider cursor-pointer" onclick="sortTable(3)">
+                  <div class="flex items-center">
+                    Departments <i class="fas fa-sort ml-1 text-gray-400"></i>
+                  </div>
+                </th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider cursor-pointer" onclick="sortTable(4)">
+                  <div class="flex items-center">
+                    Total Logs <i class="fas fa-sort ml-1 text-gray-400"></i>
+                  </div>
+                </th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider cursor-pointer" onclick="sortTable(5)">
+                  <div class="flex items-center">
+                    Reviewed Logs <i class="fas fa-sort ml-1 text-gray-400"></i>
+                  </div>
+                </th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider cursor-pointer" onclick="sortTable(6)">
+                  <div class="flex items-center">
+                    Monthly Logs <i class="fas fa-sort ml-1 text-gray-400"></i>
+                  </div>
+                </th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider cursor-pointer" onclick="sortTable(7)">
+                  <div class="flex items-center">
+                    Performance <i class="fas fa-sort ml-1 text-gray-400"></i>
+                  </div>
+                </th>
+              </tr>
+            </thead>
+            <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+              {% for doctor in doctors %}
+                <tr>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">{{ doctor.name }}</td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">{{ doctor.email }}</td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">{{ doctor.speciality|default:"Not specified" }}</td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">{{ doctor.departments }}</td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">{{ doctor.total_logs }}</td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">{{ doctor.reviewed_logs }}</td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">{{ doctor.monthly_logs }}</td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    {% if doctor.total_logs > 0 %}
+                      <div class="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
+                        {% with performance_percentage=doctor.review_percentage %}
+                          {% if performance_percentage > 70 %}
+                            <div class="bg-green-600 h-2.5 rounded-full" style="width: {{ performance_percentage }}%"></div>
+                          {% elif performance_percentage > 40 %}
+                            <div class="bg-yellow-600 h-2.5 rounded-full" style="width: {{ performance_percentage }}%"></div>
+                          {% else %}
+                            <div class="bg-red-600 h-2.5 rounded-full" style="width: {% if performance_percentage < 2 %}2{% else %}{{ performance_percentage }}{% endif %}%"></div>
+                          {% endif %}
+                        {% endwith %}
+                      </div>
+                      <span class="text-xs text-gray-500 dark:text-gray-400">{{ doctor.review_percentage }}% reviewed</span>
+                    {% else %}
+                      <span class="text-xs text-gray-500 dark:text-gray-400">No data</span>
+                    {% endif %}
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% else %}
+        <div class="p-8 text-center">
+          <div class="flex flex-col items-center justify-center">
+            <i class="fas fa-user-md text-gray-300 dark:text-gray-600 text-5xl mb-4"></i>
+            {% if search_query %}
+              <p class="text-gray-500 dark:text-gray-400">No doctors found matching "{{ search_query }}"</p>
+              <a href="{% url 'staff_section:staff_dash' %}{% if selected_department %}?department={{ selected_department }}{% endif %}" class="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                <i class="fas fa-times mr-1"></i> Clear Search
+              </a>
+            {% else %}
+              <p class="text-gray-500 dark:text-gray-400">No doctors found in your departments.</p>
+            {% endif %}
+          </div>
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- Chart.js Visualization -->
+    <div class="bg-white dark:bg-gray-800 p-8 rounded-xl shadow-lg animate-fade-in">
+      <div class="flex flex-col md:flex-row justify-between items-center mb-6">
+        <h3 class="text-2xl font-semibold dark:text-white">Record Review Overview</h3>
+        <div class="flex space-x-2 mt-2 md:mt-0">
+          <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200">
+            <span class="w-2 h-2 mr-1 rounded-full bg-purple-500"></span>
+            Total
+          </span>
+          <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200">
+            <span class="w-2 h-2 mr-1 rounded-full bg-red-500"></span>
+            Pending
+          </span>
+          <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+            <span class="w-2 h-2 mr-1 rounded-full bg-green-500"></span>
+            Reviewed
+          </span>
+        </div>
+      </div>
+      <div id="chart-container" style="position: relative; height: 300px;">
+        {% if total_records > 0 %}
+          <canvas id="reviewChart"></canvas>
+        {% else %}
+          <div class="flex flex-col items-center justify-center h-full">
+            <i class="fas fa-chart-bar text-gray-300 dark:text-gray-600 text-5xl mb-4"></i>
+            <p class="text-gray-500 dark:text-gray-400">No data available to display</p>
+            <p class="text-sm text-gray-400 dark:text-gray-500 mt-2">Records will appear here once students submit logs</p>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  {% if total_records > 0 %}
+  <!-- Chart.js Script -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    // Create a one-time initialization function
+    var initializeChart = function() {
+      // Get the chart container and canvas
+      var canvas = document.getElementById('reviewChart');
+      if (!canvas) return;
+
+      // Get the context
+      var ctx = canvas.getContext('2d');
+      if (!ctx) return;
+
+      // Chart data - ensure we're using integers
+      var totalRecords = {{ total_records|default:0 }};
+      var leftToReview = {{ left_to_review|default:0 }};
+      var reviewed = {{ reviewed|default:0 }};
+
+      // Create the chart
+      var chart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: ['Total Records', 'Left to Review', 'Reviewed'],
+          datasets: [{
+            label: 'Review Status',
+            data: [totalRecords, leftToReview, reviewed],
+            backgroundColor: [
+              'rgba(139, 92, 246, 0.7)',  // Purple
+              'rgba(239, 68, 68, 0.7)',   // Red
+              'rgba(16, 185, 129, 0.7)'   // Green
+            ],
+            borderColor: [
+              'rgba(139, 92, 246, 1)',
+              'rgba(239, 68, 68, 1)',
+              'rgba(16, 185, 129, 1)'
+            ],
+            borderWidth: 1
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              display: false
+            },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  let label = context.dataset.label || '';
+                  if (label) {
+                    label += ': ';
+                  }
+                  if (context.parsed.y !== null) {
+                    label += context.parsed.y;
+                  }
+                  return label;
+                }
+              }
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: {
+                precision: 0
+              }
+            }
+          }
+        }
+      });
+
+      // Return the chart instance
+      return chart;
+    };
+
+    // Initialize the chart when the DOM is fully loaded
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', function() {
+        initializeChart();
+      });
+    } else {
+      initializeChart();
+    }
+  </script>
+  {% endif %}
+
+  <!-- Table Sorting Script -->
+  <script>
+    function sortTable(columnIndex) {
+      const table = document.getElementById('doctorTable');
+      if (!table) return;
+
+      const tbody = table.querySelector('tbody');
+      const rows = Array.from(tbody.querySelectorAll('tr'));
+      const headers = table.querySelectorAll('th');
+
+      // Get current sort direction
+      const currentHeader = headers[columnIndex];
+      const isAscending = currentHeader.getAttribute('data-sort') !== 'asc';
+
+      // Reset all headers
+      headers.forEach(header => {
+        header.setAttribute('data-sort', '');
+        const icon = header.querySelector('i');
+        if (icon) icon.className = 'fas fa-sort ml-1 text-gray-400';
+      });
+
+      // Set current header sort direction
+      currentHeader.setAttribute('data-sort', isAscending ? 'asc' : 'desc');
+      const icon = currentHeader.querySelector('i');
+      if (icon) {
+        icon.className = isAscending ?
+          'fas fa-sort-up ml-1 text-blue-500' :
+          'fas fa-sort-down ml-1 text-blue-500';
+      }
+
+      // Sort the rows
+      rows.sort((rowA, rowB) => {
+        const cellA = rowA.querySelectorAll('td')[columnIndex].textContent.trim();
+        const cellB = rowB.querySelectorAll('td')[columnIndex].textContent.trim();
+
+        // Check if the content is a number
+        const numA = parseFloat(cellA);
+        const numB = parseFloat(cellB);
+
+        if (!isNaN(numA) && !isNaN(numB)) {
+          return isAscending ? numA - numB : numB - numA;
+        } else {
+          return isAscending ?
+            cellA.localeCompare(cellB) :
+            cellB.localeCompare(cellA);
+        }
+      });
+
+      // Re-append rows in the new order
+      rows.forEach(row => tbody.appendChild(row));
+    }
+  </script>
+{% endblock %}
