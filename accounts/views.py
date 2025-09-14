@@ -1,8 +1,6 @@
 from django.contrib.auth.views import LoginView
 
-def login_view(request):
-    """Custom login view to handle authentication"""
-    return LoginView.as_view(template_name='registration/login.html')(request)
+
 from django.shortcuts import render
 from django.shortcuts import render
 from django.conf import settings
@@ -10,8 +8,23 @@ import logging
 from django.shortcuts import redirect
 from django.conf import settings
 from urllib.parse import urlencode
+from allauth.socialaccount.internal import statekit
+from django.http import JsonResponse
+from django.conf import settings
+from urllib.parse import urlencode
+from django.shortcuts import redirect
+from django.urls import reverse
+from django.conf import settings
+from django.contrib.auth.decorators import login_required
+from django.utils.http import url_has_allowed_host_and_scheme
+from urllib.parse import urlparse
+
+def login_view(request):
+    """Custom login view to handle authentication"""
+    return LoginView.as_view(template_name='registration/login.html')(request)
 
 
+@login_required
 def welcome(request):
     """Simple welcome page for pending users or when SSO cannot proceed.
 
@@ -71,10 +84,7 @@ def microsoft_state(request):
     the provider directly (to avoid the intermediate /accounts/.../login page)
     while still ensuring the server has stored the expected state.
     """
-    from allauth.socialaccount.internal import statekit
-    from django.http import JsonResponse
-    from django.conf import settings
-    from urllib.parse import urlencode
+
 
     state = {'process': 'login'}
     state_id = statekit.stash_state(request, state)
@@ -89,35 +99,34 @@ def microsoft_state(request):
     tenant = getattr(settings, 'TENANT_ID', 'common')
     authorize_url = f"https://login.microsoftonline.com/{tenant}/oauth2/v2.0/authorize?{urlencode(params)}"
     # Log the generated URL for debugging (non-sensitive; the URL contains state)
-    import logging
+    
     logging.getLogger('sso_debug').debug('Generated authorize_url=%s', authorize_url)
     return JsonResponse({'authorize_url': authorize_url})
 
 
+@login_required
 def post_login_redirect(request):
     """Central redirect view after login.
 
-    Both the account adapter and settings will point to this view so that
-    every login (social or local) goes through a single role-based
-    redirect decision. This ensures admin role changes are respected on
-    next login because we re-load the user from the DB in the adapter and
-    this view trusts the session-authenticated user to exist.
+    All successful logins (social or local) should be sent here by
+    setting `LOGIN_REDIRECT_URL = '/accounts/post-login-redirect/'` in
+    `settings.py`. The view reloads the user from the DB to pick up any
+    admin-made changes to `role` and then redirects to the role-based
+    dashboard. A safe `next` parameter is honoured if it doesn't point
+    back to provider internals or the login page.
     """
-    from django.shortcuts import redirect
-    from django.urls import reverse
-    from django.conf import settings
 
     user = getattr(request, 'user', None)
     if not user or not getattr(user, 'is_authenticated', False):
-        return redirect('login')
+        return redirect(settings.LOGIN_URL)
 
-    # Reload user from DB to pick up recent role changes
+    # Reload user to pick up recent role changes
     try:
         user = type(user).objects.filter(pk=user.pk).first() or user
     except Exception:
         pass
 
-    # Respect a safe `next` parameter but avoid redirect loops back to login
+    # Respect a safe `next` parameter
     next_url = request.GET.get('next') or request.POST.get('next')
     try:
         login_path = reverse('login')
@@ -125,9 +134,6 @@ def post_login_redirect(request):
         login_path = getattr(settings, 'LOGIN_URL', '/login/')
 
     if next_url:
-        from urllib.parse import urlparse
-        from django.utils.http import url_has_allowed_host_and_scheme
-
         parsed = urlparse(next_url)
         path = parsed.path or ''
         is_provider_path = '3rdparty' in path or 'socialaccount' in path or path.startswith('/accounts/microsoft')
@@ -135,7 +141,7 @@ def post_login_redirect(request):
         if is_allowed and not is_provider_path and not (next_url == login_path or next_url.endswith('/login/') or next_url == getattr(settings, 'LOGIN_URL', '/login/')):
             return redirect(next_url)
 
-    # Map roles to named URLs (reverse-safe)
+    # Map roles to named URL names and reverse them; default to homepage
     role_to_name = {
         'defaultuser': 'defaultuser:default_home',
         'student': 'student_section:student_dash',
@@ -149,7 +155,7 @@ def post_login_redirect(request):
         try:
             return redirect(reverse(role_to_name[role]))
         except Exception:
-            # Fallback to path-based redirect if reversing fails
+            # Fallback to simple path if reverse fails
             fallback_paths = {
                 'defaultuser': '/defaultuser/',
                 'student': '/student_section/',
@@ -160,4 +166,4 @@ def post_login_redirect(request):
             return redirect(fallback_paths.get(role, '/'))
 
     # Default fallback
-    return redirect(getattr(settings, 'LOGIN_REDIRECT_URL', '/'))
+    return redirect('/')

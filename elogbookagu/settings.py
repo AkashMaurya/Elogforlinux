@@ -48,12 +48,15 @@ ALLOWED_HOSTS = [
 # Application definition
 
 # Email settings
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'  # Replace with your SMTP server
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'your_email@example.com'  # Replace with your email
-EMAIL_HOST_PASSWORD = 'your_app_password'  # Replace with your app password (not regular password)
+# Use the console backend during development to avoid sending real emails.
+# This effectively disables SMTP and email verification flows.
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+# Clear any SMTP-specific settings so they are not used accidentally.
+EMAIL_HOST = ''
+EMAIL_PORT = None
+EMAIL_USE_TLS = False
+EMAIL_HOST_USER = ''
+EMAIL_HOST_PASSWORD = ''
 
 INSTALLED_APPS = [
     'django.contrib.sites',
@@ -269,7 +272,12 @@ if os.environ.get('RUNNING_TESTS'):
 # the user's role. Use the concrete path to avoid ambiguity between a
 # view-name and a URL path when other libraries (allauth) call into
 # settings.
+# LOGIN_REDIRECT_URL = '/accounts/post-login-redirect/'
+
 LOGIN_REDIRECT_URL = '/accounts/post-login-redirect/'
+ACCOUNT_SIGNUP_REDIRECT_URL = '/accounts/post-login-redirect/' 
+
+
 
 # Sites framework (required by django-allauth)
 SITE_ID = 1
@@ -336,12 +344,27 @@ ACCOUNT_SIGNUP_FIELDS = [
 ACCOUNT_EMAIL_VERIFICATION = "optional"  # Development ke liye
 
 # email Reset / SMTP settings
-EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
-EMAIL_HOST = "smtp.gmail.com"
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-EMAIL_HOST_USER = "dailyhackshindi@gmail.com"  # Your Gmail address
-EMAIL_HOST_PASSWORD = "zobm otwz nymq emiq"  # Your generated app password
+# Ensure allauth does not require email verification or email uniqueness
+# when using SSO-only authentication. Use console backend to avoid SMTP.
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+EMAIL_HOST = ''
+EMAIL_PORT = None
+EMAIL_USE_TLS = False
+EMAIL_HOST_USER = ''
+EMAIL_HOST_PASSWORD = ''
+
+# django-allauth: disable email verification and make email optional when
+# you ONLY allow SSO logins. Set verification to 'none' and don't require
+# email during signup. Keep ACCOUNT_AUTHENTICATION_METHOD as 'username'
+# if you still want to allow username-based admin logins locally.
+ACCOUNT_EMAIL_VERIFICATION = 'none'
+ACCOUNT_EMAIL_REQUIRED = False
+ACCOUNT_USERNAME_REQUIRED = True
+ACCOUNT_AUTHENTICATION_METHOD = 'username'
+
+# Disable password reset/management emails by pointing to the console backend
+# and avoiding allauth views that send emails. If you later enable local
+# password logins, re-enable appropriate flows.
 
 
 warnings.filterwarnings(

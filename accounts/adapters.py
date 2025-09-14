@@ -117,19 +117,11 @@ class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
       if is_allowed and not is_provider_path and not (next_url == login_path or next_url.endswith('/login/') or next_url == getattr(settings, 'LOGIN_URL', '/login/')):
         return next_url
 
-    default = getattr(settings, 'LOGIN_REDIRECT_URL', '/')
-    if not user:
-      return default
-
-    role_to_url = {
-      'defaultuser': reverse('defaultuser:default_home'),
-      'student': reverse('student_section:student_dash'),
-      'doctor': reverse('doctor_section:doctor_dash'),
-      'staff': reverse('staff_section:staff_dash'),
-      'admin': reverse('admin_section:admin_dash'),
-    }
-
-    return role_to_url.get(getattr(user, 'role', None), default)
+    # Send the user to the central post-login redirect URL so that a single
+    # view (`/accounts/post-login-redirect/`) can perform role-based routing.
+    # This avoids leaking provider/internal endpoints via `next` and keeps
+    # redirect logic in one place.
+    return getattr(settings, 'LOGIN_REDIRECT_URL', '/')
 
   @transaction.atomic
   def save_user(self, request, sociallogin, form=None):
@@ -366,12 +358,5 @@ class CustomAccountAdapter(DefaultAccountAdapter):
     else:
       return default
 
-    role_to_url = {
-      'defaultuser': reverse('defaultuser:default_home'),
-      'student': reverse('student_section:student_dash'),
-      'doctor': reverse('doctor_section:doctor_dash'),
-      'staff': reverse('staff_section:staff_dash'),
-      'admin': reverse('admin_section:admin_dash'),
-    }
-
-    return role_to_url.get(getattr(user, 'role', None), default)
+    # Defer role-based routing to the centralized post-login view.
+    return getattr(settings, 'LOGIN_REDIRECT_URL', '/')
