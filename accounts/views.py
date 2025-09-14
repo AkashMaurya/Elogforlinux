@@ -1,6 +1,4 @@
 from django.contrib.auth.views import LoginView
-
-
 from django.shortcuts import render
 from django.shortcuts import render
 from django.conf import settings
@@ -18,6 +16,11 @@ from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.utils.http import url_has_allowed_host_and_scheme
 from urllib.parse import urlparse
+import logging
+
+
+
+ssolog = logging.getLogger('sso_debug')
 
 def login_view(request):
     """Custom login view to handle authentication"""
@@ -57,6 +60,14 @@ def microsoft_direct(request):
     }
 
     state_id = statekit.stash_state(request, state)
+
+    # Persist lightweight copy of state to DB as a fallback for missing session
+    try:
+        from .models import SSOState
+        SSOState.objects.update_or_create(state_id=state_id, defaults={'payload': state})
+        logging.getLogger('sso_debug').debug('microsoft_direct: persisted SSOState state_id=%s', state_id)
+    except Exception:
+        logging.getLogger('sso_debug').exception('microsoft_direct: failed to persist SSOState for state_id=%s', state_id)
 
 
     # Prefer explicit settings; fall back to the tenant/client the user
@@ -99,49 +110,54 @@ def microsoft_state(request):
     tenant = getattr(settings, 'TENANT_ID', 'common')
     authorize_url = f"https://login.microsoftonline.com/{tenant}/oauth2/v2.0/authorize?{urlencode(params)}"
     # Log the generated URL for debugging (non-sensitive; the URL contains state)
-    
+    # Also persist state to DB so callback restore can work when session cookie is missing
+    try:
+        from accounts.models import SSOState
+        SSOState.objects.update_or_create(state_id=state_id, defaults={'payload': state})
+        logging.getLogger('sso_debug').debug('microsoft_state: persisted SSOState state_id=%s', state_id)
+    except Exception:
+        logging.getLogger('sso_debug').exception('microsoft_state: failed to persist SSOState for state_id=%s', state_id)
+
     logging.getLogger('sso_debug').debug('Generated authorize_url=%s', authorize_url)
     return JsonResponse({'authorize_url': authorize_url})
 
 
+
+
+ssolog = logging.getLogger('sso_debug')
+
+
 @login_required
 def post_login_redirect(request):
-    """Central redirect view after login.
-
-    All successful logins (social or local) should be sent here by
-    setting `LOGIN_REDIRECT_URL = '/accounts/post-login-redirect/'` in
-    `settings.py`. The view reloads the user from the DB to pick up any
-    admin-made changes to `role` and then redirects to the role-based
-    dashboard. A safe `next` parameter is honoured if it doesn't point
-    back to provider internals or the login page.
-    """
+    """Redirect user to the proper section after login based on role."""
 
     user = getattr(request, 'user', None)
     if not user or not getattr(user, 'is_authenticated', False):
         return redirect(settings.LOGIN_URL)
 
-    # Reload user to pick up recent role changes
+    # Reload user to pick up any recent role changes
     try:
         user = type(user).objects.filter(pk=user.pk).first() or user
     except Exception:
         pass
 
-    # Respect a safe `next` parameter
+    # Handle 'next' parameter safely
     next_url = request.GET.get('next') or request.POST.get('next')
-    try:
-        login_path = reverse('login')
-    except Exception:
-        login_path = getattr(settings, 'LOGIN_URL', '/login/')
-
     if next_url:
         parsed = urlparse(next_url)
         path = parsed.path or ''
-        is_provider_path = '3rdparty' in path or 'socialaccount' in path or path.startswith('/accounts/microsoft')
-        is_allowed = url_has_allowed_host_and_scheme(next_url, allowed_hosts={request.get_host()}, require_https=request.is_secure())
-        if is_allowed and not is_provider_path and not (next_url == login_path or next_url.endswith('/login/') or next_url == getattr(settings, 'LOGIN_URL', '/login/')):
+        # Ignore internal provider URLs
+        is_provider_path = any(x in path for x in ['3rdparty', 'socialaccount', '/accounts/microsoft'])
+        is_allowed = url_has_allowed_host_and_scheme(
+            next_url, allowed_hosts={request.get_host()}, require_https=request.is_secure()
+        )
+        if not is_provider_path and is_allowed:
+            ssolog.debug('post_login_redirect: redirecting to safe next_url=%s', next_url)
             return redirect(next_url)
+        else:
+            ssolog.debug('post_login_redirect: ignoring unsafe or provider next_url=%s', next_url)
 
-    # Map roles to named URL names and reverse them; default to homepage
+    # Map roles to dashboard URLs
     role_to_name = {
         'defaultuser': 'defaultuser:default_home',
         'student': 'student_section:student_dash',
@@ -151,19 +167,18 @@ def post_login_redirect(request):
     }
 
     role = getattr(user, 'role', None)
-    if role in role_to_name:
-        try:
-            return redirect(reverse(role_to_name[role]))
-        except Exception:
-            # Fallback to simple path if reverse fails
-            fallback_paths = {
-                'defaultuser': '/defaultuser/',
-                'student': '/student_section/',
-                'staff': '/staff_section/',
-                'doctor': '/doctor_section/',
-                'admin': '/admin_section/',
-            }
-            return redirect(fallback_paths.get(role, '/'))
+    try:
+        target_url = reverse(role_to_name.get(role, 'defaultuser:default_home'))
+    except Exception:
+        # fallback to simple path
+        fallback_paths = {
+            'defaultuser': '/defaultuser/',
+            'student': '/student_section/',
+            'staff': '/staff_section/',
+            'doctor': '/doctor_section/',
+            'admin': '/admin_section/',
+        }
+        target_url = fallback_paths.get(role, '/')
 
-    # Default fallback
-    return redirect('/')
+    ssolog.debug('post_login_redirect: user=%s role=%s redirecting to %s', getattr(user, 'pk', None), role, target_url)
+    return redirect(target_url)

@@ -87,6 +87,7 @@ MIDDLEWARE = [
     # sanitize incoming Host headers that may contain unexpected comma-separated values
     'elogbookagu.middleware.host_sanitizer.HostSanitizerMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'elogbookagu.middleware.sso_state_restore.SSOStateRestoreMiddleware',
     'elogbookagu.middleware.ensure_user.EnsureUserMiddleware',
     'elogbookagu.middleware.sso_logger.SSOCallbackLoggerMiddleware',
     'elogbookagu.middleware.ms_login_redirect.MSLoginRedirectMiddleware',
