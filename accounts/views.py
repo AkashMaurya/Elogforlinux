@@ -51,42 +51,64 @@ def microsoft_direct(request):
     is stored in the session before redirecting to Microsoft. The resulting
     redirect goes straight to `login.microsoftonline.com/<TENANT>/oauth2/v2.0/authorize`.
     """
-    from allauth.socialaccount.internal import statekit
+    ssolog = logging.getLogger('sso_debug')
+    ssolog.debug('microsoft_direct: CALLED - method=%s path=%s user=%s',
+                request.method, request.path, getattr(request.user, 'pk', 'Anonymous'))
 
-    # Build minimal state expected by allauth. Keep 'process' to allow
-    # downstream handling if required.
-    state = {
-        'process': 'login',
-    }
-
-    state_id = statekit.stash_state(request, state)
-
-    # Persist lightweight copy of state to DB as a fallback for missing session
     try:
-        from .models import SSOState
-        SSOState.objects.update_or_create(state_id=state_id, defaults={'payload': state})
-        logging.getLogger('sso_debug').debug('microsoft_direct: persisted SSOState state_id=%s', state_id)
-    except Exception:
-        logging.getLogger('sso_debug').exception('microsoft_direct: failed to persist SSOState for state_id=%s', state_id)
+        from allauth.socialaccount.internal import statekit
+
+        # Build minimal state expected by allauth. Keep 'process' to allow
+        # downstream handling if required.
+        state = {
+            'process': 'login',
+        }
+
+        state_id = statekit.stash_state(request, state)
+        ssolog.debug('microsoft_direct: stashed state_id=%s', state_id)
+
+        # Persist lightweight copy of state to DB as a fallback for missing session
+        try:
+            from .models import SSOState
+            SSOState.objects.update_or_create(state_id=state_id, defaults={'payload': state})
+            ssolog.debug('microsoft_direct: persisted SSOState state_id=%s', state_id)
+        except Exception:
+            ssolog.exception('microsoft_direct: failed to persist SSOState for state_id=%s', state_id)
+    except Exception as e:
+        ssolog.exception('microsoft_direct: error in state handling: %s', e)
+        # Don't fail completely, continue with the redirect
+        state_id = 'fallback_state'
 
 
-    # Prefer explicit settings; fall back to the tenant/client the user
-    # requested so the URL matches their expectation.
-    client_id = getattr(settings, 'MICROSOFT_CLIENT_ID', '') or '2b3039c5-ff38-4ab1-9250-22e791e33999'
-    tenant = getattr(settings, 'TENANT_ID', '') or '9c021be8-508f-4638-b1df-52b0e3c615ac'
+    try:
+        # Prefer explicit settings; fall back to the tenant/client the user
+        # requested so the URL matches their expectation.
+        client_id = getattr(settings, 'MICROSOFT_CLIENT_ID', '') or '2b3039c5-ff38-4ab1-9250-22e791e33999'
+        tenant = getattr(settings, 'TENANT_ID', '') or '9c021be8-508f-4638-b1df-52b0e3c615ac'
+        redirect_uri = getattr(settings, 'REDIRECT_URI', '')
 
-    # Use the more typical OIDC scope ordering requested by the user.
-    scope = 'profile openid User.Read email'
+        ssolog.debug('microsoft_direct: client_id=%s tenant=%s redirect_uri=%s',
+                    client_id[:10] + '...', tenant, redirect_uri)
 
-    params = {
-        'client_id': client_id,
-        'response_type': 'code',
-        'redirect_uri': getattr(settings, 'REDIRECT_URI', ''),
-        'scope': scope,
-        'state': state_id,
-    }
-    authorize_url = f"https://login.microsoftonline.com/{tenant}/oauth2/v2.0/authorize?{urlencode(params)}"
-    return redirect(authorize_url)
+        # Use the more typical OIDC scope ordering requested by the user.
+        scope = 'profile openid User.Read email'
+
+        params = {
+            'client_id': client_id,
+            'response_type': 'code',
+            'redirect_uri': redirect_uri,
+            'scope': scope,
+            'state': state_id,
+        }
+        authorize_url = f"https://login.microsoftonline.com/{tenant}/oauth2/v2.0/authorize?{urlencode(params)}"
+        ssolog.debug('microsoft_direct: redirecting to Microsoft OAuth URL: %s', authorize_url[:100] + '...')
+        return redirect(authorize_url)
+    except Exception as e:
+        ssolog.exception('microsoft_direct: error building OAuth URL: %s', e)
+        # Fallback to login page with error message
+        from django.contrib import messages
+        messages.error(request, 'Error initiating Microsoft login. Please try again.')
+        return redirect('/login/')
 
 
 def microsoft_state(request):
@@ -127,12 +149,49 @@ def microsoft_state(request):
 ssolog = logging.getLogger('sso_debug')
 
 
-@login_required
 def post_login_redirect(request):
-    """Redirect user to the proper section after login based on role."""
+    """Redirect user to the proper section after login based on role.
+
+    Note: We don't use @login_required here because this view is called
+    immediately after SSO authentication, and there can be timing issues
+    with session establishment. Instead, we handle authentication manually.
+    """
 
     user = getattr(request, 'user', None)
+    session_info = {
+        'session_key': getattr(request.session, 'session_key', 'None'),
+        'session_keys': list(request.session.keys()) if hasattr(request, 'session') else [],
+        'has_socialaccount_states': 'socialaccount_states' in request.session if hasattr(request, 'session') else False,
+    }
+
+    ssolog.debug('post_login_redirect: called with user=%s auth=%s session_info=%s',
+                getattr(user, 'pk', None),
+                bool(user and getattr(user, 'is_authenticated', False)),
+                session_info)
+
     if not user or not getattr(user, 'is_authenticated', False):
+        ssolog.warning('post_login_redirect: user not authenticated. user=%s auth=%s session=%s',
+                      getattr(user, 'pk', None),
+                      bool(user and getattr(user, 'is_authenticated', False)),
+                      session_info)
+
+        # Check if this might be a timing issue with SSO callback
+        referer = request.META.get('HTTP_REFERER', '')
+        user_agent = request.META.get('HTTP_USER_AGENT', '')
+
+        # Log additional debugging info
+        ssolog.warning('post_login_redirect: referer=%s user_agent=%s', referer, user_agent)
+
+        # If this appears to be coming from Microsoft SSO, try a different approach
+        if ('microsoft' in referer.lower() or 'login.microsoftonline.com' in referer.lower() or
+            'accounts/microsoft' in request.META.get('HTTP_REFERER', '')):
+            ssolog.error('post_login_redirect: SSO callback but user not authenticated - possible session/cookie issue')
+            # Redirect to a safe landing page with an error message
+            from django.contrib import messages
+            messages.error(request, 'Authentication completed but session not established. Please try logging in again.')
+            return redirect('/')
+
+        # For non-SSO cases, redirect to login
         return redirect(settings.LOGIN_URL)
 
     # Reload user to pick up any recent role changes
@@ -182,3 +241,63 @@ def post_login_redirect(request):
 
     ssolog.debug('post_login_redirect: user=%s role=%s redirecting to %s', getattr(user, 'pk', None), role, target_url)
     return redirect(target_url)
+
+
+def debug_auth_status(request):
+    """Debug view to check authentication status - remove in production."""
+    from django.http import JsonResponse
+
+    user = getattr(request, 'user', None)
+    session_data = dict(request.session) if hasattr(request, 'session') else {}
+
+    # Remove sensitive data from session for logging
+    safe_session = {k: v for k, v in session_data.items() if not k.startswith('_')}
+
+    # Check if user exists in database
+    user_in_db = None
+    if user and hasattr(user, 'pk') and user.pk:
+        try:
+            from django.contrib.auth import get_user_model
+            User = get_user_model()
+            user_in_db = User.objects.filter(pk=user.pk).first()
+        except Exception as e:
+            user_in_db = f"Error: {e}"
+
+    debug_info = {
+        'user_exists': user is not None,
+        'user_authenticated': bool(user and getattr(user, 'is_authenticated', False)),
+        'user_id': getattr(user, 'pk', None),
+        'user_email': getattr(user, 'email', None),
+        'user_role': getattr(user, 'role', None),
+        'user_in_db': bool(user_in_db) if user_in_db and not isinstance(user_in_db, str) else str(user_in_db),
+        'session_key': getattr(request.session, 'session_key', None),
+        'session_keys': list(safe_session.keys()),
+        'has_socialaccount_states': 'socialaccount_states' in session_data,
+        'request_path': request.path,
+        'request_method': request.method,
+        'middleware_order': [m.__class__.__name__ for m in getattr(request, '_middleware_chain', [])],
+    }
+
+    ssolog.debug('debug_auth_status: %s', debug_info)
+    return JsonResponse(debug_info)
+
+
+def social_connections_redirect(request):
+    """Handle redirects from allauth's /accounts/3rdparty/ URL.
+
+    This view intercepts allauth's default social connections redirect
+    and sends users to the appropriate role-based dashboard instead.
+    """
+    user = getattr(request, 'user', None)
+    ssolog.debug('social_connections_redirect: called with user=%s auth=%s',
+                getattr(user, 'pk', None),
+                bool(user and getattr(user, 'is_authenticated', False)))
+
+    if user and getattr(user, 'is_authenticated', False):
+        # User is authenticated, redirect to role-based dashboard
+        ssolog.debug('social_connections_redirect: user authenticated, redirecting to post-login-redirect')
+        return redirect('/accounts/post-login-redirect/')
+    else:
+        # User not authenticated, redirect to login
+        ssolog.warning('social_connections_redirect: user not authenticated, redirecting to login')
+        return redirect(settings.LOGIN_URL)

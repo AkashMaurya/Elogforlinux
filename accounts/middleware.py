@@ -17,6 +17,16 @@ class RefreshUserMiddleware(MiddlewareMixin):
 
     def process_request(self, request):
         try:
+            # Skip refresh during SSO-related paths to avoid interfering with authentication
+            sso_paths = [
+                '/accounts/microsoft/login/callback/',
+                '/accounts/3rdparty/',
+                '/accounts/post-login-redirect/',
+            ]
+            if any(request.path.startswith(path) for path in sso_paths):
+                logger.debug('RefreshUserMiddleware: skipping refresh for SSO path: %s', request.path)
+                return
+
             user = getattr(request, 'user', None)
             if user and getattr(user, 'is_authenticated', False):
                 # Refresh from DB to pick up role or other field changes
@@ -24,6 +34,7 @@ class RefreshUserMiddleware(MiddlewareMixin):
                     fresh = User.objects.filter(pk=user.pk).first()
                     if fresh:
                         request.user = fresh
+                        logger.debug('RefreshUserMiddleware: refreshed user %s', getattr(fresh, 'pk', None))
                 except DatabaseError:
                     logger.exception('Database error while refreshing user %s', getattr(user, 'pk', None))
         except Exception:

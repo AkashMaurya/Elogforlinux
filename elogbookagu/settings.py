@@ -90,16 +90,19 @@ MIDDLEWARE = [
     'elogbookagu.middleware.sso_state_restore.SSOStateRestoreMiddleware',
     'elogbookagu.middleware.ensure_user.EnsureUserMiddleware',
     'elogbookagu.middleware.sso_logger.SSOCallbackLoggerMiddleware',
+    # Strip unsafe next parameters before they reach login views/adapters
+    'elogbookagu.middleware.strip_unsafe_next.StripUnsafeNextMiddleware',
     'elogbookagu.middleware.ms_login_redirect.MSLoginRedirectMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
-    # Refresh user from DB each request so role changes in admin take effect immediately
-    'accounts.middleware.RefreshUserMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    # allauth middleware (required by django-allauth)
+    # allauth middleware (required by django-allauth) - must run before RefreshUserMiddleware
     'allauth.account.middleware.AccountMiddleware',
+    # Refresh user from DB each request so role changes in admin take effect immediately
+    # This runs after allauth to ensure authentication is fully established
+    'accounts.middleware.RefreshUserMiddleware',
 ]
 
 # Tell Django which urls.py file to use
@@ -185,6 +188,7 @@ USE_TZ = True
 
 
 AUTH_USER_MODEL = "accounts.CustomUser"
+# Point LOGIN_URL to the main login page that offers both traditional and SSO options
 LOGIN_URL = "/login/"
 LOGOUT_REDIRECT_URL = "login"  # Or any other URL you'd like
 
@@ -251,8 +255,9 @@ SECURE_BROWSER_XSS_FILTER = True
 SECURE_CONTENT_TYPE_NOSNIFF = True
 X_FRAME_OPTIONS = "DENY"
 
-SESSION_COOKIE_DOMAIN = ".agu.edu.bh"
-CSRF_COOKIE_DOMAIN = ".agu.edu.bh"
+# Temporarily disable cookie domain to test if it's causing session issues
+# SESSION_COOKIE_DOMAIN = ".agu.edu.bh"
+# CSRF_COOKIE_DOMAIN = ".agu.edu.bh"
 
 AUTHENTICATION_BACKENDS = [
     "django.contrib.auth.backends.ModelBackend",
@@ -330,6 +335,10 @@ SOCIALACCOUNT_ADAPTER = 'accounts.adapters.CustomSocialAccountAdapter'
 
 # Use a custom account adapter to control post-login redirects based on role
 ACCOUNT_ADAPTER = 'accounts.adapters.CustomAccountAdapter'
+
+# Additional allauth settings to ensure proper redirect behavior
+SOCIALACCOUNT_LOGIN_ON_GET = True  # Allow GET requests for social login
+SOCIALACCOUNT_AUTO_SIGNUP = True  # Automatically create accounts for social logins
 
 
 # Signup/login ke liye fields define karo

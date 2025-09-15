@@ -15,7 +15,8 @@ class FakeAccount:
 
 class FakeSocialLogin:
     def __init__(self, email, first_name='', last_name='', username=None, account_extra=None):
-        self.user = SimpleNamespace(email=email, first_name=first_name, last_name=last_name, username=username)
+        # Create a proper User instance for new user tests
+        self.user = User(email=email, first_name=first_name, last_name=last_name, username=username or email.split('@')[0])
         self.account = FakeAccount(provider='microsoft', extra_data=account_extra or {})
         self.state = {}
 

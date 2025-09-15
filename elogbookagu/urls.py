@@ -33,13 +33,15 @@ urlpatterns = [
     path("", include("publicpage.urls")),
     # Directly register the welcome route to avoid namespace collisions
     path('accounts/welcome/', accounts_views.welcome, name='accounts_welcome'),
+    # Custom accounts URLs must come before allauth.urls to avoid conflicts
     path("accounts/", include(("accounts.urls", "accounts"), namespace="accounts")),
+    # Allauth URLs for OAuth/social authentication
+    path("accounts/", include("allauth.urls")),
     path("doctors/", include("doctor_section.urls")),
     path("admin_section/", include("admin_section.urls")),
     path("defaultuser/", include(("defaultuser.urls", "defaultuser"), namespace="defaultuser")),
     path("staff_section/", include("staff_section.urls")),
     path("student_section/", include("student_section.urls")),
-    path("accounts/", include("allauth.urls")),
     path("set-theme/", set_theme, name="set_theme"),
 ]
 
