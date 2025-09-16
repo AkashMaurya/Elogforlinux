@@ -1,0 +1,527 @@
+{% extends 'base.html' %}
+
+{% block title %}
+  Student Blogs
+{% endblock %}
+
+{% block navbar %}
+{% include 'components/admin_auth_navbar.html' %}
+{% endblock %}
+
+<!-- Main Content -->
+
+{% block content %}
+  <div class="container mx-auto px-4 py-8">
+    <div class="mb-8">
+      <h2 class="text-2xl font-bold text-gray-800 dark:text-white mb-6">{% if is_edit %}Edit{% else %}Add{% endif %} User</h2>
+
+      <!-- Messages section -->
+      {% if messages %}
+        <div class="mb-6">
+          {% for message in messages %}
+            <div class="p-4 mb-4 rounded-lg {% if message.tags == 'success' %}bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100{% elif message.tags == 'error' %}bg-red-100 text-red-800 dark:bg-red-800 dark:text-red-100{% else %}bg-blue-100 text-blue-800 dark:bg-blue-800 dark:text-blue-100{% endif %}">
+              {{ message }}
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+
+      <!-- User Form -->
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
+        <form method="post" action="{% if is_edit %}{% url 'admin_section:edit_user' user_obj.id %}{% else %}{% url 'admin_section:add_user' %}{% endif %}" enctype="multipart/form-data">
+          {% csrf_token %}
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Basic Information -->
+            <div>
+              <h3 class="text-lg font-semibold text-gray-800 dark:text-white mb-4">Basic Information</h3>
+
+              <div class="mb-4">
+                <label for="id_username" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Username</label>
+                {{ form.username }}
+                {% if form.username.errors %}
+                  <p class="text-red-500 text-sm mt-1">{{ form.username.errors.0 }}</p>
+                {% endif %}
+              </div>
+
+              <div class="mb-4">
+                <label for="id_email" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email</label>
+                {{ form.email }}
+                {% if form.email.errors %}
+                  <p class="text-red-500 text-sm mt-1">{{ form.email.errors.0 }}</p>
+                {% endif %}
+              </div>
+
+              <div class="mb-4">
+                <label for="id_first_name" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">First Name</label>
+                {{ form.first_name }}
+                {% if form.first_name.errors %}
+                  <p class="text-red-500 text-sm mt-1">{{ form.first_name.errors.0 }}</p>
+                {% endif %}
+              </div>
+
+              <div class="mb-4">
+                <label for="id_last_name" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Last Name</label>
+                {{ form.last_name }}
+                {% if form.last_name.errors %}
+                  <p class="text-red-500 text-sm mt-1">{{ form.last_name.errors.0 }}</p>
+                {% endif %}
+              </div>
+
+              <div class="mb-4">
+                <label for="id_role" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Role</label>
+                {{ form.role }}
+                {% if form.role.errors %}
+                  <p class="text-red-500 text-sm mt-1">{{ form.role.errors.0 }}</p>
+                {% endif %}
+              </div>
+            </div>
+
+            <!-- Additional Information -->
+            <div>
+              <h3 class="text-lg font-semibold text-gray-800 dark:text-white mb-4">Additional Information</h3>
+
+              <div class="mb-4">
+                <label for="id_profile_photo" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Profile Photo</label>
+                {{ form.profile_photo }}
+                {% if form.profile_photo.errors %}
+                  <p class="text-red-500 text-sm mt-1">{{ form.profile_photo.errors.0 }}</p>
+                {% endif %}
+              </div>
+
+              <div class="mb-4">
+                <label for="id_phone_no" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Phone Number</label>
+                {{ form.phone_no }}
+                {% if form.phone_no.errors %}
+                  <p class="text-red-500 text-sm mt-1">{{ form.phone_no.errors.0 }}</p>
+                {% endif %}
+              </div>
+
+              <div class="mb-4">
+                <label for="id_city" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">City</label>
+                {{ form.city }}
+                {% if form.city.errors %}
+                  <p class="text-red-500 text-sm mt-1">{{ form.city.errors.0 }}</p>
+                {% endif %}
+              </div>
+
+              <div class="mb-4">
+                <label for="id_country" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Country</label>
+                {{ form.country }}
+                {% if form.country.errors %}
+                  <p class="text-red-500 text-sm mt-1">{{ form.country.errors.0 }}</p>
+                {% endif %}
+              </div>
+
+              <div class="mb-4">
+                <label for="id_password1" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Password</label>
+                {{ form.password1 }}
+                {% if form.password1.errors %}
+                  <p class="text-red-500 text-sm mt-1">{{ form.password1.errors.0 }}</p>
+                {% endif %}
+                {% if not is_edit %}
+                  <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">{{ form.password1.help_text|safe }}</p>
+                {% endif %}
+              </div>
+
+              <div class="mb-4">
+                <label for="id_password2" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Confirm Password</label>
+                {{ form.password2 }}
+                {% if form.password2.errors %}
+                  <p class="text-red-500 text-sm mt-1">{{ form.password2.errors.0 }}</p>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+
+          <div class="flex justify-end mt-6">
+            {% if is_edit %}
+              <a href="{% url 'admin_section:add_user' %}" class="mr-2 px-4 py-2 bg-gray-200 text-gray-800 dark:bg-gray-700 dark:text-white rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors duration-200">Cancel</a>
+            {% endif %}
+            <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+              {% if is_edit %}Update{% else %}Add{% endif %} User
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Users Table -->
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden">
+      <div class="p-6 border-b border-gray-200 dark:border-gray-700 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <h3 class="text-xl font-semibold text-gray-800 dark:text-white">Users</h3>
+
+        <!-- Search and Filter Form -->
+        <form method="get" action="{% url 'admin_section:add_user' %}" class="w-full md:w-auto flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2">
+          <!-- Role Filter Dropdown -->
+          <div class="relative">
+            <select name="role" id="role-filter" class="w-full md:w-40 px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white appearance-none">
+              <option value="">All Roles</option>
+              {% for role_value, role_display in roles %}
+                <option value="{{ role_value }}" {% if role_filter == role_value %}selected{% endif %}>{{ role_display }}</option>
+              {% endfor %}
+            </select>
+            
+            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700 dark:text-gray-300">
+              
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+              </svg>
+            </div>
+          </div>
+          &nbsp; &nbsp;
+          <!-- Search Input -->
+          <div class="relative flex-grow flex">
+            <input type="text" name="q" id="user-search" value="{{ search_query }}" class="w-full md:w-64 px-4 py-2 rounded-l-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white" placeholder="Search by name, email, or ID">
+            <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-r-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+              </svg>
+            </button>
+          </div>
+        </form>
+      </div>
+
+      {% if users %}
+        <!-- Bulk Actions Bar -->
+        <div id="bulkActionsBar" class="hidden bg-blue-50 dark:bg-blue-900 border border-blue-200 dark:border-blue-700 rounded-lg p-4 mb-4">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center">
+              <span id="selectedCount" class="text-sm font-medium text-blue-800 dark:text-blue-200">0 users selected</span>
+            </div>
+            <div class="flex space-x-2">
+              <button id="bulkDeleteBtn" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-colors duration-200">
+                <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1-1H9a1 1 0 00-1 1v1M4 7h16"></path>
+                </svg>
+                Delete Selected
+              </button>
+              <button id="clearSelection" class="px-4 py-2 bg-gray-300 text-gray-700 dark:bg-gray-600 dark:text-gray-200 rounded-lg hover:bg-gray-400 dark:hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors duration-200">
+                Clear Selection
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+            <thead class="bg-gray-50 dark:bg-gray-700">
+              <tr>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                  <input type="checkbox" id="selectAll" class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50">
+                </th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">User</th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Email</th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Role</th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Date Joined</th>
+                <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Actions</th>
+              </tr>
+            </thead>
+            <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+              {% for user in users %}
+                <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    {% if not user.is_superuser %}
+                      <input type="checkbox" class="user-checkbox rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50" value="{{ user.id }}" data-username="{{ user.username }}">
+                    {% endif %}
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="flex items-center">
+                      <div class="flex-shrink-0 h-10 w-10">
+                        <img class="h-10 w-10 rounded-full object-cover" src="{{ user.profile_photo.url }}" alt="{{ user.username }}">
+                      </div>
+                      <div class="ml-4">
+                        <div class="text-sm font-medium text-gray-900 dark:text-white">{{ user.username }}</div>
+                        <div class="text-sm text-gray-500 dark:text-gray-400">{{ user.get_full_name }}</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">{{ user.email }}</td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {% if user.role == 'admin' %}bg-purple-100 text-purple-800 dark:bg-purple-800 dark:text-purple-100{% elif user.role == 'doctor' %}bg-blue-100 text-blue-800 dark:bg-blue-800 dark:text-blue-100{% elif user.role == 'student' %}bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100{% else %}bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-100{% endif %}">
+                      {{ user.get_role_display }}
+                    </span>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">{{ user.date_joined|date:"M d, Y" }}</td>
+                  <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                    <a href="{% url 'admin_section:edit_user' user.id %}" class="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300 mr-3">Edit</a>
+                    <button type="button" class="delete-user-btn text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300" data-user-id="{{ user.id }}" data-username="{{ user.username }}">Delete</button>
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Pagination -->
+        {% if users.has_other_pages %}
+          <div class="bg-white dark:bg-gray-800 px-4 py-3 flex items-center justify-between border-t border-gray-200 dark:border-gray-700 sm:px-6">
+            <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+              <div>
+                <p class="text-sm text-gray-700 dark:text-gray-300">
+                  Showing <span class="font-medium">{{ users.start_index }}</span> to <span class="font-medium">{{ users.end_index }}</span> of <span class="font-medium">{{ users.paginator.count }}</span> results
+                </p>
+              </div>
+              <div>
+                <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+                  {% if users.has_previous %}
+                    <a href="?page={{ users.previous_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}{% if role_filter %}&role={{ role_filter }}{% endif %}" class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm font-medium text-gray-500 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700">
+                      <span class="sr-only">Previous</span>
+                      <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                        <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
+                      </svg>
+                    </a>
+                  {% endif %}
+
+                  {% for i in users.paginator.page_range %}
+                    {% if users.number == i %}
+                      <span class="relative inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 bg-blue-50 dark:bg-blue-900 text-sm font-medium text-blue-600 dark:text-blue-200">
+                        {{ i }}
+                      </span>
+                    {% elif i > users.number|add:'-3' and i < users.number|add:'3' %}
+                      <a href="?page={{ i }}{% if search_query %}&q={{ search_query }}{% endif %}{% if role_filter %}&role={{ role_filter }}{% endif %}" class="relative inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700">
+                        {{ i }}
+                      </a>
+                    {% endif %}
+                  {% endfor %}
+
+                  {% if users.has_next %}
+                    <a href="?page={{ users.next_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}{% if role_filter %}&role={{ role_filter }}{% endif %}" class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm font-medium text-gray-500 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700">
+                      <span class="sr-only">Next</span>
+                      <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                        <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+                      </svg>
+                    </a>
+                  {% endif %}
+                </nav>
+              </div>
+            </div>
+          </div>
+        {% endif %}
+      {% else %}
+        <div class="text-center py-8">
+          <p class="text-gray-500 dark:text-gray-400">No users found. Add your first user above.</p>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Delete Confirmation Modal -->
+  <div id="deleteModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50">
+    <div class="flex items-center justify-center min-h-screen px-4">
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-md p-6">
+        <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-4">Confirm Deletion</h3>
+        <p class="text-gray-700 dark:text-gray-300 mb-6">Are you sure you want to delete the user <span id="usernameToDelete" class="font-semibold"></span>? This action cannot be undone.</p>
+        <div class="flex justify-end space-x-3">
+          <button id="cancelDelete" class="px-4 py-2 bg-gray-200 text-gray-800 dark:bg-gray-700 dark:text-white rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors duration-200">Cancel</button>
+          <form id="deleteForm" method="post">
+            {% csrf_token %}
+            <button type="submit" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2">Delete</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bulk Delete Confirmation Modal -->
+  <div id="bulkDeleteModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50">
+    <div class="flex items-center justify-center min-h-screen px-4">
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-lg p-6">
+        <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-4">Confirm Bulk Deletion</h3>
+        <p class="text-gray-700 dark:text-gray-300 mb-4">Are you sure you want to delete the following <span id="bulkDeleteCount" class="font-semibold"></span> user(s)? This action cannot be undone.</p>
+        <div class="max-h-32 overflow-y-auto mb-6">
+          <ul id="bulkDeleteUserList" class="text-sm text-gray-600 dark:text-gray-400 space-y-1">
+            <!-- User list will be populated by JavaScript -->
+          </ul>
+        </div>
+        <div class="flex justify-end space-x-3">
+          <button id="cancelBulkDelete" class="px-4 py-2 bg-gray-200 text-gray-800 dark:bg-gray-700 dark:text-white rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors duration-200">Cancel</button>
+          <button id="confirmBulkDelete" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2">Delete All</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- JavaScript for delete confirmation and bulk operations -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Elements
+      const deleteModal = document.getElementById('deleteModal');
+      const usernameToDelete = document.getElementById('usernameToDelete');
+      const deleteForm = document.getElementById('deleteForm');
+      const cancelDelete = document.getElementById('cancelDelete');
+
+      const bulkDeleteModal = document.getElementById('bulkDeleteModal');
+      const bulkActionsBar = document.getElementById('bulkActionsBar');
+      const selectAllCheckbox = document.getElementById('selectAll');
+      const userCheckboxes = document.querySelectorAll('.user-checkbox');
+      const selectedCount = document.getElementById('selectedCount');
+      const bulkDeleteBtn = document.getElementById('bulkDeleteBtn');
+      const clearSelectionBtn = document.getElementById('clearSelection');
+      const cancelBulkDelete = document.getElementById('cancelBulkDelete');
+      const confirmBulkDelete = document.getElementById('confirmBulkDelete');
+      const bulkDeleteCount = document.getElementById('bulkDeleteCount');
+      const bulkDeleteUserList = document.getElementById('bulkDeleteUserList');
+
+      // Single user delete functionality
+      document.querySelectorAll('.delete-user-btn').forEach(button => {
+        button.addEventListener('click', function() {
+          const userId = this.getAttribute('data-user-id');
+          const username = this.getAttribute('data-username');
+
+          usernameToDelete.textContent = username;
+          deleteForm.action = `/admin_section/delete-user/${userId}/`;
+          deleteModal.classList.remove('hidden');
+        });
+      });
+
+      cancelDelete.addEventListener('click', function() {
+        deleteModal.classList.add('hidden');
+      });
+
+      deleteModal.addEventListener('click', function(event) {
+        if (event.target === deleteModal) {
+          deleteModal.classList.add('hidden');
+        }
+      });
+
+      // Bulk selection functionality
+      function updateBulkActionsBar() {
+        const checkedBoxes = document.querySelectorAll('.user-checkbox:checked');
+        const count = checkedBoxes.length;
+
+        if (count > 0) {
+          bulkActionsBar.classList.remove('hidden');
+          selectedCount.textContent = `${count} user${count > 1 ? 's' : ''} selected`;
+        } else {
+          bulkActionsBar.classList.add('hidden');
+        }
+
+        // Update select all checkbox state
+        if (count === 0) {
+          selectAllCheckbox.indeterminate = false;
+          selectAllCheckbox.checked = false;
+        } else if (count === userCheckboxes.length) {
+          selectAllCheckbox.indeterminate = false;
+          selectAllCheckbox.checked = true;
+        } else {
+          selectAllCheckbox.indeterminate = true;
+        }
+      }
+
+      // Select all functionality
+      selectAllCheckbox.addEventListener('change', function() {
+        const isChecked = this.checked;
+        userCheckboxes.forEach(checkbox => {
+          checkbox.checked = isChecked;
+        });
+        updateBulkActionsBar();
+      });
+
+      // Individual checkbox functionality
+      userCheckboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', updateBulkActionsBar);
+      });
+
+      // Clear selection
+      clearSelectionBtn.addEventListener('click', function() {
+        userCheckboxes.forEach(checkbox => {
+          checkbox.checked = false;
+        });
+        selectAllCheckbox.checked = false;
+        selectAllCheckbox.indeterminate = false;
+        updateBulkActionsBar();
+      });
+
+      // Bulk delete functionality
+      bulkDeleteBtn.addEventListener('click', function() {
+        const checkedBoxes = document.querySelectorAll('.user-checkbox:checked');
+        const selectedUsers = Array.from(checkedBoxes).map(checkbox => ({
+          id: checkbox.value,
+          username: checkbox.getAttribute('data-username')
+        }));
+
+        if (selectedUsers.length === 0) {
+          alert('Please select users to delete.');
+          return;
+        }
+
+        // Populate bulk delete modal
+        bulkDeleteCount.textContent = selectedUsers.length;
+        bulkDeleteUserList.innerHTML = '';
+        selectedUsers.forEach(user => {
+          const li = document.createElement('li');
+          li.textContent = `• ${user.username}`;
+          bulkDeleteUserList.appendChild(li);
+        });
+
+        bulkDeleteModal.classList.remove('hidden');
+      });
+
+      // Confirm bulk delete
+      confirmBulkDelete.addEventListener('click', function() {
+        const checkedBoxes = document.querySelectorAll('.user-checkbox:checked');
+        const userIds = Array.from(checkedBoxes).map(checkbox => checkbox.value);
+
+        if (userIds.length === 0) {
+          alert('No users selected.');
+          return;
+        }
+
+        // Show loading state
+        confirmBulkDelete.disabled = true;
+        confirmBulkDelete.innerHTML = 'Deleting...';
+
+        // Prepare form data
+        const formData = new FormData();
+        userIds.forEach(id => {
+          formData.append('user_ids[]', id);
+        });
+
+        // Add CSRF token
+        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        formData.append('csrfmiddlewaretoken', csrfToken);
+
+        // Send bulk delete request
+        fetch('{% url "admin_section:bulk_delete_users" %}', {
+          method: 'POST',
+          body: formData,
+          headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+          }
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            // Show success message
+            alert(data.message);
+            // Reload the page to refresh the user list
+            window.location.reload();
+          } else {
+            alert('Error: ' + data.message);
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          alert('An error occurred while deleting users.');
+        })
+        .finally(() => {
+          // Reset button state
+          confirmBulkDelete.disabled = false;
+          confirmBulkDelete.innerHTML = 'Delete All';
+          bulkDeleteModal.classList.add('hidden');
+        });
+      });
+
+      // Cancel bulk delete
+      cancelBulkDelete.addEventListener('click', function() {
+        bulkDeleteModal.classList.add('hidden');
+      });
+
+      // Close bulk delete modal when clicking outside
+      bulkDeleteModal.addEventListener('click', function(event) {
+        if (event.target === bulkDeleteModal) {
+          bulkDeleteModal.classList.add('hidden');
+        }
+      });
+    });
+  </script>
+{% endblock %}

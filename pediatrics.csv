@@ -1,0 +1,114 @@
+name,activity_type,department
+Others/New (Type Description Below),Accident & Emergency,Pediatrics
+Others/New (Type Description Below),AGU Session,Pediatrics
+Others/New (Type Description Below),Bedside Teaching,Pediatrics
+Others/New (Type Description Below),Hospital Out Patient Dept.,Pediatrics
+Others/New (Type Description Below),Interactive Session,Pediatrics
+Others/New (Type Description Below),Online Session,Pediatrics
+Arrhythmias,Medical Skills & Simulation Center,Pediatrics
+Bronchodilators Delivery & Counseling,Medical Skills & Simulation Center,Pediatrics
+Child in shock (Anaphylaxis),Medical Skills & Simulation Center,Pediatrics
+Child with Acute respiratory distress,Medical Skills & Simulation Center,Pediatrics
+Child with cyanosis,Medical Skills & Simulation Center,Pediatrics
+Child with vomiting,Medical Skills & Simulation Center,Pediatrics
+Child with wheezing,Medical Skills & Simulation Center,Pediatrics
+IV Cannulation,Medical Skills & Simulation Center,Pediatrics
+Lumbar Puncture,Medical Skills & Simulation Center,Pediatrics
+Neonatal Examination,Medical Skills & Simulation Center,Pediatrics
+Pediatrics Chest X-ray Interpretation,Medical Skills & Simulation Center,Pediatrics
+The febrile child with Rashes,Medical Skills & Simulation Center,Pediatrics
+Assess development using developmental milestones charts,Skills & Procedure,Pediatrics
+"Assess the physical growth by measuring and recording height, weight and head circumference on growth charts",Skills & Procedure,Pediatrics
+Blood collection: Venous & arterial,Skills & Procedure,Pediatrics
+Calculate dehydration deficit and maintenance fluid and electrolyte requirements for different ages,Skills & Procedure,Pediatrics
+Describe infant feeding,Skills & Procedure,Pediatrics
+Identify and know how to use inhalers & PEF meters,Skills & Procedure,Pediatrics
+Identify common congenital anomalies,Skills & Procedure,Pediatrics
+Know how to use the fluid pump,Skills & Procedure,Pediatrics
+LP & CSF collection,Skills & Procedure,Pediatrics
+Measure BP using Mercury sphygmomanometer,Skills & Procedure,Pediatrics
+Measure skin fold thickness,Skills & Procedure,Pediatrics
+Newborn gestational age assessment,Skills & Procedure,Pediatrics
+Plan Immunization schedule,Skills & Procedure,Pediatrics
+Read monitors and oxygen supply devices,Skills & Procedure,Pediatrics
+Resuscitation and Respiratory support of newborn infants & children,Skills & Procedure,Pediatrics
+Others/New (Type Description Below),AGU Session,OBGYN
+Others/New (Type Description Below),Bedside Teaching,OBGYN
+Others/New (Type Description Below),Case Writeups,OBGYN
+Others/New (Type Description Below),Hospital Out Patient Dpt.,OBGYN
+Bimanual examination and pap smear,Medical Skills & Simulation Center,OBGYN
+Conduct of Normal Delivery,Medical Skills & Simulation Center,OBGYN
+Diagnosis and management of first stage of Labor,Medical Skills & Simulation Center,OBGYN
+Obstetric Hemorrhage (APH and PPH),Medical Skills & Simulation Center,OBGYN
+Abdominal Examination of Ob./Gyn. Cases,Skills & Procedure,OBGYN
+Attend Cesarean Section,Skills & Procedure,OBGYN
+Bi-Manual Pelvic Examination,Skills & Procedure,OBGYN
+Collection of: Pap Smear,Skills & Procedure,OBGYN
+Collection of: Vaginal Swabs,Skills & Procedure,OBGYN
+Major Gynecological Surgery: Hysterectomy,Skills & Procedure,OBGYN
+Major Gynecological Surgery: Laparoscopic Procedures,Skills & Procedure,OBGYN
+Major Gynecological Surgery: Myomectomy,Skills & Procedure,OBGYN
+Minor Gynecological Surgery: Cervical Cerclage,Skills & Procedure,OBGYN
+Minor Gynecological Surgery: Evacuation of Uterus,Skills & Procedure,OBGYN
+Minor Gynecological Surgery: Hysteroscopy,Skills & Procedure,OBGYN
+Minor Gynecological Surgery: Incision and Drainage of Bartholin Abscess,Skills & Procedure,OBGYN
+Identification of Instruments: Amnihook,Skills & Procedure,OBGYN
+Identification of Instruments: Fetal Scalp Electrode,Skills & Procedure,OBGYN
+Identification of Instruments: Forceps,Skills & Procedure,OBGYN
+Identification of Instruments: Vacuum,Skills & Procedure,OBGYN
+Interpretation of CTG,Skills & Procedure,OBGYN
+Interpretation of Partogram,Skills & Procedure,OBGYN
+Speculum Examination,Skills & Procedure,OBGYN
+Ultrasonography: Gynecological US,Skills & Procedure,OBGYN
+Ultrasonography: Obstetrics: 2nd and 3rd trimester,Skills & Procedure,OBGYN
+Ultrasonography: Obstetrics: First trimester,Skills & Procedure,OBGYN
+Others/New (Type Description Below),AGU Session,Internal Medicine
+Others/New (Type Description Below),Bedside Teaching,Internal Medicine
+Anemia Case ,Core Cases,Internal Medicine
+Arrhythmia Case ,Core Cases,Internal Medicine
+Ascites Case ,Core Cases,Internal Medicine
+Bronchial Asthma Case ,Core Cases,Internal Medicine
+COPD Case ,Core Cases,Internal Medicine
+Coronary Heart Disease Case ,Core Cases,Internal Medicine
+Diabetes Mellitus Case ,Core Cases,Internal Medicine
+Edema Case ,Core Cases,Internal Medicine
+Heart Failure Case ,Core Cases,Internal Medicine
+Hepatosplenomegaly Case ,Core Cases,Internal Medicine
+Jaundice Case ,Core Cases,Internal Medicine
+Pneumonia Case ,Core Cases,Internal Medicine
+Sickle Cell Disease Case ,Core Cases,Internal Medicine
+Stroke Case ,Core Cases,Internal Medicine
+Others/New (Type Description Below),Core Cases,Internal Medicine
+Others/New (Type Description Below),Hospital Out Patient Dpt.,Internal Medicine
+Acute shortness of breath,Medical Skills & Simulation Center,Internal Medicine
+Approach to patient with abdominal distention,Medical Skills & Simulation Center,Internal Medicine
+Approach to patient with abdominal pain and vomiting,Medical Skills & Simulation Center,Internal Medicine
+Approach to patient with body aches,Medical Skills & Simulation Center,Internal Medicine
+Approach to patient with cough,Medical Skills & Simulation Center,Internal Medicine
+Approach to patient with headache,Medical Skills & Simulation Center,Internal Medicine
+Chest pain,Medical Skills & Simulation Center,Internal Medicine
+Diagnosis and management of life-threatening arrhythmias,Medical Skills & Simulation Center,Internal Medicine
+"Liver, spleen, and kidney examination",Medical Skills & Simulation Center,Internal Medicine
+Pleural tapping,Medical Skills & Simulation Center,Internal Medicine
+Others (Type Description Below),Medical Skills & Simulation Center,Internal Medicine
+12 Leads ECG,Skills & Procedure,Internal Medicine
+Arterial Blood Gas (ABG) Sampling,Skills & Procedure,Internal Medicine
+Ascitic Tapping,Skills & Procedure,Internal Medicine
+Bedside Spirometry,Skills & Procedure,Internal Medicine
+"Biopsy (Skin/Renal, etc.)",Skills & Procedure,Internal Medicine
+Bone Marrow Aspiration,Skills & Procedure,Internal Medicine
+Bronchoscopy,Skills & Procedure,Internal Medicine
+Central Venous Line Insertion,Skills & Procedure,Internal Medicine
+Chest Tube Placement for Pneumothorax,Skills & Procedure,Internal Medicine
+Colonoscopy/Endoscopy,Skills & Procedure,Internal Medicine
+Echocardiogram,Skills & Procedure,Internal Medicine
+Exercise Test (TMT - Treadmill Test),Skills & Procedure,Internal Medicine
+Gastroscopy,Skills & Procedure,Internal Medicine
+Haemodialysis,Skills & Procedure,Internal Medicine
+Intramuscular (IM) Injection,Skills & Procedure,Internal Medicine
+Intravenous (IV) Line Insertion,Skills & Procedure,Internal Medicine
+Peritoneal Dialysis,Skills & Procedure,Internal Medicine
+Pleural Tapping,Skills & Procedure,Internal Medicine
+Pulmonary or Radial Artery Catheter Placement,Skills & Procedure,Internal Medicine
+Use of Inhaler,Skills & Procedure,Internal Medicine
+Others/New (Type Description Below),Skills & Procedure,Internal Medicine

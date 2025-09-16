@@ -1,0 +1,356 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin Notifications{% endblock %}
+
+{% block navbar %}
+  {% include 'components/admin_auth_navbar.html' %}
+{% endblock %}
+
+{% block content %}
+  {% csrf_token %}
+  <div class="container mx-auto px-4 py-8">
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 max-w-5xl mx-auto">
+      <!-- Notification Stats -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        <div class="bg-blue-50 dark:bg-blue-900/30 rounded-lg p-4 flex items-center justify-between shadow-sm">
+          <div>
+            <h3 class="text-sm font-medium text-blue-800 dark:text-blue-200">Total Notifications</h3>
+            <p class="text-2xl font-bold text-blue-600 dark:text-blue-300">{{ notifications.paginator.count }}</p>
+          </div>
+          <div class="bg-blue-100 dark:bg-blue-800 p-3 rounded-full">
+            <i class="fas fa-bell text-blue-500 dark:text-blue-300 text-xl"></i>
+          </div>
+        </div>
+
+        <div class="bg-red-50 dark:bg-red-900/30 rounded-lg p-4 flex items-center justify-between shadow-sm">
+          <div>
+            <h3 class="text-sm font-medium text-red-800 dark:text-red-200">Unread</h3>
+            <p class="text-2xl font-bold text-red-600 dark:text-red-300">{{ unread_count }}</p>
+          </div>
+          <div class="bg-red-100 dark:bg-red-800 p-3 rounded-full">
+            <i class="fas fa-envelope text-red-500 dark:text-red-300 text-xl"></i>
+          </div>
+        </div>
+
+        <div class="bg-green-50 dark:bg-green-900/30 rounded-lg p-4 flex items-center justify-between shadow-sm">
+          <div>
+            <h3 class="text-sm font-medium text-green-800 dark:text-green-200">Read</h3>
+            <p class="text-2xl font-bold text-green-600 dark:text-green-300">{{ notifications.paginator.count|add:"-"|add:unread_count }}</p>
+          </div>
+          <div class="bg-green-100 dark:bg-green-800 p-3 rounded-full">
+            <i class="fas fa-check-double text-green-500 dark:text-green-300 text-xl"></i>
+          </div>
+        </div>
+      </div>
+      <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+        <div>
+          <h2 class="text-2xl font-bold text-gray-800 dark:text-white flex items-center">
+            <i class="fas fa-bell text-blue-500 dark:text-blue-400 mr-2"></i>
+            Support Notifications
+          </h2>
+          <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Manage your support notifications from students, doctors, and staff</p>
+        </div>
+
+        <div class="flex items-center space-x-2">
+          <!-- Filter dropdown -->
+          <div class="relative" x-data="{open: false}">
+            <button @click="open = !open" class="flex items-center bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
+              <i class="fas fa-filter mr-2 text-gray-500 dark:text-gray-400"></i>
+              <span>Filter</span>
+              <i class="fas fa-chevron-down ml-2 text-xs"></i>
+            </button>
+
+            <div x-show="open" @click.away="open = false" x-transition:enter="transition ease-out duration-100" x-transition:enter-start="transform opacity-0 scale-95" x-transition:enter-end="transform opacity-100 scale-100" x-transition:leave="transition ease-in duration-75" x-transition:leave-start="transform opacity-100 scale-100" x-transition:leave-end="transform opacity-0 scale-95" class="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-md shadow-lg z-10 border border-gray-200 dark:border-gray-700" style="display: none;">
+              <div class="py-1">
+                <a href="?filter=all" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">All Notifications</a>
+                <a href="?filter=unread" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">Unread Only</a>
+                <a href="?filter=student" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">Student Support</a>
+                <a href="?filter=doctor" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">Doctor Support</a>
+                <a href="?filter=staff" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">Staff Support</a>
+              </div>
+            </div>
+          </div>
+
+          {% if unread_count > 0 %}
+            <a href="?mark_all_read=true" class="flex items-center bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg px-4 py-2 text-sm transition-colors duration-200">
+              <i class="fas fa-check-double mr-2"></i>
+              <span>Mark all as read</span>
+            </a>
+          {% endif %}
+
+          {% if total_count > 0 %}
+            <button id="deleteAllBtn" class="flex items-center bg-red-600 hover:bg-red-700 text-white font-medium rounded-lg px-4 py-2 text-sm transition-colors duration-200">
+              <i class="fas fa-trash-alt mr-2"></i>
+              <span>Delete All</span>
+            </button>
+          {% endif %}
+        </div>
+      </div>
+
+      {% if notifications %}
+        <div class="overflow-hidden bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm">
+          <ul class="divide-y divide-gray-200 dark:divide-gray-700">
+            {% for notification in notifications %}
+              <li class="{% if not notification.is_read %}bg-blue-50 dark:bg-blue-900/20{% endif %} transition-all duration-200 hover:bg-gray-50 dark:hover:bg-gray-700/50 group">
+                <div class="p-4 flex justify-between items-start">
+                  <!-- Left side with notification icon -->
+                  <div class="flex-shrink-0 mr-4">
+                    <div class="{% if not notification.is_read %}bg-blue-100 dark:bg-blue-800 text-blue-500 dark:text-blue-300{% else %}bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400{% endif %} rounded-full p-2 w-10 h-10 flex items-center justify-center">
+                      {% if notification.support_ticket_type == 'student' %}
+                        <i class="fas fa-user-graduate text-lg"></i>
+                      {% elif notification.support_ticket_type == 'doctor' %}
+                        <i class="fas fa-user-md text-lg"></i>
+                      {% elif notification.support_ticket_type == 'staff' %}
+                        <i class="fas fa-user-tie text-lg"></i>
+                      {% else %}
+                        <i class="fas fa-bell text-lg"></i>
+                      {% endif %}
+                    </div>
+                  </div>
+
+                  <!-- Notification content -->
+                  <div class="flex-1">
+                    <div class="flex items-start justify-between">
+                      <h3 class="text-lg font-semibold text-gray-800 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-200">
+                        {{ notification.title }}
+                        {% if not notification.is_read %}
+                          <span class="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-800 dark:text-blue-100">
+                            New
+                          </span>
+                        {% endif %}
+                      </h3>
+
+                      <!-- Mark as read button -->
+                      {% if not notification.is_read %}
+                        <a href="?mark_read={{ notification.id }}" class="ml-2 text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200" title="Mark as read">
+                          <i class="fas fa-check"></i>
+                          <span class="sr-only">Mark as read</span>
+                        </a>
+                      {% endif %}
+                    </div>
+
+                    <p class="text-sm text-gray-600 dark:text-gray-300 mt-1">{{ notification.message }}</p>
+
+                    <div class="flex flex-wrap items-center mt-3 text-xs">
+                      <!-- Date -->
+                      <span class="inline-flex items-center text-gray-500 dark:text-gray-400">
+                        <i class="far fa-clock mr-1"></i>
+                        {{ notification.created_at|date:"F j, Y, g:i a" }}
+                      </span>
+
+                      <!-- Separator -->
+                      <span class="mx-2 text-gray-300 dark:text-gray-600">•</span>
+
+                      <!-- Support type -->
+                      <span class="inline-flex items-center capitalize {% if notification.support_ticket_type == 'student' %}text-green-600 dark:text-green-400{% elif notification.support_ticket_type == 'doctor' %}text-indigo-600 dark:text-indigo-400{% elif notification.support_ticket_type == 'staff' %}text-purple-600 dark:text-purple-400{% endif %}">
+                        <i class="fas {% if notification.support_ticket_type == 'student' %}fa-user-graduate{% elif notification.support_ticket_type == 'doctor' %}fa-user-md{% elif notification.support_ticket_type == 'staff' %}fa-user-tie{% endif %} mr-1"></i>
+                        {{ notification.support_ticket_type }} Support
+                      </span>
+
+                      <!-- View ticket button -->
+                      {% if notification.ticket_id %}
+                        <a href="?view_ticket={{ notification.id }}" class="ml-auto inline-flex items-center text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium">
+                          <span>View Ticket</span>
+                          <i class="fas fa-arrow-right ml-1 text-xs"></i>
+                        </a>
+                      {% endif %}
+                    </div>
+                  </div>
+                </div>
+              </li>
+            {% endfor %}
+          </ul>
+        </div>
+
+        <!-- Pagination -->
+        {% if notifications.has_other_pages %}
+          <div class="flex justify-center mt-6">
+            <nav class="inline-flex rounded-lg shadow-sm" aria-label="Pagination">
+              <!-- Previous page button -->
+              <a href="{% if notifications.has_previous %}?page={{ notifications.previous_page_number }}{% else %}#{% endif %}"
+                 class="relative inline-flex items-center px-3 py-2 rounded-l-lg border border-gray-300 dark:border-gray-600 {% if notifications.has_previous %}bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700{% else %}bg-gray-100 dark:bg-gray-700 text-gray-400 dark:text-gray-500 cursor-not-allowed{% endif %}">
+                <i class="fas fa-chevron-left h-5 w-5"></i>
+                <span class="sr-only">Previous</span>
+              </a>
+
+              <!-- Page numbers -->
+              {% for i in notifications.paginator.page_range %}
+                {% if notifications.number == i %}
+                  <span class="relative inline-flex items-center px-4 py-2 border border-blue-500 dark:border-blue-600 bg-blue-50 dark:bg-blue-900/40 text-sm font-medium text-blue-600 dark:text-blue-300">
+                    {{ i }}
+                  </span>
+                {% elif i > notifications.number|add:'-3' and i < notifications.number|add:'3' %}
+                  <a href="?page={{ i }}" class="relative inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200">
+                    {{ i }}
+                  </a>
+                {% endif %}
+              {% endfor %}
+
+              <!-- Next page button -->
+              <a href="{% if notifications.has_next %}?page={{ notifications.next_page_number }}{% else %}#{% endif %}"
+                 class="relative inline-flex items-center px-3 py-2 rounded-r-lg border border-gray-300 dark:border-gray-600 {% if notifications.has_next %}bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700{% else %}bg-gray-100 dark:bg-gray-700 text-gray-400 dark:text-gray-500 cursor-not-allowed{% endif %}">
+                <i class="fas fa-chevron-right h-5 w-5"></i>
+                <span class="sr-only">Next</span>
+              </a>
+            </nav>
+          </div>
+
+          <!-- Page info -->
+          <div class="text-center mt-2 text-sm text-gray-500 dark:text-gray-400">
+            Showing page {{ notifications.number }} of {{ notifications.paginator.num_pages }}
+          </div>
+        {% endif %}
+      {% else %}
+        <div class="text-center py-16 bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+          <div class="bg-gray-100 dark:bg-gray-700 rounded-full p-4 w-16 h-16 mx-auto flex items-center justify-center mb-4">
+            <i class="fas fa-bell-slash text-gray-400 dark:text-gray-500 text-2xl"></i>
+          </div>
+          <h3 class="text-xl font-medium text-gray-900 dark:text-white">No notifications</h3>
+          <p class="mt-2 text-sm text-gray-500 dark:text-gray-400 max-w-md mx-auto">You don't have any support notifications at the moment. When students, doctors, or staff submit support requests, they will appear here.</p>
+
+          <!-- Action buttons -->
+          <div class="mt-6 flex justify-center space-x-4">
+            <a href="{% url 'admin_section:admin_support' %}" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+              <i class="fas fa-headset mr-2"></i>
+              View Support Tickets
+            </a>
+            <a href="{% url 'admin_section:admin_dash' %}" class="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+              <i class="fas fa-chart-line mr-2"></i>
+              Go to Dashboard
+            </a>
+          </div>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Delete All Confirmation Modal -->
+  <div id="deleteAllModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50">
+    <div class="flex items-center justify-center min-h-screen px-4">
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-md p-6">
+        <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-4">Confirm Delete All</h3>
+        <p class="text-gray-700 dark:text-gray-300 mb-6">Are you sure you want to delete <span class="font-semibold">all {{ total_count }} notification(s)</span>? This action cannot be undone.</p>
+        <div class="flex justify-end space-x-3">
+          <button id="cancelDeleteAll" class="px-4 py-2 bg-gray-200 text-gray-800 dark:bg-gray-700 dark:text-white rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors duration-200">Cancel</button>
+          <button id="confirmDeleteAll" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2">Delete All</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- JavaScript for enhanced functionality -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Elements
+      const deleteAllBtn = document.getElementById('deleteAllBtn');
+      const deleteAllModal = document.getElementById('deleteAllModal');
+      const cancelDeleteAll = document.getElementById('cancelDeleteAll');
+      const confirmDeleteAll = document.getElementById('confirmDeleteAll');
+
+      // Delete All functionality
+      if (deleteAllBtn) {
+        deleteAllBtn.addEventListener('click', function() {
+          deleteAllModal.classList.remove('hidden');
+        });
+      }
+
+      if (cancelDeleteAll) {
+        cancelDeleteAll.addEventListener('click', function() {
+          deleteAllModal.classList.add('hidden');
+        });
+      }
+
+      if (confirmDeleteAll) {
+        confirmDeleteAll.addEventListener('click', function() {
+          // Show loading state
+          confirmDeleteAll.disabled = true;
+          confirmDeleteAll.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Deleting...';
+
+          // Get CSRF token
+          const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value ||
+                           document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+          // Send delete request
+          fetch('{% url "admin_section:delete_all_notifications" %}', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded',
+              'X-Requested-With': 'XMLHttpRequest',
+              'X-CSRFToken': csrfToken
+            },
+            body: 'csrfmiddlewaretoken=' + encodeURIComponent(csrfToken)
+          })
+          .then(response => response.json())
+          .then(data => {
+            if (data.success) {
+              // Show success message and reload page
+              alert(data.message);
+              window.location.reload();
+            } else {
+              alert('Error: ' + data.message);
+            }
+          })
+          .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred while deleting notifications.');
+          })
+          .finally(() => {
+            // Reset button state
+            confirmDeleteAll.disabled = false;
+            confirmDeleteAll.innerHTML = 'Delete All';
+            deleteAllModal.classList.add('hidden');
+          });
+        });
+      }
+
+      // Close modal when clicking outside
+      if (deleteAllModal) {
+        deleteAllModal.addEventListener('click', function(event) {
+          if (event.target === deleteAllModal) {
+            deleteAllModal.classList.add('hidden');
+          }
+        });
+      }
+
+      // Auto-dismiss notifications after marking as read
+      const markReadLinks = document.querySelectorAll('a[href^="?mark_read="]');
+      markReadLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+          e.preventDefault();
+          const notificationItem = this.closest('li');
+
+          // Add fade-out animation
+          notificationItem.style.transition = 'opacity 0.5s, transform 0.5s';
+          notificationItem.style.opacity = '0';
+          notificationItem.style.transform = 'translateX(10px)';
+
+          // After animation completes, redirect to mark as read
+          setTimeout(() => {
+            window.location.href = this.getAttribute('href');
+          }, 500);
+        });
+      });
+
+      // Preserve filter parameters when paginating
+      const paginationLinks = document.querySelectorAll('a[href^="?page="]');
+      const urlParams = new URLSearchParams(window.location.search);
+      const filterParam = urlParams.get('filter');
+
+      if (filterParam) {
+        paginationLinks.forEach(link => {
+          const href = link.getAttribute('href');
+          link.setAttribute('href', `${href}&filter=${filterParam}`);
+        });
+      }
+
+      // Highlight current filter in dropdown
+      const filterLinks = document.querySelectorAll('a[href^="?filter="]');
+      filterLinks.forEach(link => {
+        const linkFilter = link.getAttribute('href').split('=')[1];
+        if (linkFilter === filterParam) {
+          link.classList.add('bg-blue-50', 'dark:bg-blue-900/30', 'text-blue-600', 'dark:text-blue-400');
+        }
+      });
+    });
+  </script>
+{% endblock %}

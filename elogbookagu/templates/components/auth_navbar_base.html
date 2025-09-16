@@ -1,0 +1,318 @@
+{% comment %}
+Base template for authenticated user navbars (admin, doctor, staff, student)
+This template provides the common structure and functionality for all auth navbars.
+{% endcomment %}
+
+<!-- Sidebar Toggle Button (Mobile) -->
+<button id="sidebar-toggle"
+        class="fixed z-50 bottom-4 right-4 md:hidden bg-blue-600 text-white p-3 rounded-full shadow-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105 active:scale-95"
+        aria-label="Toggle sidebar">
+  <i id="sidebar-toggle-icon" class="fas fa-bars"></i>
+</button>
+
+<!-- Header -->
+<header class="bg-white dark:bg-gray-800 shadow-md fixed top-0 left-0 right-0 z-40 h-16 transition-all duration-300">
+  <div class="flex items-center justify-between h-full px-4 md:px-6 max-w-7xl mx-auto">
+    <!-- Left section with logo and toggle -->
+    <div class="flex items-center space-x-3">
+      <!-- Mobile sidebar toggle (in header) -->
+      <button id="header-sidebar-toggle" class="md:hidden p-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none transition-all duration-200">
+        <i class="fas fa-bars text-xl"></i>
+      </button>
+
+      <!-- Logo and portal name -->
+      <a href="{% block home_url %}{% endblock %}" class="flex items-center">
+        <i class="{% block header_icon %}fas fa-book-medical{% endblock %} text-blue-600 dark:text-blue-400 text-2xl mr-2"></i>
+        <span class="font-bold text-xl text-gray-800 dark:text-white hidden sm:inline">{% block portal_name %}ElogBook Portal{% endblock %}</span>
+      </a>
+    </div>
+
+    <!-- Center section with welcome message -->
+    <div class="hidden md:block text-center">
+      <h1 class="text-lg font-semibold text-gray-800 dark:text-white">
+        Welcome, {% block user_title %}{% endblock %} {{ request.session.first_name }} {{ request.session.last_name }}
+      </h1>
+    </div>
+
+    <!-- Right section with actions -->
+    <div class="flex items-center space-x-3">
+      <!-- Notification Icon -->
+      <div class="relative">
+        <a href="{% block notifications_url %}#{% endblock %}" class="p-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition-colors duration-200" aria-label="Notifications">
+          <i class="fas fa-bell text-xl"></i>
+          {% if unread_notifications_count > 0 %}
+            <span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">{{ unread_notifications_count }}</span>
+          {% endif %}
+        </a>
+      </div>
+
+      <!-- Theme Toggle -->
+      <button id="theme-toggle" aria-label="Toggle dark mode" class="p-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500">
+        <svg id="theme-toggle-dark-icon" class="w-5 h-5 hidden" fill="currentColor" viewBox="0 0 20 20">
+          <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path>
+        </svg>
+        <svg id="theme-toggle-light-icon" class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+          <path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" fill-rule="evenodd" clip-rule="evenodd"></path>
+        </svg>
+      </button>
+
+      <!-- User Menu -->
+      <div class="relative" x-data="{open: false}">
+        <button @click="open = !open" id="user-menu-button" class="flex items-center text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full p-1 focus:outline-none focus:ring-2 focus:ring-blue-500">
+          <span class="sr-only">Open user menu</span>
+          <div class="h-8 w-8 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center text-blue-600 dark:text-blue-300 font-semibold">
+            {{ request.session.first_name|slice:"0:1" }}
+          </div>
+        </button>
+        <!-- User dropdown menu -->
+        <div x-show="open" @click.away="open = false" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 transform scale-95" x-transition:enter-end="opacity-100 transform scale-100" x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100 transform scale-100" x-transition:leave-end="opacity-0 transform scale-95" class="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-md shadow-lg py-1 z-50 ring-1 ring-black ring-opacity-5" style="display: none;">
+          <div class="px-4 py-2 text-sm text-gray-700 dark:text-gray-200 border-b border-gray-200 dark:border-gray-700">
+            <p class="font-semibold">{{ request.session.first_name }} {{ request.session.last_name }}</p>
+            <p class="text-xs text-gray-500 dark:text-gray-400">{% block user_role_header %}User{% endblock %}</p>
+          </div>
+          <a href="{% block profile_url %}#{% endblock %}" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">
+            <i class="fas fa-user mr-2"></i> Profile
+          </a>
+          <form method="POST" action="{% block logout_url %}#{% endblock %}" class="w-full">
+            {% csrf_token %}
+            <button type="submit" class="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">
+              <i class="fas fa-sign-out-alt mr-2"></i> Logout
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- Sidebar -->
+<aside id="sidebar" class="fixed inset-y-0 left-0 z-30 w-64 pt-16 bg-white dark:bg-gray-800 shadow-lg transform -translate-x-full transition-transform duration-300 ease-in-out md:translate-x-0 overflow-hidden">
+  <div class="h-full flex flex-col">
+    <!-- Scrollable content area -->
+    <div class="flex-1 px-3 py-4 overflow-y-auto">
+      <!-- User Info -->
+      <div class="flex items-center p-3 mb-6 rounded-lg bg-gray-50 dark:bg-gray-700 shadow-sm">
+        <div class="flex-shrink-0">
+          <div class="h-10 w-10 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center text-blue-600 dark:text-blue-300 font-semibold text-lg">
+            {{ request.session.first_name|slice:"0:1" }}
+          </div>
+        </div>
+        <div class="ml-3 overflow-hidden">
+        <p class="text-sm font-medium text-gray-900 dark:text-white truncate">{{ request.session.first_name }} {{ request.session.last_name }}</p>
+        <p class="text-xs text-gray-500 dark:text-gray-400 truncate">{% block user_role %}User{% endblock %}</p>
+      </div>
+    </div>
+
+      <!-- Navigation Menu -->
+      <nav class="space-y-1">
+        {% block sidebar_menu %}
+        <!-- Navigation items will be provided by the extending template -->
+        {% endblock %}
+      </nav>
+    </div>
+
+    <!-- Footer with logout (always at the bottom) -->
+    <div class="px-3 py-3 border-t border-gray-200 dark:border-gray-700">
+      <form method="POST" action="{% block logout_url_bottom %}#{% endblock %}" class="w-full">
+        {% csrf_token %}
+        <button type="submit" class="flex w-full items-center px-4 py-3 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 group transition-colors duration-200">
+          <i class="fas fa-sign-out-alt w-5 h-5 text-red-600 dark:text-red-400"></i>
+          <span class="ml-3 font-medium">Logout</span>
+        </button>
+      </form>
+    </div>
+  </div>
+</aside>
+
+<!-- Main Content Wrapper -->
+<div id="content-wrapper" class="pt-16 md:pl-64 min-h-screen transition-all duration-300">
+  <!-- This div wraps around the content in base.html -->
+</div>
+
+<!-- Overlay for mobile sidebar -->
+<div id="sidebar-overlay" class="fixed inset-0 bg-gray-900 bg-opacity-50 z-20 hidden md:hidden"></div>
+
+<!-- JavaScript for Sidebar and User Menu -->
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Elements
+    const sidebarToggle = document.getElementById('sidebar-toggle');
+    const headerSidebarToggle = document.getElementById('header-sidebar-toggle');
+    const sidebarToggleIcon = document.getElementById('sidebar-toggle-icon');
+    const sidebar = document.getElementById('sidebar');
+    const contentWrapper = document.getElementById('content-wrapper');
+    const sidebarOverlay = document.getElementById('sidebar-overlay');
+    const userMenuButton = document.getElementById('user-menu-button');
+    const userDropdown = document.getElementById('user-dropdown');
+    const themeToggleBtn = document.getElementById('theme-toggle');
+
+    // Function to toggle sidebar
+    function toggleSidebar() {
+      if (sidebar && sidebarOverlay) {
+        const isOpen = !sidebar.classList.contains('-translate-x-full');
+
+        if (isOpen) {
+          // Close sidebar
+          sidebar.classList.add('-translate-x-full');
+          sidebarOverlay.classList.add('hidden');
+          if (sidebarToggleIcon) {
+            sidebarToggleIcon.classList.remove('fa-times');
+            sidebarToggleIcon.classList.add('fa-bars');
+          }
+          document.body.classList.remove('overflow-hidden');
+        } else {
+          // Open sidebar
+          sidebar.classList.remove('-translate-x-full');
+          sidebarOverlay.classList.remove('hidden');
+          if (sidebarToggleIcon) {
+            sidebarToggleIcon.classList.remove('fa-bars');
+            sidebarToggleIcon.classList.add('fa-times');
+          }
+          document.body.classList.add('overflow-hidden');
+        }
+      }
+    }
+
+    // Toggle sidebar on floating button click
+    if (sidebarToggle) {
+      sidebarToggle.addEventListener('click', toggleSidebar);
+    }
+
+    // Toggle sidebar from header button
+    if (headerSidebarToggle) {
+      headerSidebarToggle.addEventListener('click', toggleSidebar);
+    }
+
+    // Close sidebar when clicking overlay
+    if (sidebarOverlay) {
+      sidebarOverlay.addEventListener('click', toggleSidebar);
+    }
+
+    // Handle responsive behavior
+    function handleResponsiveLayout() {
+      if (window.innerWidth >= 768) { // md breakpoint
+        if (sidebar) sidebar.classList.remove('-translate-x-full');
+        if (sidebarOverlay) sidebarOverlay.classList.add('hidden');
+        document.body.classList.remove('overflow-hidden');
+      } else {
+        if (sidebar) sidebar.classList.add('-translate-x-full');
+      }
+    }
+
+    // Initialize responsive layout
+    handleResponsiveLayout();
+
+    // Update on window resize
+    window.addEventListener('resize', handleResponsiveLayout);
+
+    // User dropdown menu is now handled by Alpine.js
+
+    // Theme toggle
+    if (themeToggleBtn) {
+      themeToggleBtn.addEventListener('click', function() {
+        if (typeof window.toggleTheme === 'function') {
+          window.toggleTheme();
+        }
+      });
+    }
+
+    // Highlight active navigation item
+    function highlightActiveNavItem() {
+      const navItems = document.querySelectorAll('.nav-item');
+      const currentPath = window.location.pathname;
+
+      navItems.forEach(item => {
+        // Remove active class from all items
+        item.classList.remove('nav-active');
+
+        // Get the path from the item's href
+        const itemPath = item.getAttribute('href');
+        if (!itemPath) return;
+
+        // Check if current path matches or starts with this item's path
+        if (
+          (currentPath === itemPath) ||
+          (currentPath.startsWith(itemPath) && itemPath !== '/') ||
+          (itemPath.includes('dashboard') && (currentPath === '/' || currentPath === ''))
+        ) {
+          item.classList.add('nav-active');
+        }
+      });
+    }
+
+    // Run highlight on page load
+    highlightActiveNavItem();
+
+    // Move main content inside wrapper
+    function setupContentWrapper() {
+      const mainContent = document.querySelector('main');
+      if (mainContent && contentWrapper) {
+        // Check if content is already wrapped
+        if (!contentWrapper.contains(mainContent) && !mainContent.contains(contentWrapper)) {
+          // Clone the main content
+          const mainClone = mainContent.cloneNode(true);
+
+          // Replace the original main with the wrapper containing the clone
+          contentWrapper.appendChild(mainClone);
+          mainContent.replaceWith(contentWrapper);
+        }
+      }
+    }
+
+    // Run once on load
+    setupContentWrapper();
+  });
+</script>
+
+<!-- Styles for Auth Navbar -->
+<style>
+  /* Active navigation item */
+  .nav-active {
+    @apply bg-blue-50 text-blue-700 dark:bg-gray-700 dark:text-blue-400 font-semibold border-l-4 border-blue-600 dark:border-blue-400;
+  }
+
+  .nav-active i {
+    @apply text-blue-700 dark:text-blue-400;
+  }
+
+  /* Mobile sidebar toggle button animation */
+  #sidebar-toggle, #header-sidebar-toggle {
+    transition: transform 0.3s ease;
+  }
+
+  #sidebar-toggle:hover, #header-sidebar-toggle:hover {
+    transform: scale(1.1);
+  }
+
+  /* Prevent scrolling when mobile sidebar is open */
+  body.overflow-hidden {
+    overflow: hidden;
+  }
+
+  /* Ensure proper spacing for content */
+  @media (min-width: 768px) {
+    #content-wrapper {
+      padding-left: 16rem; /* 64px = width of sidebar */
+    }
+  }
+
+  /* Smooth transitions for sidebar */
+  #sidebar {
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+  }
+
+  /* Responsive adjustments */
+  @media (max-width: 767px) {
+    #sidebar {
+      width: 85%;
+      max-width: 300px;
+    }
+  }
+
+  /* Improved focus styles */
+  button:focus-visible,
+  a:focus-visible {
+    outline: 2px solid #3b82f6;
+    outline-offset: 2px;
+  }
+</style>

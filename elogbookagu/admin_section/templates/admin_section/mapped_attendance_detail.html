@@ -1,0 +1,335 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block extra_head %}
+<style>
+  .detail-card {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  }
+  
+  .info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+  }
+  
+  .status-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 500;
+  }
+  
+  .status-active {
+    background-color: #dcfce7;
+    color: #166534;
+  }
+  
+  .status-inactive {
+    background-color: #fef2f2;
+    color: #991b1b;
+  }
+  
+  .list-item {
+    padding: 0.75rem;
+    border-radius: 0.5rem;
+    border: 1px solid #e5e7eb;
+    background-color: #f9fafb;
+    transition: all 0.2s;
+  }
+  
+  .list-item:hover {
+    background-color: #f3f4f6;
+    border-color: #3b82f6;
+  }
+  
+  .dark .list-item {
+    background-color: #374151;
+    border-color: #4b5563;
+  }
+  
+  .dark .list-item:hover {
+    background-color: #4b5563;
+    border-color: #3b82f6;
+  }
+
+  .student-avatar {
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+
+  .avatar-initials {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  }
+</style>
+{% endblock %}
+
+{% block navbar %}
+  {% include 'components/admin_auth_navbar.html' %}
+{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    
+    <!-- Header Section -->
+    <div class="detail-card rounded-lg p-6 mb-8 text-white">
+      <div class="flex items-center justify-between">
+        <div>
+          <h1 class="text-3xl font-bold">{{ mapping.name }}</h1>
+          <p class="mt-2 text-blue-100">
+            Training Site: {{ mapping.training_site.name }} | Log Year: {{ mapping.log_year.year_name }}
+          </p>
+        </div>
+        <div class="flex space-x-3">
+          <a href="{% url 'admin_section:mapped_attendance_edit' mapping.pk %}" 
+             class="inline-flex items-center px-4 py-2 bg-white text-blue-600 rounded-lg hover:bg-gray-100 transition-colors duration-200 font-medium">
+            <i class="fas fa-edit mr-2"></i>
+            Edit Mapping
+          </a>
+          <a href="{% url 'admin_section:mapped_attendance_list' %}" 
+             class="inline-flex items-center px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors duration-200 font-medium">
+            <i class="fas fa-arrow-left mr-2"></i>
+            Back to List
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Basic Information -->
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm mb-8">
+      <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+        <h3 class="text-lg font-semibold text-gray-900 dark:text-white flex items-center">
+          <i class="fas fa-info-circle mr-2 text-blue-600"></i>
+          Basic Information
+        </h3>
+      </div>
+      <div class="p-6">
+        <div class="info-grid">
+          <div>
+            <label class="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Mapping Name</label>
+            <p class="text-lg font-semibold text-gray-900 dark:text-white">{{ mapping.name }}</p>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Training Site</label>
+            <p class="text-lg font-semibold text-gray-900 dark:text-white">{{ mapping.training_site.name }}</p>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Log Year</label>
+            <p class="text-lg font-semibold text-gray-900 dark:text-white">{{ mapping.log_year.year_name }}</p>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Log Year Section</label>
+            <p class="text-lg font-semibold text-gray-900 dark:text-white">
+              {% if mapping.log_year_section %}
+                {{ mapping.log_year_section.year_section_name }}
+              {% else %}
+                <span class="text-gray-400">Not specified</span>
+              {% endif %}
+            </p>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Status</label>
+            {% if mapping.is_active %}
+              <span class="status-badge status-active">
+                <i class="fas fa-check-circle mr-1"></i>Active
+              </span>
+            {% else %}
+              <span class="status-badge status-inactive">
+                <i class="fas fa-times-circle mr-1"></i>Inactive
+              </span>
+            {% endif %}
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Created</label>
+            <p class="text-lg font-semibold text-gray-900 dark:text-white">{{ mapping.created_at|date:"M d, Y H:i" }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Statistics -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
+        <div class="flex items-center">
+          <div class="p-3 rounded-full bg-blue-100 dark:bg-blue-900">
+            <i class="fas fa-user-md text-blue-600 dark:text-blue-400 text-xl"></i>
+          </div>
+          <div class="ml-4">
+            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Mapped Doctors</p>
+            <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ mapping.doctors.count }}</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
+        <div class="flex items-center">
+          <div class="p-3 rounded-full bg-green-100 dark:bg-green-900">
+            <i class="fas fa-users text-green-600 dark:text-green-400 text-xl"></i>
+          </div>
+          <div class="ml-4">
+            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Mapped Groups</p>
+            <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ mapping.groups.count }}</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
+        <div class="flex items-center">
+          <div class="p-3 rounded-full bg-purple-100 dark:bg-purple-900">
+            <i class="fas fa-user-graduate text-purple-600 dark:text-purple-400 text-xl"></i>
+          </div>
+          <div class="ml-4">
+            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Total Students</p>
+            <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ students|length }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mapped Doctors and Groups -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      
+      <!-- Mapped Doctors -->
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm">
+        <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+          <h3 class="text-lg font-semibold text-gray-900 dark:text-white flex items-center">
+            <i class="fas fa-user-md mr-2 text-blue-600"></i>
+            Mapped Doctors ({{ mapping.doctors.count }})
+          </h3>
+        </div>
+        <div class="p-6">
+          {% if mapping.doctors.exists %}
+            <div class="space-y-3">
+              {% for doctor in mapping.doctors.all %}
+                <div class="list-item">
+                  <div class="flex items-center justify-between">
+                    <div>
+                      <p class="font-medium text-gray-900 dark:text-white">
+                        {{ doctor.user.get_full_name|default:doctor.user.username }}
+                      </p>
+                      <p class="text-sm text-gray-500 dark:text-gray-400">
+                        {{ doctor.user.email }}
+                      </p>
+                      {% if doctor.user.speciality %}
+                        <p class="text-xs text-blue-600 dark:text-blue-400">
+                          {{ doctor.user.speciality }}
+                        </p>
+                      {% endif %}
+                    </div>
+                    <div class="text-right">
+                      <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                        Doctor
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              {% endfor %}
+            </div>
+          {% else %}
+            <div class="text-center py-8">
+              <i class="fas fa-user-md text-gray-400 text-3xl mb-3"></i>
+              <p class="text-gray-500 dark:text-gray-400">No doctors mapped to this training site</p>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Mapped Groups -->
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm">
+        <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+          <h3 class="text-lg font-semibold text-gray-900 dark:text-white flex items-center">
+            <i class="fas fa-users mr-2 text-green-600"></i>
+            Mapped Groups ({{ mapping.groups.count }})
+          </h3>
+        </div>
+        <div class="p-6">
+          {% if mapping.groups.exists %}
+            <div class="space-y-3">
+              {% for group in mapping.groups.all %}
+                <div class="list-item">
+                  <div class="flex items-center justify-between">
+                    <div>
+                      <p class="font-medium text-gray-900 dark:text-white">
+                        {{ group.group_name }}
+                      </p>
+                      <p class="text-sm text-gray-500 dark:text-gray-400">
+                        {{ group.log_year.year_name }}
+                        {% if group.log_year_section %}
+                          - {{ group.log_year_section.year_section_name }}
+                        {% endif %}
+                      </p>
+                    </div>
+                    <div class="text-right">
+                      <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                        {{ group.students.count }} student{{ group.students.count|pluralize }}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              {% endfor %}
+            </div>
+          {% else %}
+            <div class="text-center py-8">
+              <i class="fas fa-users text-gray-400 text-3xl mb-3"></i>
+              <p class="text-gray-500 dark:text-gray-400">No groups mapped to this training site</p>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Students in Mapped Groups -->
+    {% if students %}
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm mt-8">
+        <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+          <h3 class="text-lg font-semibold text-gray-900 dark:text-white flex items-center">
+            <i class="fas fa-user-graduate mr-2 text-purple-600"></i>
+            Students in Mapped Groups ({{ students|length }})
+          </h3>
+        </div>
+        <div class="p-6">
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {% for student in students %}
+              <div class="list-item">
+                <div class="flex items-center">
+                  <div class="flex-shrink-0">
+                    <div class="student-avatar w-10 h-10 rounded-full overflow-hidden border-2 border-gray-200 dark:border-gray-600">
+                      {% if student.user.profile_photo %}
+                        <img src="{{ student.user.profile_photo.url }}"
+                             alt="{{ student.user.get_full_name|default:student.user.username }}"
+                             class="w-full h-full object-cover">
+                      {% else %}
+                        <div class="avatar-initials w-full h-full flex items-center justify-center">
+                          <span class="text-white font-semibold text-xs">
+                            {{ student.user.get_full_name|default:student.user.username|first|upper }}
+                          </span>
+                        </div>
+                      {% endif %}
+                    </div>
+                  </div>
+                  <div class="ml-3 flex-1">
+                    <p class="text-sm font-medium text-gray-900 dark:text-white">
+                      {{ student.user.get_full_name|default:student.user.username }}
+                    </p>
+                    <p class="text-xs text-gray-500 dark:text-gray-400">
+                      ID: {{ student.student_id }}
+                    </p>
+                    <p class="text-xs text-purple-600 dark:text-purple-400">
+                      {{ student.group.group_name }}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

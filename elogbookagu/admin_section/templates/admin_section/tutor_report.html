@@ -1,0 +1,641 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Tutor Report Dashboard {% endblock title %}
+
+{% block navbar %}
+{% include 'components/admin_auth_navbar.html' %}
+{% endblock navbar %}
+
+{% block content %}
+<div class="px-4 sm:px-6 lg:px-8 py-8 transition-all duration-300 w-full mx-auto"
+  x-data="{ darkMode: localStorage.getItem('darkMode') === 'true' }" :class="{ 'dark': darkMode }">
+
+  <!-- Header Section -->
+  <div class="mb-8">
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div>
+        <h1 class="text-3xl font-bold text-gray-900 dark:text-white flex items-center">
+          <i class="fas fa-user-md text-purple-600 dark:text-purple-400 mr-3"></i>
+          Tutor Report Dashboard
+        </h1>
+        <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">
+          Comprehensive analysis of tutor supervision, case reviews, and departmental performance metrics.
+        </p>
+      </div>
+      <div class="flex justify-end">
+        <button onclick="exportReport()"
+          class="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 text-sm font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition-colors duration-200">
+          <i class="fas fa-download mr-2"></i> Export
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filters Section -->
+  <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg mb-8 print:hidden">
+    <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+      <h3 class="text-lg font-semibold text-gray-900 dark:text-white flex items-center">
+        <i class="fas fa-filter text-purple-600 dark:text-purple-400 mr-2"></i> Filters
+      </h3>
+    </div>
+    <div class="p-6">
+      <form method="GET" id="filterForm" class="space-y-6">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <!-- Department Filter -->
+          <div>
+            <label for="department" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <i class="fas fa-building text-blue-500 mr-1"></i> Department
+            </label>
+            <select name="department" id="department"
+              class="w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white shadow-sm focus:border-purple-500 focus:ring focus:ring-purple-500 focus:ring-opacity-50">
+              <option value="">All Departments</option>
+              {% for dept in departments %}
+              <option value="{{ dept.id }}" {% if selected_department == dept.id|stringformat:"s" %}selected{% endif %}>
+                {{ dept.name }}
+              </option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <!-- Doctor Specific Filter -->
+          <div>
+            <label for="doctor" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <i class="fas fa-user-md text-green-500 mr-1"></i> Doctor (Specific)
+            </label>
+            <select name="doctor" id="doctor"
+              class="w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white shadow-sm focus:border-purple-500 focus:ring focus:ring-purple-500 focus:ring-opacity-50">
+              <option value="">All Doctors</option>
+              {% for doctor in doctors %}
+              <option value="{{ doctor.id }}" {% if selected_doctor == doctor.id|stringformat:"s" %}selected{% endif %}>
+                Dr. {{ doctor.user.get_full_name|default:doctor.user.username }}
+              </option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <!-- Search Doctor Filter -->
+          <div>
+            <label for="q" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <i class="fas fa-search text-purple-500 mr-1"></i> Search Doctor
+            </label>
+            <div class="relative">
+              <input type="text" name="q" id="q" value="{{ search_query }}" placeholder="Name or email..."
+                class="w-full pl-10 pr-4 py-2 rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white shadow-sm focus:border-purple-500 focus:ring focus:ring-purple-500 focus:ring-opacity-50">
+              <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <i class="fas fa-search text-gray-400"></i>
+              </div>
+            </div>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="flex items-end">
+            <div class="flex space-x-2 w-full">
+              <button type="submit"
+                class="flex-1 inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition-colors duration-200">
+                <i class="fas fa-search mr-2"></i> Apply Filters
+              </button>
+              <a href="{% url 'admin_section:tutor_report' %}"
+                class="flex-1 inline-flex items-center justify-center px-4 py-2 border border-gray-300 dark:border-gray-600 text-sm font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition-colors duration-200">
+                <i class="fas fa-times mr-2"></i> Clear All
+              </a>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Active Filters Info -->
+  {% if selected_department or selected_doctor_obj or search_query %}
+  <div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 mb-6">
+    <div class="flex items-center">
+      <i class="fas fa-info-circle text-blue-600 dark:text-blue-400 mr-2"></i>
+      <span class="text-sm font-medium text-blue-800 dark:text-blue-200">Active Filters:</span>
+      <div class="ml-2 flex flex-wrap gap-2">
+        {% if selected_department %}
+        <span
+          class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 dark:bg-blue-800 text-blue-800 dark:text-blue-200">
+          Department: {% for dept in departments %}{% if dept.id|stringformat:"s" == selected_department %}{{ dept.name }}{% endif %}{% endfor %}
+        </span>
+        {% endif %}
+        {% if selected_doctor_obj %}
+        <span
+          class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 dark:bg-green-800 text-green-800 dark:text-green-200">
+          Doctor: {{ selected_doctor_obj.user.get_full_name|default:selected_doctor_obj.user.username }}
+        </span>
+        {% endif %}
+        {% if search_query %}
+        <span
+          class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 dark:bg-purple-800 text-purple-800 dark:text-purple-200">
+          {% if selected_doctor_obj and not selected_doctor %}Search Result: "{{ search_query }}"{% else %}Search: "{{ search_query }}"{% endif %}
+        </span>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Selected Doctor Profile -->
+  {% if selected_doctor_obj %}
+  <div
+    class="bg-gradient-to-r from-green-50 to-blue-50 dark:from-green-900/20 dark:to-blue-900/20 border border-green-200 dark:border-green-800 rounded-xl shadow-lg p-6 mb-8">
+    <div class="flex flex-col sm:flex-row items-center sm:items-start space-y-4 sm:space-y-0 sm:space-x-6">
+      <!-- Profile Picture -->
+      <div class="flex-shrink-0">
+        <div
+          class="h-20 w-20 rounded-full overflow-hidden bg-gradient-to-br from-green-400 to-blue-500 flex items-center justify-center shadow-lg">
+          {% if selected_doctor_obj.user.profile_photo and selected_doctor_obj.user.profile_photo.url != '/media/profiles/default.jpg' %}
+          <img src="{{ selected_doctor_obj.user.profile_photo.url }}" alt="{{ selected_doctor_obj.user.get_full_name }}"
+            class="h-full w-full object-cover">
+          {% else %}
+          <span class="text-2xl font-bold text-white">
+            {{ selected_doctor_obj.user.first_name|first|default:selected_doctor_obj.user.username|first|upper }}{{
+            selected_doctor_obj.user.last_name|first|upper }}
+          </span>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Doctor Information -->
+      <div class="flex-1 text-center sm:text-left">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:space-x-3 mb-3">
+          <h3 class="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
+            Dr. {{ selected_doctor_obj.user.get_full_name|default:selected_doctor_obj.user.username }}
+          </h3>
+          <span
+            class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 dark:bg-green-900/50 text-green-800 dark:text-green-200">
+            <i class="fas fa-user-md mr-1"></i> Supervisor
+          </span>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+          <div class="flex items-center justify-center sm:justify-start text-gray-600 dark:text-gray-400">
+            <i class="fas fa-envelope text-purple-500 mr-2"></i>
+            <span class="font-medium">Email:</span>
+            <span class="ml-1 text-gray-900 dark:text-white truncate">{{ selected_doctor_obj.user.email }}</span>
+          </div>
+          <div class="flex items-center justify-center sm:justify-start text-gray-600 dark:text-gray-400">
+            <i class="fas fa-building text-blue-500 mr-2"></i>
+            <span class="font-medium">Departments:</span>
+            <span class="ml-1 text-gray-900 dark:text-white font-semibold">
+              {% for dept in selected_doctor_obj.departments.all %}
+              {{ dept.name }}{% if not forloop.last %}, {% endif %}
+              {% empty %}No Department Assigned{% endfor %}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Stats -->
+      <div class="flex-shrink-0">
+        <div class="text-center bg-white dark:bg-gray-800 rounded-lg p-4 shadow-sm">
+          <div class="text-2xl sm:text-3xl font-bold text-green-600 dark:text-green-400">{{ total_logs }}</div>
+          <div class="text-xs sm:text-sm text-gray-600 dark:text-gray-400">Total Logs</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Search Results Info -->
+  {% if search_results_info and search_results_info.count > 1 %}
+  <div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl shadow-lg p-6 mb-8">
+    <div class="flex items-start space-x-4">
+      <div class="flex-shrink-0">
+        <div class="h-12 w-12 rounded-full bg-blue-100 dark:bg-blue-900/50 flex items-center justify-center">
+          <i class="fas fa-search text-blue-600 dark:text-blue-400 text-xl"></i>
+        </div>
+      </div>
+      <div class="flex-1">
+        <h3 class="text-lg font-semibold text-blue-900 dark:text-blue-100 mb-2">
+          Search Results for "{{ search_query }}"
+        </h3>
+        <p class="text-blue-700 dark:text-blue-300 mb-4">
+          Found {{ search_results_info.count }} doctor{{ search_results_info.count|pluralize }} matching your search.
+          {% if search_results_info.count > 5 %}Showing first 5 results.{% endif %}
+        </p>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {% for doctor in search_results_info.doctors %}
+          <div
+            class="bg-white dark:bg-gray-800 rounded-lg p-4 border border-blue-200 dark:border-blue-700 hover:shadow-md transition-shadow duration-200">
+            <div class="flex items-center space-x-3">
+              <div class="flex-shrink-0">
+                <div
+                  class="h-10 w-10 rounded-full overflow-hidden bg-gradient-to-br from-purple-400 to-blue-500 flex items-center justify-center">
+                  {% if doctor.user.profile_photo and doctor.user.profile_photo.url != '/media/profiles/default.jpg' %}
+                  <img src="{{ doctor.user.profile_photo.url }}" alt="{{ doctor.user.get_full_name }}"
+                    class="h-full w-full object-cover">
+                  {% else %}
+                  <span class="text-sm font-bold text-white">
+                    {{ doctor.user.first_name|first|default:doctor.user.username|first|upper }}{{
+                    doctor.user.last_name|first|upper }}
+                  </span>
+                  {% endif %}
+                </div>
+              </div>
+              <div class="flex-1 min-w-0">
+                <p class="text-sm font-medium text-gray-900 dark:text-white truncate">
+                  Dr. {{ doctor.user.get_full_name|default:doctor.user.username }}
+                </p>
+                <p class="text-xs text-gray-500 dark:text-gray-400 truncate">{{ doctor.user.email }}</p>
+                <p class="text-xs text-gray-500 dark:text-gray-400">
+                  {% for dept in doctor.departments.all %}{{ dept.name }}{% if not forloop.last %}, {% endif %}{% endfor %}
+                </p>
+              </div>
+              <div class="flex-shrink-0">
+                <a href="?doctor={{ doctor.id }}"
+                  class="inline-flex items-center px-2 py-1 text-xs font-medium rounded-md text-purple-700 bg-purple-100 hover:bg-purple-200 dark:bg-purple-900/50 dark:text-purple-300 dark:hover:bg-purple-900/70 transition-colors duration-200">
+                  Select
+                </a>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Summary Cards -->
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border-l-4 border-blue-500">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Total Logs Supervised</p>
+          <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ total_logs }}</p>
+        </div>
+        <div class="p-3 rounded-full bg-blue-100 dark:bg-blue-900/50">
+          <i class="fas fa-file-medical text-blue-600 dark:text-blue-400"></i>
+        </div>
+      </div>
+    </div>
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border-l-4 border-green-500">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Approved Logs</p>
+          <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ approved_logs }}</p>
+        </div>
+        <div class="p-3 rounded-full bg-green-100 dark:bg-green-900/50">
+          <i class="fas fa-check-circle text-green-600 dark:text-green-400"></i>
+        </div>
+      </div>
+    </div>
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border-l-4 border-purple-500">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Active Doctors</p>
+          <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ total_doctors }}</p>
+        </div>
+        <div class="p-3 rounded-full bg-purple-100 dark:bg-purple-900/50">
+          <i class="fas fa-user-md text-purple-600 dark:text-purple-400"></i>
+        </div>
+      </div>
+    </div>
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border-l-4 border-orange-500">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Pending Reviews</p>
+          <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ pending_logs }}</p>
+        </div>
+        <div class="p-3 rounded-full bg-orange-100 dark:bg-orange-900/50">
+          <i class="fas fa-clock text-orange-600 dark:text-orange-400"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Charts and Visualizations -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+    <!-- Case Types Pie Chart -->
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden">
+      <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+        <h3 class="text-lg font-semibold text-gray-900 dark:text-white flex items-center">
+          <i class="fas fa-chart-pie text-blue-600 dark:text-blue-400 mr-2"></i> Case Types Distribution
+        </h3>
+      </div>
+      <div class="p-6">
+        <div class="h-64">
+          <canvas id="caseTypesChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Diagnosis Types Pie Chart -->
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden">
+      <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+        <h3 class="text-lg font-semibold text-gray-900 dark:text-white flex items-center">
+          <i class="fas fa-chart-pie text-purple-600 dark:text-purple-400 mr-2"></i> Diagnosis Types
+        </h3>
+      </div>
+      <div class="p-6">
+        <div class="h-64">
+          <canvas id="diagnosisTypesChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Activity Types Pie Chart -->
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden">
+      <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+        <h3 class="text-lg font-semibold text-gray-900 dark:text-white flex items-center">
+          <i class="fas fa-chart-pie text-orange-600 dark:text-orange-400 mr-2"></i> Activity Types
+        </h3>
+      </div>
+      <div class="p-6">
+        <div class="h-64">
+          <canvas id="activityTypesChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Supervision Types Pie Chart -->
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden">
+      <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+        <h3 class="text-lg font-semibold text-gray-900 dark:text-white flex items-center">
+          <i class="fas fa-chart-pie text-green-600 dark:text-green-400 mr-2"></i> Supervision Types
+        </h3>
+      </div>
+      <div class="p-6">
+        <div class="h-64">
+          <canvas id="supervisionChart"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Monthly Cases Line Chart -->
+  <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden mb-8">
+    <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+      <h3 class="text-lg font-semibold text-gray-900 dark:text-white flex items-center">
+        <i class="fas fa-chart-line text-indigo-600 dark:text-indigo-400 mr-2"></i> Cases Supervised by Month
+      </h3>
+    </div>
+    <div class="p-6">
+      <div class="h-80">
+        <canvas id="monthlyChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Approval Status Chart -->
+  <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden mb-8">
+    <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+      <h3 class="text-lg font-semibold text-gray-900 dark:text-white flex items-center">
+        <i class="fas fa-chart-bar text-emerald-600 dark:text-emerald-400 mr-2"></i> Approval Status Overview
+      </h3>
+    </div>
+    <div class="p-6">
+      <!-- Approval Status Numbers Plain Text -->
+      <!-- <div class="mb-4">
+        <span class="font-semibold">Approved Cases:</span> {{ approved_logs }}<br>
+        <span class="font-semibold">Pending Cases:</span> {{ pending_logs }}<br>
+        <span class="font-semibold">Rejected Cases:</span> {{ rejected_logs }}
+      </div> -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="h-64">
+          <canvas id="approvalStatusChart"></canvas>
+        </div>
+        <div class="space-y-4">
+          <div class="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg">
+            <div class="flex items-center justify-between">
+              <span class="text-green-800 dark:text-green-200 font-medium">Approved Cases</span>
+              <span class="text-2xl font-bold text-green-600 dark:text-green-400" id="approvedCount">{{ approved_logs}}</span>
+            </div>
+          </div>
+          <div class="bg-yellow-50 dark:bg-yellow-900/20 p-4 rounded-lg">
+            <div class="flex items-center justify-between">
+              <span class="text-yellow-800 dark:text-yellow-200 font-medium">Pending Cases</span>
+              <span class="text-2xl font-bold text-yellow-600 dark:text-yellow-400" id="pendingCount">{{ pending_logs}}</span>
+            </div>
+          </div>
+          <div class="bg-red-50 dark:bg-red-900/20 p-4 rounded-lg">
+            <div class="flex items-center justify-between">
+              <span class="text-red-800 dark:text-red-200 font-medium">Rejected Cases</span>
+              <span class="text-2xl font-bold text-red-600 dark:text-red-400" id="rejectedCount">{{ rejected_logs }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content %}
+
+{% block extra_scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  // Chart configuration
+  const chartConfig = {
+    colors: [
+      '#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6',
+      '#06B6D4', '#84CC16', '#F97316', '#EC4899', '#6366F1'
+    ],
+    noDataColor: '#E5E7EB',
+    pieOptions: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { position: 'bottom', labels: { padding: 20, usePointStyle: true } }
+      }
+    },
+    lineOptions: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { display: true } },
+      scales: {
+        y: { beginAtZero: true, grid: { color: 'rgba(0, 0, 0, 0.1)' } },
+        x: { grid: { color: 'rgba(0, 0, 0, 0.1)' } }
+      }
+    },
+    barOptions: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        y: { beginAtZero: true, grid: { color: 'rgba(0, 0, 0, 0.1)' } },
+        x: { grid: { display: false } }
+      }
+    }
+  };
+
+  // Chart data from backend
+  const chartData = {
+    caseTypes: JSON.parse("{{ case_types_data|default:'{}'|escapejs }}"),
+    diagnosisTypes: JSON.parse("{{ diagnosis_types_data|default:'{}'|escapejs }}"),
+    activityTypes: JSON.parse("{{ activity_types_data|default:'{}'|escapejs }}"),
+    supervision: JSON.parse("{{ supervision_data|default:'{}'|escapejs }}"),
+    monthly: JSON.parse("{{ monthly_data|default:'{}'|escapejs }}"),
+    approvalStatus: JSON.parse("{{ approval_status_data|default:'{}'|escapejs }}")
+  };
+
+  // Initialize charts
+  document.addEventListener('DOMContentLoaded', () => {
+    console.log('Chart Data:', chartData);
+    console.log('Chart.js version:', Chart.version);
+
+    // Check if Chart.js is loaded
+    if (typeof Chart === 'undefined') {
+      console.error('Chart.js is not loaded!');
+      return;
+    }
+
+    // Initialize each chart individually with error handling
+    const chartIds = ['caseTypesChart', 'diagnosisTypesChart', 'activityTypesChart', 'supervisionChart', 'monthlyChart', 'approvalStatusChart'];
+
+    chartIds.forEach(chartId => {
+      try {
+        console.log(`Initializing ${chartId}...`);
+        window[chartId] = initializeChart(chartId);
+        console.log(`${chartId} initialized successfully`);
+      } catch (error) {
+        console.error(`Error initializing ${chartId}:`, error);
+      }
+    });
+  });
+
+  function initializeChart(chartId) {
+    const canvas = document.getElementById(chartId);
+    if (!canvas) {
+      console.error(`Canvas element with id '${chartId}' not found`);
+      return null;
+    }
+
+    const ctx = canvas.getContext('2d');
+    const dataKey = chartId.replace('Chart', '');
+    const hasData = chartData[dataKey]?.labels?.length > 0;
+
+    console.log(`Chart ${chartId} - Data key: ${dataKey}, Has data: ${hasData}`, chartData[dataKey]);
+
+    const config = {
+      caseTypesChart: {
+        type: 'pie',
+        data: {
+          labels: hasData ? chartData.caseTypes.labels : ['No Data Available'],
+          datasets: [{
+            data: hasData ? chartData.caseTypes.data : [1],
+            backgroundColor: hasData ? chartConfig.colors : [chartConfig.noDataColor],
+            borderWidth: 2,
+            borderColor: '#ffffff'
+          }]
+        },
+        options: { ...chartConfig.pieOptions, plugins: { ...chartConfig.pieOptions.plugins, tooltip: { enabled: hasData } } }
+      },
+      diagnosisTypesChart: {
+        type: 'pie',
+        data: {
+          labels: hasData ? chartData.diagnosisTypes.labels : ['No Data Available'],
+          datasets: [{
+            data: hasData ? chartData.diagnosisTypes.data : [1],
+            backgroundColor: hasData ? chartConfig.colors : [chartConfig.noDataColor],
+            borderWidth: 2,
+            borderColor: '#ffffff'
+          }]
+        },
+        options: { ...chartConfig.pieOptions, plugins: { ...chartConfig.pieOptions.plugins, tooltip: { enabled: hasData } } }
+      },
+      activityTypesChart: {
+        type: 'pie',
+        data: {
+          labels: hasData ? chartData.activityTypes.labels : ['No Data Available'],
+          datasets: [{
+            data: hasData ? chartData.activityTypes.data : [1],
+            backgroundColor: hasData ? chartConfig.colors : [chartConfig.noDataColor],
+            borderWidth: 2,
+            borderColor: '#ffffff'
+          }]
+        },
+        options: chartConfig.pieOptions
+      },
+      supervisionChart: {
+        type: 'pie',
+        data: {
+          labels: hasData ? chartData.supervision.labels : ['No Data Available'],
+          datasets: [{
+            data: hasData ? chartData.supervision.data : [1],
+            backgroundColor: hasData ? chartConfig.colors.slice(0, 5) : [chartConfig.noDataColor],
+            borderWidth: 2,
+            borderColor: '#ffffff'
+          }]
+        },
+        options: chartConfig.pieOptions
+      },
+      monthlyChart: {
+        type: 'line',
+        data: {
+          labels: hasData ? chartData.monthly.labels : ['No Data Available'],
+          datasets: [{
+            label: 'Cases Supervised per Month',
+            data: hasData ? chartData.monthly.data : [0],
+            borderColor: hasData ? '#6366F1' : chartConfig.noDataColor,
+            backgroundColor: hasData ? 'rgba(99, 102, 241, 0.1)' : 'rgba(229, 231, 235, 0.1)',
+            borderWidth: 3,
+            fill: true,
+            tension: 0.4,
+            pointBackgroundColor: hasData ? '#6366F1' : chartConfig.noDataColor,
+            pointBorderColor: '#ffffff',
+            pointBorderWidth: 2,
+            pointRadius: hasData ? 6 : 0
+          }]
+        },
+        options: { ...chartConfig.lineOptions, plugins: { ...chartConfig.lineOptions.plugins, tooltip: { enabled: hasData } } }
+      },
+      approvalStatusChart: {
+        type: 'bar',
+        data: {
+          labels: ['Approved', 'Pending', 'Rejected'],
+          datasets: [{
+            data: [
+              chartData.approvalStatus?.approved || 0,
+              chartData.approvalStatus?.pending || 0,
+              chartData.approvalStatus?.rejected || 0
+            ],
+            backgroundColor: ['#10B981', '#F59E0B', '#EF4444'],
+            borderWidth: 0,
+            borderRadius: 8
+          }]
+        },
+        options: chartConfig.barOptions
+      }
+    };
+
+    return new Chart(ctx, config[chartId]);
+  }
+
+  // Search functionality with debounce
+  const searchInput = document.getElementById('q');
+  let searchTimeout;
+  searchInput.addEventListener('input', () => {
+    clearTimeout(searchTimeout);
+    searchTimeout = setTimeout(() => {
+      if (searchInput.value.length >= 2 || searchInput.value.length === 0) {
+        searchInput.form.submit();
+      }
+    }, 500);
+  });
+
+  searchInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') {
+      clearTimeout(searchTimeout);
+      searchInput.form.submit();
+    }
+  });
+
+  // Auto-submit on select change
+  ['department', 'doctor'].forEach(id => {
+    document.getElementById(id).addEventListener('change', function () {
+      this.form.submit();
+    });
+  });
+
+  // Print and export functions
+  function printReport() {
+    window.print();
+  }
+
+  function exportReport() {
+    alert('Export functionality will be implemented soon');
+  }
+</script>
+{% endblock extra_scripts %}

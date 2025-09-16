@@ -1,0 +1,328 @@
+{% extends 'base.html' %}
+
+{% block title %}
+  Doctor Help & Support
+{% endblock %}
+
+{% block navbar %}
+  {% include './components/doc_auth_navbar.html' %}
+{% endblock %}
+
+{% block content %}
+  <div class="container mx-auto px-4 py-8 animate-fade-in">
+    <!-- Header Section with Icon -->
+    <div class="text-center mb-8">
+      <div class="inline-block p-4 bg-blue-100 dark:bg-blue-900 rounded-full mb-4">
+        <i class="fas fa-headset text-3xl text-blue-600 dark:text-blue-400"></i>
+      </div>
+      <h2 class="text-3xl font-bold text-gray-800 dark:text-white">Doctor Support Center</h2>
+      <p class="text-gray-600 dark:text-gray-300 mt-2 max-w-2xl mx-auto">Submit your issues or questions and our support team will help you resolve them promptly</p>
+    </div>
+
+    <!-- Messages section with animation -->
+    <div id="messages-container" class="mb-6">
+      {% if messages %}
+        {% for message in messages %}
+          <div class="p-4 mb-4 rounded-lg flex items-start animate-fade-in-down {% if message.tags == 'success' %}bg-green-100 text-green-800 dark:bg-green-800/50 dark:text-green-100{% elif message.tags == 'error' %}bg-red-100 text-red-800 dark:bg-red-800/50 dark:text-red-100{% else %}bg-blue-100 text-blue-800 dark:bg-blue-800/50 dark:text-blue-100{% endif %}">
+            <div class="mr-3 mt-0.5">
+              {% if message.tags == 'success' %}
+                <i class="fas fa-check-circle"></i>
+              {% elif message.tags == 'error' %}
+                <i class="fas fa-exclamation-circle"></i>
+              {% else %}
+                <i class="fas fa-info-circle"></i>
+              {% endif %}
+            </div>
+            <div>
+              {{ message }}
+            </div>
+            <button type="button" class="ml-auto -mx-1.5 -my-1.5 rounded-lg focus:ring-2 p-1.5 inline-flex h-8 w-8 hover:bg-gray-200 dark:hover:bg-gray-700" onclick="this.parentElement.remove()">
+              <span class="sr-only">Close</span>
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+        {% endfor %}
+      {% endif %}
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <!-- Support Form with enhanced styling -->
+      <div class="bg-white dark:bg-gray-800 rounded-xl shadow-xl p-6 border border-gray-200 dark:border-gray-700 transition-all duration-300 hover:shadow-2xl">
+        <div class="flex items-center mb-6">
+          <div class="p-3 bg-blue-100 dark:bg-blue-900 rounded-lg mr-3">
+            <i class="fas fa-paper-plane text-blue-600 dark:text-blue-400"></i>
+          </div>
+          <h3 class="text-xl font-semibold text-gray-800 dark:text-white">Submit a Support Request</h3>
+        </div>
+
+        <form id="supportForm" method="post" class="space-y-5">
+          {% csrf_token %}
+          <div>
+            <label for="id_subject" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Subject <span class="text-red-500">*</span></label>
+            {{ form.subject }}
+            <div id="subject-error" class="text-red-500 text-xs mt-1 hidden">Please enter a subject for your request</div>
+          </div>
+          <div>
+            <label for="id_description" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Description <span class="text-red-500">*</span></label>
+            {{ form.description }}
+            <div id="description-error" class="text-red-500 text-xs mt-1 hidden">Please provide a detailed description of your issue</div>
+            <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">Please provide as much detail as possible to help us assist you better</div>
+          </div>
+          <div class="pt-3">
+            <button id="submitBtn" type="submit" class="w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-75 transition-all duration-200 flex justify-center items-center">
+              <span id="submitText">Submit Request</span>
+              <span id="loadingSpinner" class="hidden ml-2">
+                <svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+              </span>
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Support Tickets Table with enhanced styling -->
+      <div class="bg-white dark:bg-gray-800 rounded-xl shadow-xl p-6 border border-gray-200 dark:border-gray-700 transition-all duration-300 hover:shadow-2xl">
+        <div class="flex items-center justify-between mb-6">
+          <div class="flex items-center">
+            <div class="p-3 bg-blue-100 dark:bg-blue-900 rounded-lg mr-3">
+              <i class="fas fa-ticket-alt text-blue-600 dark:text-blue-400"></i>
+            </div>
+            <h3 class="text-xl font-semibold text-gray-800 dark:text-white">Your Support Tickets</h3>
+          </div>
+          <span class="px-3 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+            {{ tickets|length }} Ticket{% if tickets|length != 1 %}s{% endif %}
+          </span>
+        </div>
+
+        {% if tickets %}
+          <div class="overflow-x-auto rounded-lg border border-gray-200 dark:border-gray-700">
+            <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+              <thead class="bg-gray-50 dark:bg-gray-700">
+                <tr>
+                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Subject</th>
+                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Date</th>
+                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Status</th>
+                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Actions</th>
+                </tr>
+              </thead>
+              <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                {% for ticket in tickets %}
+                  <tr class="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-150">
+                    <td class="px-6 py-4 text-sm font-medium text-gray-900 dark:text-white">
+                      <div class="flex items-center">
+                        <span class="{% if ticket.status == 'solved' %}line-through text-gray-500 dark:text-gray-400{% endif %}">{{ ticket.subject }}</span>
+                        {% if ticket.date_created|date:"Y-m-d" == now|date:"Y-m-d" %}
+                          <span class="ml-2 px-2 py-0.5 text-xs rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">New</span>
+                        {% endif %}
+                      </div>
+                    </td>
+                    <td class="px-6 py-4 text-sm text-gray-500 dark:text-gray-300">
+                      <div class="flex items-center">
+                        <i class="far fa-calendar-alt mr-2"></i>
+                        <span>{{ ticket.date_created|date:"M d, Y" }}</span>
+                      </div>
+                    </td>
+                    <td class="px-6 py-4">
+                      <span class="px-2.5 py-1 inline-flex items-center text-xs leading-5 font-semibold rounded-full {% if ticket.status == 'solved' %}bg-green-100 text-green-800 dark:bg-green-800/50 dark:text-green-100{% else %}bg-yellow-100 text-yellow-800 dark:bg-yellow-800/50 dark:text-yellow-100{% endif %}">
+                        {% if ticket.status == 'solved' %}
+                          <i class="fas fa-check-circle mr-1"></i>
+                        {% else %}
+                          <i class="fas fa-clock mr-1"></i>
+                        {% endif %}
+                        {{ ticket.status|title }}
+                      </span>
+                    </td>
+                    <td class="px-6 py-4 text-sm">
+                      <div class="flex space-x-3">
+                        {% if ticket.status == 'pending' %}
+                          <a href="{% url 'doctor_section:delete_support_ticket' ticket.id %}" class="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 flex items-center" onclick="return confirmDelete(event, '{{ ticket.subject }}')">
+                            <i class="fas fa-trash-alt mr-1"></i> Delete
+                          </a>
+                        {% endif %}
+
+                        {% if ticket.status == 'solved' and ticket.admin_comments %}
+                          <button class="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300 flex items-center" onclick="toggleComments('comments-{{ ticket.id }}', this)">
+                            <i class="fas fa-eye mr-1"></i> <span class="response-text">View Response</span>
+                          </button>
+                        {% endif %}
+                      </div>
+                    </td>
+                  </tr>
+                  {% if ticket.status == 'solved' and ticket.admin_comments %}
+                    <tr id="comments-{{ ticket.id }}" class="hidden bg-gray-50 dark:bg-gray-700 animate-fade-in">
+                      <td colspan="4" class="px-6 py-4 text-sm text-gray-500 dark:text-gray-300">
+                        <div class="bg-white dark:bg-gray-800 p-4 rounded-lg border-l-4 border-green-500 dark:border-green-600">
+                          <p class="font-semibold mb-2 text-gray-700 dark:text-gray-200">Admin Response:</p>
+                          <p class="mb-3 whitespace-pre-line">{{ ticket.admin_comments }}</p>
+                          <div class="flex items-center text-xs text-gray-500 dark:text-gray-400">
+                            <i class="far fa-clock mr-1"></i>
+                            <span>Resolved on: {{ ticket.resolved_date|date:"M d, Y H:i" }}</span>
+                          </div>
+                        </div>
+                      </td>
+                    </tr>
+                  {% endif %}
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% else %}
+          <div class="text-center py-12 border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg">
+            <div class="text-gray-400 dark:text-gray-500 mb-3">
+              <i class="fas fa-ticket-alt text-5xl"></i>
+            </div>
+            <p class="text-gray-500 dark:text-gray-400 mb-2">You haven't submitted any support tickets yet.</p>
+            <p class="text-sm text-gray-400 dark:text-gray-500">Use the form on the left to submit your first request.</p>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Form validation
+    document.addEventListener('DOMContentLoaded', function() {
+      const form = document.getElementById('supportForm');
+      const subjectField = document.getElementById('id_subject');
+      const descriptionField = document.getElementById('id_description');
+      const subjectError = document.getElementById('subject-error');
+      const descriptionError = document.getElementById('description-error');
+      const submitBtn = document.getElementById('submitBtn');
+      const submitText = document.getElementById('submitText');
+      const loadingSpinner = document.getElementById('loadingSpinner');
+
+      // Preload form fields if they exist in localStorage
+      if (localStorage.getItem('doctor_support_subject')) {
+        subjectField.value = localStorage.getItem('doctor_support_subject');
+      }
+      if (localStorage.getItem('doctor_support_description')) {
+        descriptionField.value = localStorage.getItem('doctor_support_description');
+      }
+
+      // Save form fields to localStorage as the user types (debounced)
+      let subjectTimeout, descriptionTimeout;
+      subjectField.addEventListener('input', function() {
+        clearTimeout(subjectTimeout);
+        subjectTimeout = setTimeout(() => {
+          localStorage.setItem('doctor_support_subject', subjectField.value);
+        }, 500);
+      });
+
+      descriptionField.addEventListener('input', function() {
+        clearTimeout(descriptionTimeout);
+        descriptionTimeout = setTimeout(() => {
+          localStorage.setItem('doctor_support_description', descriptionField.value);
+        }, 500);
+      });
+
+      if (form) {
+        form.addEventListener('submit', function(e) {
+          let isValid = true;
+
+          // Reset errors
+          subjectError.classList.add('hidden');
+          descriptionError.classList.add('hidden');
+
+          // Validate subject
+          if (!subjectField.value.trim()) {
+            subjectError.classList.remove('hidden');
+            subjectField.classList.add('border-red-500');
+            isValid = false;
+          } else {
+            subjectField.classList.remove('border-red-500');
+          }
+
+          // Validate description
+          if (!descriptionField.value.trim()) {
+            descriptionError.classList.remove('hidden');
+            descriptionField.classList.add('border-red-500');
+            isValid = false;
+          } else {
+            descriptionField.classList.remove('border-red-500');
+          }
+
+          if (isValid) {
+            // Show loading state
+            submitText.textContent = 'Submitting...';
+            loadingSpinner.classList.remove('hidden');
+            submitBtn.disabled = true;
+
+            // Clear localStorage after successful submission
+            form.addEventListener('formdata', function() {
+              localStorage.removeItem('doctor_support_subject');
+              localStorage.removeItem('doctor_support_description');
+            });
+          } else {
+            e.preventDefault();
+          }
+        });
+      }
+    });
+
+    // Toggle comments with animation
+    function toggleComments(id, button) {
+      const commentsRow = document.getElementById(id);
+      const responseText = button.querySelector('.response-text');
+
+      if (commentsRow.classList.contains('hidden')) {
+        commentsRow.classList.remove('hidden');
+        responseText.textContent = 'Hide Response';
+        button.querySelector('i').classList.remove('fa-eye');
+        button.querySelector('i').classList.add('fa-eye-slash');
+      } else {
+        commentsRow.classList.add('hidden');
+        responseText.textContent = 'View Response';
+        button.querySelector('i').classList.remove('fa-eye-slash');
+        button.querySelector('i').classList.add('fa-eye');
+      }
+    }
+
+    // Confirm delete with custom dialog
+    function confirmDelete(event, subject) {
+      event.preventDefault();
+      if (confirm(`Are you sure you want to delete the ticket: "${subject}"? This action cannot be undone.`)) {
+        window.location.href = event.target.closest('a').href;
+      }
+      return false;
+    }
+
+    // Auto-hide messages after 5 seconds
+    setTimeout(function() {
+      const messages = document.querySelectorAll('#messages-container > div');
+      messages.forEach(function(message) {
+        message.classList.add('opacity-0', 'transition-opacity', 'duration-500');
+        setTimeout(function() {
+          message.remove();
+        }, 500);
+      });
+    }, 5000);
+  </script>
+
+  <style>
+    .animate-fade-in {
+      animation: fadeIn 0.5s ease-in-out;
+    }
+
+    .animate-fade-in-down {
+      animation: fadeInDown 0.5s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes fadeInDown {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  </style>
+{% endblock %}
