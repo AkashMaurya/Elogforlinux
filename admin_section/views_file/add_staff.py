@@ -219,17 +219,31 @@ def edit_staff(request, staff_id):
 
 @login_required
 def delete_staff(request, staff_id):
+    """DEPRECATED: Use remove_staff_role instead for safe role removal"""
     staff = get_object_or_404(Staff, id=staff_id)
     user = staff.user
 
     if request.method == 'POST':
-        # Delete the user (will cascade delete the staff profile)
-        user.delete()
-        messages.success(request, 'Staff deleted successfully!')
-        return redirect('admin_section:add_staff')
+        # Check if this is a role removal or account deletion
+        action = request.POST.get('action', 'remove_role')
+
+        if action == 'remove_role':
+            # Safe role removal
+            from .safe_role_management import remove_role_from_user
+            return remove_role_from_user(request, user.id, 'staff')
+
+        elif action == 'delete_account':
+            # Soft delete the entire account
+            from .safe_role_management import soft_delete_user
+            return soft_delete_user(request, user.id)
+
+        else:
+            messages.error(request, 'Invalid action specified.')
+            return redirect('admin_section:add_staff')
 
     context = {
         'staff': staff,
+        'user': user,
     }
 
     return render(request, 'admin_section/delete_staff.html', context)

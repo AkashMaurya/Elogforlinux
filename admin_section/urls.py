@@ -15,6 +15,10 @@ from .views_file.CoreDiaProSession_views import (
 )
 
 from .views_file.add_user import add_user, edit_user, delete_user, bulk_delete_users
+from .views_file.safe_role_management import (
+    remove_role_from_user, soft_delete_user, restore_user, hard_delete_user,
+    view_deleted_users, change_user_role
+)
 from .views_file.add_year import add_year, edit_year, delete_year
 from .views_file.add_elogyear import add_elogyear, edit_elogyear, delete_elogyear
 from .views_file.add_department import add_department, edit_department, delete_department, get_year_sections
@@ -187,6 +191,14 @@ urlpatterns = [
     path('download-user-template/', views.download_user_template, name='download_user_template'),
     path('export-users/', views.export_users, name='export_users'),
     path('export-department-logs/', views.export_department_logs, name='export_department_logs'),
+
+    # Safe Role Management URLs
+    path('remove-role/<int:user_id>/<str:role>/', remove_role_from_user, name='remove_role_from_user'),
+    path('soft-delete-user/<int:user_id>/', soft_delete_user, name='soft_delete_user'),
+    path('restore-user/<int:user_id>/', restore_user, name='restore_user'),
+    path('hard-delete-user/<int:user_id>/', hard_delete_user, name='hard_delete_user'),
+    path('deleted-users/', view_deleted_users, name='view_deleted_users'),
+    path('change-user-role/<int:user_id>/', change_user_role, name='change_user_role'),
 
     # AJAX endpoints
     path('api/get-user-data/', views.get_user_data, name='get_user_data'),

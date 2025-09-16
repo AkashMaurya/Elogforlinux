@@ -38,24 +38,78 @@ def add_doctor(request):
             if user_form.is_valid() and doctor_form.is_valid():
                 try:
                     with transaction.atomic():
+                        # Check if username or email already exists
+                        username = user_form.cleaned_data['username']
+                        email = user_form.cleaned_data['email']
+
+                        if CustomUser.objects.filter(username=username).exists():
+                            messages.error(request, f'Username "{username}" already exists. Please choose a different username.')
+                            return render(request, 'admin_section/add_doctor.html', {
+                                'user_form': user_form,
+                                'doctor_form': doctor_form,
+                                'bulk_form': bulk_form,
+                                'assign_form': assign_form,
+                                'departments': Department.objects.all(),
+                                'doctors': Doctor.objects.all(),
+                                'selected_department': request.GET.get('department', ''),
+                                'search_query': request.GET.get('q', ''),
+                                'unread_notifications_count': AdminNotification.objects.filter(recipient=request.user, is_read=False).count(),
+                                'admin_unread_notifications_count': AdminNotification.objects.filter(recipient=request.user, is_read=False).count(),
+                            })
+
+                        if CustomUser.objects.filter(email=email).exists():
+                            messages.error(request, f'Email "{email}" already exists. Please use a different email address.')
+                            return render(request, 'admin_section/add_doctor.html', {
+                                'user_form': user_form,
+                                'doctor_form': doctor_form,
+                                'bulk_form': bulk_form,
+                                'assign_form': assign_form,
+                                'departments': Department.objects.all(),
+                                'doctors': Doctor.objects.all(),
+                                'selected_department': request.GET.get('department', ''),
+                                'search_query': request.GET.get('q', ''),
+                                'unread_notifications_count': AdminNotification.objects.filter(recipient=request.user, is_read=False).count(),
+                                'admin_unread_notifications_count': AdminNotification.objects.filter(recipient=request.user, is_read=False).count(),
+                            })
+
                         # Create user with doctor role
                         user = user_form.save(commit=False)
                         user.role = 'doctor'
                         user.save()
 
-                        # Create doctor profile
-                        doctor = doctor_form.save(commit=False)
-                        doctor.user = user
-                        doctor.save()
+                        # The signal will automatically create a Doctor profile
+                        # We just need to get it and update the departments
+                        try:
+                            # Get the automatically created doctor profile
+                            doctor = user.doctor_profile
 
-                        # Add departments (many-to-many relationship)
-                        if doctor_form.cleaned_data.get('departments'):
-                            doctor.departments.set(doctor_form.cleaned_data['departments'])
+                            # Add departments (many-to-many relationship)
+                            if doctor_form.cleaned_data.get('departments'):
+                                doctor.departments.set(doctor_form.cleaned_data['departments'])
+
+                        except Exception as profile_error:
+                            # If for some reason the profile wasn't created automatically, create it manually
+                            doctor = Doctor.objects.create(user=user)
+                            if doctor_form.cleaned_data.get('departments'):
+                                doctor.departments.set(doctor_form.cleaned_data['departments'])
 
                         messages.success(request, f'Doctor {user.first_name} {user.last_name} added successfully!')
                         return redirect('admin_section:add_doctor')
                 except Exception as e:
                     messages.error(request, f'Error adding doctor: {str(e)}')
+                    # If there was an error, make sure forms are visible
+                    return render(request, 'admin_section/add_doctor.html', {
+                        'user_form': user_form,
+                        'doctor_form': doctor_form,
+                        'bulk_form': bulk_form,
+                        'assign_form': assign_form,
+                        'departments': Department.objects.all(),
+                        'doctors': Doctor.objects.all(),
+                        'selected_department': request.GET.get('department', ''),
+                        'search_query': request.GET.get('q', ''),
+                        'unread_notifications_count': AdminNotification.objects.filter(recipient=request.user, is_read=False).count(),
+                        'admin_unread_notifications_count': AdminNotification.objects.filter(recipient=request.user, is_read=False).count(),
+                    })
 
         elif 'bulk_upload' in request.POST:
             # Bulk doctor upload
@@ -308,28 +362,32 @@ def edit_doctor(request, doctor_id):
 
 
 def delete_doctor(request, doctor_id):
+    """DEPRECATED: Use remove_doctor_role instead for safe role removal"""
     doctor = get_object_or_404(Doctor, id=doctor_id)
     user = doctor.user
 
     if request.method == 'POST':
-        try:
-            # Store name for success message
-            name = f"{user.first_name} {user.last_name}"
+        # Check if this is a role removal or account deletion
+        action = request.POST.get('action', 'remove_role')
 
-            # Delete doctor and user
-            with transaction.atomic():
-                doctor.delete()
-                user.delete()
+        if action == 'remove_role':
+            # Safe role removal - redirect to new safe function
+            from .safe_role_management import remove_role_from_user
+            return remove_role_from_user(request, user.id, 'doctor')
 
-            messages.success(request, f'Doctor {name} deleted successfully!')
-        except Exception as e:
-            messages.error(request, f'Error deleting doctor: {str(e)}')
+        elif action == 'delete_account':
+            # Soft delete the entire account
+            from .safe_role_management import soft_delete_user
+            return soft_delete_user(request, user.id)
 
-        return redirect('admin_section:add_doctor')
+        else:
+            messages.error(request, 'Invalid action specified.')
+            return redirect('admin_section:add_doctor')
 
-    # If GET request, show confirmation page
+    # Show updated confirmation page with options
     context = {
-        'doctor': doctor
+        'doctor': doctor,
+        'user': user,
     }
 
     return render(request, "admin_section/delete_doctor_confirm.html", context)

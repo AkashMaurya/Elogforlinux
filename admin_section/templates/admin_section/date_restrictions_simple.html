@@ -20,6 +20,24 @@
       </div>
     </div>
 
+    <!-- Help Section -->
+    <div class=" bg-dark-900 mb-8 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-xl border border-blue-200 dark:border-blue-800 p-6">
+      <div class="flex items-start">
+        <div class="flex-shrink-0">
+          <i class="fas fa-info-circle text-blue-600 dark:text-blue-400 text-xl mt-1"></i>
+        </div>
+        <div class="ml-4">
+          <h3 class="text-lg font-semibold text-black dark:text-blue-900 mb-2">How Date Restrictions Work</h3>
+          <div class="text-black dark:text-blue-900 space-y-2">
+            <p><strong>Student Restrictions:</strong> Control when students can submit their log entries (past/future date limits and allowed days).</p>
+            <p><strong>Doctor Restrictions:</strong> Control when doctors can review student logs (review deadlines and allowed days).</p>
+            <p><strong>Review Period:</strong> Set automatic deadlines for doctors to review logs after submission.</p>
+            <p><strong>Allowed Days:</strong> Restrict submissions/reviews to specific days of the week (e.g., weekdays only).</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Messages -->
     {% if messages %}
       <div class="mb-6">
@@ -41,19 +59,34 @@
         {% csrf_token %}
 
         <!-- Status Toggle -->
-        <div class="mb-6">
-          <div class="flex items-center">
-            <label class="inline-flex relative items-center cursor-pointer">
-              <input type="checkbox" name="is_active" class="sr-only peer" {% if settings.is_active %}checked{% endif %}>
-              <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
-              <span class="ml-3 text-sm font-medium text-gray-900 dark:text-gray-300">Enable Date Restrictions</span>
-            </label>
+        <div class="mb-8 p-4 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg border border-yellow-200 dark:border-yellow-800">
+          <div class="flex items-start">
+            <div class="flex-shrink-0">
+              <i class="fas fa-toggle-on text-yellow-600 dark:text-yellow-400 text-xl mt-1"></i>
+            </div>
+            <div class="ml-3 flex-1">
+              <label class="inline-flex relative items-center cursor-pointer">
+                <input type="checkbox" name="is_active" class="sr-only peer" {% if settings.is_active %}checked{% endif %}>
+                <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+                <span class="ml-3 text-sm font-medium text-gray-900 dark:text-gray-300">Enable Date Restrictions</span>
+              </label>
+              <p class="text-sm text-yellow-700 dark:text-yellow-300 mt-2">
+                <strong>Important:</strong> When disabled, students and doctors can submit/review logs on any date without restrictions.
+                Enable this to enforce the date limits and allowed days configured below.
+              </p>
+            </div>
           </div>
         </div>
 
         <!-- Student Restrictions -->
-        <div class="mb-6">
-          <h4 class="text-lg font-medium text-gray-800 dark:text-white mb-4">Student Restrictions</h4>
+        <div class="mb-8 p-6 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+          <div class="flex items-center mb-4">
+            <i class="fas fa-user-graduate text-blue-600 dark:text-blue-400 text-xl mr-3"></i>
+            <h4 class="text-lg font-medium text-blue-900 dark:text-blue-100">Student Log Submission Restrictions</h4>
+          </div>
+          <p class="text-sm text-blue-800 dark:text-blue-200 mb-6">
+            These settings control when students can submit their log entries. Use these to prevent backdating or future dating of logs.
+          </p>
 
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <!-- Past Days Limit -->
@@ -67,7 +100,11 @@
                   <i class="fas fa-history text-gray-400"></i>
                 </div>
               </div>
-              <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Maximum number of days in the past a student can select for logs</p>
+              <p class="text-sm text-blue-600 dark:text-blue-300 mt-1">
+                <i class="fas fa-lightbulb mr-1"></i>
+                <strong>Example:</strong> If set to 7, students can only submit logs for dates within the last 7 days.
+                Set to 0 to allow only today's date.
+              </p>
             </div>
 
             <!-- Future Dates Toggle -->
@@ -82,6 +119,10 @@
                   <span class="ml-3 text-sm font-medium text-gray-900 dark:text-gray-300">Allow students to select future dates</span>
                 </label>
               </div>
+              <p class="text-sm text-blue-600 dark:text-blue-300 mt-2">
+                <i class="fas fa-calendar-plus mr-1"></i>
+                <strong>Recommended:</strong> Keep disabled unless students need to pre-schedule logs for planned activities.
+              </p>
             </div>
 
             <!-- Future Days Limit -->
@@ -373,5 +414,79 @@
         }
       });
     });
+
+    // Add helpful tooltips and real-time validation
+    function addTooltips() {
+      const tooltips = {
+        'student_past_days_limit': 'Common values: 7 (one week), 14 (two weeks), 30 (one month)',
+        'student_future_days_limit': 'Usually 1-7 days for planned activities',
+        'doctor_past_days_limit': 'Typically 30-90 days to allow review of older logs',
+        'doctor_review_period': 'Recommended: 7-14 days for timely reviews',
+        'doctor_notification_days': 'Send reminders 1-3 days before deadline'
+      };
+
+      Object.keys(tooltips).forEach(id => {
+        const element = document.getElementById(id);
+        if (element) {
+          element.title = tooltips[id];
+          element.addEventListener('focus', function() {
+            showTooltip(this, tooltips[id]);
+          });
+        }
+      });
+    }
+
+    function showTooltip(element, text) {
+      // Simple tooltip implementation
+      const tooltip = document.createElement('div');
+      tooltip.className = 'absolute z-10 px-3 py-2 text-sm text-white bg-gray-900 rounded-lg shadow-lg';
+      tooltip.textContent = text;
+      tooltip.style.top = (element.offsetTop - 40) + 'px';
+      tooltip.style.left = element.offsetLeft + 'px';
+      element.parentNode.appendChild(tooltip);
+
+      setTimeout(() => {
+        if (tooltip.parentNode) {
+          tooltip.parentNode.removeChild(tooltip);
+        }
+      }, 3000);
+    }
+
+    // Add real-time validation feedback
+    function addValidation() {
+      const numberInputs = document.querySelectorAll('input[type="number"]');
+      numberInputs.forEach(input => {
+        input.addEventListener('input', function() {
+          const value = parseInt(this.value);
+          const min = parseInt(this.min);
+          const max = parseInt(this.max);
+
+          // Remove existing validation classes
+          this.classList.remove('border-red-500', 'border-green-500');
+
+          if (value < min || value > max || isNaN(value)) {
+            this.classList.add('border-red-500');
+          } else {
+            this.classList.add('border-green-500');
+          }
+        });
+      });
+    }
+
+    // Initialize enhancements
+    addTooltips();
+    addValidation();
+
+    // Add form submission confirmation
+    document.querySelector('form').addEventListener('submit', function(e) {
+      const isActive = document.querySelector('input[name="is_active"]').checked;
+      if (!isActive) {
+        const confirm = window.confirm('Date restrictions will be disabled. Students and doctors will be able to submit/review logs on any date. Continue?');
+        if (!confirm) {
+          e.preventDefault();
+        }
+      }
+    });
+  });
   </script>
 {% endblock %}

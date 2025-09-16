@@ -67,9 +67,22 @@
             <h3 class="text-xl font-semibold text-gray-800 dark:text-white">Add New Doctor</h3>
             <span class="text-xs px-2 py-1 bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 rounded-full">Individual</span>
           </div>
-          <form method="POST" action="{% url 'admin_section:add_doctor' %}">
+          <form method="POST" action="{% url 'admin_section:add_doctor' %}" onsubmit="console.log('Form submitting...'); return validateForm(this);">
             {% csrf_token %}
             <input type="hidden" name="add_doctor" value="1">
+
+            <!-- Display any form errors at the top -->
+            {% if user_form.non_field_errors or doctor_form.non_field_errors %}
+              <div class="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
+                <h4 class="font-bold">Please correct the following errors:</h4>
+                {% for error in user_form.non_field_errors %}
+                  <p>{{ error }}</p>
+                {% endfor %}
+                {% for error in doctor_form.non_field_errors %}
+                  <p>{{ error }}</p>
+                {% endfor %}
+              </div>
+            {% endif %}
 
             <!-- User Form Fields -->
             <div class="mb-4">
@@ -173,7 +186,7 @@
               <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Hold Ctrl/Cmd to select multiple departments</p>
             </div>
 
-            <button type="submit" class="w-full mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all duration-300 transform hover:scale-105">
+            <button type="submit" class="w-full mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all duration-300 transform hover:scale-105" onclick="console.log('Add Doctor form submitted')">
               <i class="fas fa-user-md mr-2"></i> Add Doctor
             </button>
           </form>
@@ -407,75 +420,142 @@
 
 {% block scripts %}
 <script>
-  document.addEventListener('DOMContentLoaded', function() {
-    // Toggle forms section visibility
-    const toggleFormsBtn = document.getElementById('toggle-forms-btn');
-    const formsSection = document.getElementById('forms-section');
+  // Form validation function
+  function validateForm(form) {
+    console.log('Validating form...');
 
-    console.log('Add doctor page loaded');
-    console.log('Toggle button found:', !!toggleFormsBtn);
-    console.log('Forms section found:', !!formsSection);
+    // Check required fields
+    const requiredFields = [
+      'username', 'email', 'password1', 'password2',
+      'first_name', 'last_name', 'phone_no', 'city',
+      'country', 'speciality'
+    ];
 
-    if (toggleFormsBtn && formsSection) {
-      // Check initial state and update button accordingly
-      const isInitiallyHidden = formsSection.classList.contains('hidden');
-      if (!isInitiallyHidden) {
-        toggleFormsBtn.innerHTML = '<i class="fas fa-times mr-2"></i> Hide Forms';
-        toggleFormsBtn.classList.remove('bg-blue-600', 'hover:bg-blue-700');
-        toggleFormsBtn.classList.add('bg-gray-600', 'hover:bg-gray-700');
+    let isValid = true;
+    const missingFields = [];
+
+    requiredFields.forEach(fieldName => {
+      const field = form.querySelector(`[name="${fieldName}"]`);
+      if (field && !field.value.trim()) {
+        missingFields.push(fieldName);
+        isValid = false;
       }
+    });
 
-      toggleFormsBtn.addEventListener('click', function() {
-        console.log('Toggle button clicked');
-        const isHidden = formsSection.classList.contains('hidden');
-        console.log('Forms currently hidden:', isHidden);
-
-        if (isHidden) {
-          // Show forms
-          formsSection.classList.remove('hidden');
-          formsSection.classList.add('animate-fadeIn');
-          toggleFormsBtn.innerHTML = '<i class="fas fa-times mr-2"></i> Hide Forms';
-          toggleFormsBtn.classList.remove('bg-blue-600', 'hover:bg-blue-700');
-          toggleFormsBtn.classList.add('bg-gray-600', 'hover:bg-gray-700');
-          console.log('Forms shown');
-        } else {
-          // Hide forms
-          formsSection.classList.add('hidden');
-          formsSection.classList.remove('animate-fadeIn');
-          toggleFormsBtn.innerHTML = '<i class="fas fa-plus mr-2"></i> Add New Doctor';
-          toggleFormsBtn.classList.remove('bg-gray-600', 'hover:bg-gray-700');
-          toggleFormsBtn.classList.add('bg-blue-600', 'hover:bg-blue-700');
-          console.log('Forms hidden');
-        }
-      });
-
-      // Show forms section if there are form errors
-      const hasFormErrors = document.querySelectorAll('.text-red-500').length > 0;
-      if (hasFormErrors) {
-        formsSection.classList.remove('hidden');
-        toggleFormsBtn.innerHTML = '<i class="fas fa-times mr-2"></i> Hide Forms';
-        toggleFormsBtn.classList.remove('bg-blue-600', 'hover:bg-blue-700');
-        toggleFormsBtn.classList.add('bg-gray-600', 'hover:bg-gray-700');
-      }
-
-      // Show forms section if there are bulk upload results
-      const hasBulkResults = document.querySelector('.bulk_results') !== null || {% if bulk_results %}true{% else %}false{% endif %};
-      if (hasBulkResults) {
-        formsSection.classList.remove('hidden');
-        toggleFormsBtn.innerHTML = '<i class="fas fa-times mr-2"></i> Hide Forms';
-        toggleFormsBtn.classList.remove('bg-blue-600', 'hover:bg-blue-700');
-        toggleFormsBtn.classList.add('bg-gray-600', 'hover:bg-gray-700');
-      }
-
-      // Show forms section if explicitly requested via URL parameter
-      const urlParams = new URLSearchParams(window.location.search);
-      if (urlParams.get('show_form') === 'true') {
-        formsSection.classList.remove('hidden');
-        toggleFormsBtn.innerHTML = '<i class="fas fa-times mr-2"></i> Hide Forms';
-        toggleFormsBtn.classList.remove('bg-blue-600', 'hover:bg-blue-700');
-        toggleFormsBtn.classList.add('bg-gray-600', 'hover:bg-gray-700');
-      }
+    // Check departments
+    const departmentSelect = form.querySelector('[name="departments"]');
+    if (departmentSelect && departmentSelect.selectedOptions.length === 0) {
+      missingFields.push('departments');
+      isValid = false;
     }
+
+    if (!isValid) {
+      console.error('Missing required fields:', missingFields);
+      alert('Please fill in all required fields: ' + missingFields.join(', '));
+      return false;
+    }
+
+    // Check password match
+    const password1 = form.querySelector('[name="password1"]');
+    const password2 = form.querySelector('[name="password2"]');
+    if (password1 && password2 && password1.value !== password2.value) {
+      alert('Passwords do not match!');
+      return false;
+    }
+
+    console.log('Form validation passed');
+
+    // Disable submit button to prevent double submission
+    const submitBtn = form.querySelector('button[type="submit"]');
+    if (submitBtn) {
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Adding Doctor...';
+
+      // Re-enable after 5 seconds as a safety measure
+      setTimeout(() => {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<i class="fas fa-user-md mr-2"></i> Add Doctor';
+      }, 5000);
+    }
+
+    return true;
+  }
+
+  // Simple and reliable function to show/hide forms
+  function toggleForms() {
+    console.log('🔄 toggleForms called');
+
+    const formsSection = document.getElementById('forms-section');
+    const toggleBtn = document.getElementById('toggle-forms-btn');
+
+    if (!formsSection || !toggleBtn) {
+      console.error('❌ Error: Page elements not found');
+      alert('Error: Page elements not found. Please refresh the page.');
+      return false;
+    }
+
+    const isHidden = formsSection.classList.contains('hidden');
+    console.log('📋 Forms currently hidden:', isHidden);
+
+    if (isHidden) {
+      // Show forms
+      formsSection.classList.remove('hidden');
+      toggleBtn.innerHTML = '<i class="fas fa-times mr-2"></i> Hide Forms';
+      toggleBtn.className = 'px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors duration-200 flex items-center';
+      console.log('✅ Forms shown successfully');
+    } else {
+      // Hide forms
+      formsSection.classList.add('hidden');
+      toggleBtn.innerHTML = '<i class="fas fa-plus mr-2"></i> Add New Doctor';
+      toggleBtn.className = 'px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 flex items-center';
+      console.log('✅ Forms hidden successfully');
+    }
+
+    return false;
+  }
+
+  document.addEventListener('DOMContentLoaded', function() {
+    console.log('✅ Add doctor page loaded');
+
+    const formsSection = document.getElementById('forms-section');
+    const toggleBtn = document.getElementById('toggle-forms-btn');
+
+    if (!formsSection || !toggleBtn) {
+      console.error('❌ Required elements not found');
+      return;
+    }
+
+    // Add single event listener to the button
+    toggleBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      console.log('🔘 Button clicked');
+      toggleForms();
+    });
+
+    // Check initial state and update button accordingly
+    const isInitiallyHidden = formsSection.classList.contains('hidden');
+    console.log('📋 Forms initially hidden:', isInitiallyHidden);
+
+    if (!isInitiallyHidden) {
+      // Forms are visible, update button text
+      toggleBtn.innerHTML = '<i class="fas fa-times mr-2"></i> Hide Forms';
+      toggleBtn.className = 'px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors duration-200 flex items-center';
+    }
+
+    // Auto-show forms if there are errors or results
+    const hasFormErrors = document.querySelectorAll('.text-red-500').length > 0;
+    const hasBulkResults = document.querySelector('.bulk_results') !== null || {% if bulk_results %}true{% else %}false{% endif %};
+    const urlParams = new URLSearchParams(window.location.search);
+    const showFormParam = urlParams.get('show_form') === 'true';
+
+    if (hasFormErrors || hasBulkResults || showFormParam) {
+      console.log('📝 Auto-showing forms due to errors/results');
+      formsSection.classList.remove('hidden');
+      toggleBtn.innerHTML = '<i class="fas fa-times mr-2"></i> Hide Forms';
+      toggleBtn.className = 'px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors duration-200 flex items-center';
+    }
+
+    console.log('✅ Add doctor page initialization complete');
   });
 </script>
 {% endblock %}

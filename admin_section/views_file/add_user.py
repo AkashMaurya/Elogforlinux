@@ -147,23 +147,23 @@ def edit_user(request, user_id):
 
 
 def delete_user(request, user_id):
-    user = get_object_or_404(CustomUser, id=user_id)
+    """UPDATED: Now uses soft delete by default for safety"""
+    user = get_object_or_404(CustomUser.all_objects, id=user_id)
 
     if request.method == 'POST':
-        try:
-            username = user.username
-            user.delete()
-            messages.success(request, f'User {username} deleted successfully!')
-        except Exception as e:
-            messages.error(request, f'Error deleting user: {str(e)}')
-        return redirect('admin_section:add_user')
+        # Use soft delete by default
+        from .safe_role_management import soft_delete_user
+        return soft_delete_user(request, user_id)
 
     # If it's an AJAX request, return JSON response
     if request.headers.get('x-requested-with') == 'XMLHttpRequest':
         return JsonResponse({'success': True})
 
-    # Otherwise, redirect to the user list
-    return redirect('admin_section:add_user')
+    # Show confirmation page
+    context = {
+        'user': user,
+    }
+    return render(request, 'admin_section/delete_user_confirm.html', context)
 
 
 @require_POST

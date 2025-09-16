@@ -303,20 +303,39 @@ def edit_student(request, student_id):
 
 @login_required
 def delete_student(request, student_id):
+    """DEPRECATED: Use remove_student_role instead for safe role removal"""
     try:
         student = Student.objects.get(id=student_id)
         user = student.user
-        student_name = f"{user.first_name} {user.last_name}"
 
-        # Delete the student and user
-        with transaction.atomic():
-            student.delete()
-            user.delete()
+        if request.method == 'POST':
+            # Check if this is a role removal or account deletion
+            action = request.POST.get('action', 'remove_role')
 
-        messages.success(request, f'Student {student_name} deleted successfully!')
+            if action == 'remove_role':
+                # Safe role removal
+                from .safe_role_management import remove_role_from_user
+                return remove_role_from_user(request, user.id, 'student')
+
+            elif action == 'delete_account':
+                # Soft delete the entire account
+                from .safe_role_management import soft_delete_user
+                return soft_delete_user(request, user.id)
+
+            else:
+                messages.error(request, 'Invalid action specified.')
+                return redirect('admin_section:add_student')
+
+        # Show confirmation page with options
+        context = {
+            'student': student,
+            'user': user,
+        }
+        return render(request, "admin_section/delete_student_confirm.html", context)
+
     except Student.DoesNotExist:
         messages.error(request, 'Student not found!')
+        return redirect('admin_section:add_student')
     except Exception as e:
-        messages.error(request, f'Error deleting student: {str(e)}')
-
-    return redirect('admin_section:add_student')
+        messages.error(request, f'Error: {str(e)}')
+        return redirect('admin_section:add_student')
