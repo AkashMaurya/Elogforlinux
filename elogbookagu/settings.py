@@ -190,7 +190,7 @@ USE_TZ = True
 AUTH_USER_MODEL = "accounts.CustomUser"
 # Point LOGIN_URL to the main login page that offers both traditional and SSO options
 LOGIN_URL = "/login/"
-LOGOUT_REDIRECT_URL = "login"  # Or any other URL you'd like
+LOGOUT_REDIRECT_URL = "/login/"  # Redirect to login page after logout
 
 
 

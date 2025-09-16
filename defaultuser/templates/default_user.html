@@ -44,15 +44,53 @@
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   }
 
+  /* Dark mode gradient */
+  .dark .gradient-bg {
+    background: linear-gradient(135deg, #1e3a8a 0%, #581c87 100%);
+  }
+
   .glass-effect {
-    background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(15px);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+  }
+
+  /* Dark mode glass effect */
+  .dark .glass-effect {
+    background: rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(15px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  /* Text colors for better visibility */
+  .text-primary {
+    color: #ffffff;
+  }
+
+  .dark .text-primary {
+    color: #f8fafc;
+  }
+
+  .text-secondary {
+    color: rgba(255, 255, 255, 0.9);
+  }
+
+  .dark .text-secondary {
+    color: rgba(248, 250, 252, 0.8);
+  }
+
+  .text-muted {
+    color: rgba(255, 255, 255, 0.7);
+  }
+
+  .dark .text-muted {
+    color: rgba(248, 250, 252, 0.6);
   }
 </style>
 {% endblock %}
 
 {% block content_container %}
+{% csrf_token %}
 <div class="min-h-screen gradient-bg flex items-center justify-center px-4 py-8">
   <div class="max-w-2xl w-full">
     <!-- Main Card -->
@@ -65,16 +103,16 @@
       </div>
 
       <!-- Title -->
-      <h1 class="text-4xl md:text-5xl font-bold text-white mb-6">
+      <h1 class="text-4xl md:text-5xl font-bold text-primary mb-6">
         Account Pending
       </h1>
 
       <!-- Subtitle -->
-      <div class="bg-white bg-opacity-20 rounded-2xl p-6 mb-8">
-        <h2 class="text-xl md:text-2xl font-semibold text-white mb-4">
+      <div class="bg-black bg-opacity-20 dark:bg-black dark:bg-opacity-30 rounded-2xl p-6 mb-8 border border-white border-opacity-20 dark:border-gray-600">
+        <h2 class="text-xl md:text-2xl font-semibold text-primary mb-4 text-black">
           Welcome to AGU E-Logbook System
         </h2>
-        <p class="text-lg text-white text-opacity-90 leading-relaxed">
+        <p class="text-lg text-secondary leading-relaxed">
           Thank you for signing in! Your account is currently being reviewed by our administration team.
           You will be granted access once your account has been approved and assigned to the appropriate directory.
         </p>
@@ -82,30 +120,30 @@
 
       <!-- Status Cards -->
       <div class="grid md:grid-cols-2 gap-6 mb-8">
-        <div class="bg-white bg-opacity-10 rounded-xl p-6">
+        <div class="bg-dark-900 bg-opacity-10 dark:bg-black dark:bg-opacity-30 rounded-xl p-6 border border-white border-opacity-20 dark:border-gray-600">
           <div class="flex items-center justify-center mb-4">
-            <i class="fas fa-user-check text-3xl text-green-300"></i>
+            <i class="fas fa-user-check text-3xl text-green-300 dark:text-green-400"></i>
           </div>
-          <h3 class="text-lg font-semibold text-white mb-2">Account Created</h3>
-          <p class="text-white text-opacity-80 text-sm">Your account has been successfully created and is in our system.</p>
+          <h3 class="text-lg font-semibold text-primary mb-2">Account Created</h3>
+          <p class="text-secondary text-sm">Your account has been successfully created and is in our system.</p>
         </div>
 
-        <div class="bg-white bg-opacity-10 rounded-xl p-6">
+        <div class="bg-dark-900 bg-opacity-10 dark:bg-black dark:bg-opacity-30 rounded-xl p-6 border border-white border-opacity-20 dark:border-gray-600">
           <div class="flex items-center justify-center mb-4">
-            <i class="fas fa-hourglass-half text-3xl text-yellow-300 pulse-animation"></i>
+            <i class="fas fa-hourglass-half text-3xl text-yellow-300 dark:text-yellow-400 pulse-animation"></i>
           </div>
-          <h3 class="text-lg font-semibold text-white mb-2">Pending Review</h3>
-          <p class="text-white text-opacity-80 text-sm">Our team is reviewing your account and will assign appropriate permissions.</p>
+          <h3 class="text-lg font-semibold text-primary mb-2">Pending Review</h3>
+          <p class="text-secondary text-sm">Our team is reviewing your account and will assign appropriate permissions.</p>
         </div>
       </div>
 
       <!-- Information Box -->
-      <div class="bg-blue-500 bg-opacity-20 border border-blue-300 border-opacity-30 rounded-xl p-6 mb-8">
+      <div class="bg-blue-500 bg-opacity-20 dark:bg-blue-900 dark:bg-opacity-30 border border-blue-300 border-opacity-30 dark:border-blue-600 rounded-xl p-6 mb-8">
         <div class="flex items-start">
-          <i class="fas fa-info-circle text-blue-300 text-xl mt-1 mr-3"></i>
+          <i class="fas fa-info-circle text-blue-300 dark:text-blue-400 text-xl mt-1 mr-3"></i>
           <div class="text-left">
-            <h4 class="text-white font-semibold mb-2">What happens next?</h4>
-            <ul class="text-white text-opacity-90 text-sm space-y-1">
+            <h4 class="text-primary font-semibold mb-2">What happens next?</h4>
+            <ul class="text-secondary text-sm space-y-1">
               <li>• Our administration team will review your account</li>
               <li>• You will be assigned to the appropriate user group</li>
               <li>• You'll receive access to your designated dashboard</li>
@@ -116,41 +154,44 @@
       </div>
 
       <!-- Contact Information -->
-      <div class="bg-white bg-opacity-10 rounded-xl p-6 mb-8">
-        <h4 class="text-white font-semibold mb-4 flex items-center justify-center">
+      <div class="bg-yellow-300 bg-opacity-10 dark:bg-black dark:bg-opacity-30 rounded-xl p-6 mb-8 border border-white border-opacity-20 dark:border-gray-600">
+        <h4 class="text-primary font-semibold mb-4 flex items-center justify-center">
           <i class="fas fa-envelope mr-2"></i>
           Need Help?
         </h4>
-        <p class="text-white text-opacity-90 text-sm mb-4">
+        <p class="text-secondary text-sm mb-4">
           If you believe this is an error or need immediate assistance, please contact our administration team:
         </p>
         <div class="flex flex-col sm:flex-row gap-4 justify-center">
-          <a href="mailto:admin@agu.edu.bh" class="inline-flex items-center justify-center px-6 py-3 bg-white bg-opacity-20 hover:bg-opacity-30 text-white rounded-lg transition-all duration-300 transform hover:scale-105">
+          <a href="mailto:admin@agu.edu.bh" class="inline-flex items-center justify-center px-6 py-3 bg-white bg-opacity-20 dark:bg-gray-700 hover:bg-opacity-30 dark:hover:bg-gray-600 text-primary rounded-lg transition-all duration-300 transform hover:scale-105 border border-white border-opacity-20 dark:border-gray-500">
             <i class="fas fa-envelope mr-2"></i>
-            admin@agu.edu.bh
+            arpans@agu.edu.bh
           </a>
-          <a href="tel:+97317787878" class="inline-flex items-center justify-center px-6 py-3 bg-white bg-opacity-20 hover:bg-opacity-30 text-white rounded-lg transition-all duration-300 transform hover:scale-105">
+          <a href="tel:+97317787878" class="inline-flex items-center justify-center px-6 py-3 bg-white bg-opacity-20 dark:bg-gray-700 hover:bg-opacity-30 dark:hover:bg-gray-600 text-primary rounded-lg transition-all duration-300 transform hover:scale-105 border border-white border-opacity-20 dark:border-gray-500">
             <i class="fas fa-phone mr-2"></i>
-            +973 1778 7878
+            +973 17 239 827
           </a>
         </div>
       </div>
 
       <!-- Action Buttons -->
       <div class="flex flex-col sm:flex-row gap-4 justify-center">
-        <a href="{% url 'account_logout' %}" class="inline-flex items-center justify-center px-8 py-4 bg-red-500 hover:bg-red-600 text-white font-semibold rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg">
-          <i class="fas fa-sign-out-alt mr-2"></i>
-          Logout
-        </a>
-        <button onclick="window.location.reload()" class="inline-flex items-center justify-center px-8 py-4 bg-white bg-opacity-20 hover:bg-opacity-30 text-white font-semibold rounded-xl transition-all duration-300 transform hover:scale-105 border border-white border-opacity-30">
+        <form method="POST" action="{% url 'account_logout' %}" class="inline-block">
+          {% csrf_token %}
+          <button type="submit" class="inline-flex items-center justify-center px-8 py-4 bg-red-500 hover:bg-red-600 text-white font-semibold rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg">
+            <i class="fas fa-sign-out-alt mr-2"></i>
+            Logout
+          </button>
+        </form>
+        <button onclick="window.location.reload()" class="inline-flex items-center justify-center px-8 py-4 bg-white bg-opacity-20 dark:bg-gray-700 hover:bg-opacity-30 dark:hover:bg-gray-600 text-primary font-semibold rounded-xl transition-all duration-300 transform hover:scale-105 border border-white border-opacity-30 dark:border-gray-500">
           <i class="fas fa-sync-alt mr-2"></i>
           Refresh Status
         </button>
       </div>
 
       <!-- Footer -->
-      <div class="mt-8 pt-6 border-t border-white border-opacity-20">
-        <p class="text-white text-opacity-70 text-sm">
+      <div class="mt-8 pt-6 border-t border-white border-opacity-20 dark:border-gray-600">
+        <p class="text-muted text-sm">
           <i class="fas fa-university mr-2"></i>
           Arabian Gulf University - E-Logbook System
         </p>
@@ -159,17 +200,17 @@
 
     <!-- Additional Info Card -->
     <div class="mt-6 glass-effect rounded-2xl p-6 text-center">
-      <div class="flex items-center justify-center space-x-6 text-white text-opacity-80">
+      <div class="flex items-center justify-center space-x-6 text-secondary">
         <div class="flex items-center">
-          <i class="fas fa-shield-alt mr-2 text-green-300"></i>
+          <i class="fas fa-shield-alt mr-2 text-green-300 dark:text-green-400"></i>
           <span class="text-sm">Secure</span>
         </div>
         <div class="flex items-center">
-          <i class="fas fa-clock mr-2 text-blue-300"></i>
+          <i class="fas fa-clock mr-2 text-blue-300 dark:text-blue-400"></i>
           <span class="text-sm">24/7 Support</span>
         </div>
         <div class="flex items-center">
-          <i class="fas fa-graduation-cap mr-2 text-purple-300"></i>
+          <i class="fas fa-graduation-cap mr-2 text-purple-300 dark:text-purple-400"></i>
           <span class="text-sm">AGU Official</span>
         </div>
       </div>
