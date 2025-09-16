@@ -4,7 +4,7 @@ from django.contrib.auth.hashers import make_password
 import csv
 import io
 from accounts.models import CustomUser, Student, Doctor, Staff
-from .models import LogYear, LogYearSection, Department, Group, TrainingSite, ActivityType, CoreDiaProSession, Blog, MappedAttendance
+from .models import LogYear, LogYearSection, Department, Group, TrainingSite, ActivityType, CoreDiaProSession, Blog, BlogCategory, MappedAttendance
 
 class LogYearForm(forms.ModelForm):
     class Meta:
@@ -661,10 +661,75 @@ class TrainingSiteForm(forms.ModelForm):
         return name
 
 
+class BlogCategoryForm(forms.ModelForm):
+    class Meta:
+        model = BlogCategory
+        fields = ['name', 'description', 'is_active']
+        widgets = {
+            'name': forms.TextInput(attrs={
+                'class': 'w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white',
+                'placeholder': 'Enter category name'
+            }),
+            'description': forms.Textarea(attrs={
+                'class': 'w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white',
+                'placeholder': 'Enter category description (optional)',
+                'rows': 3
+            }),
+            'is_active': forms.CheckboxInput(attrs={
+                'class': 'h-5 w-5 text-blue-600 rounded border-gray-300 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600',
+            }),
+        }
+
+
 class BlogForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Populate category choices with both legacy and new categories
+        self.fields['category_choice'] = forms.ChoiceField(
+            choices=self.get_category_choices(),
+            widget=forms.Select(attrs={
+                'class': 'w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white',
+            }),
+            label='Category'
+        )
+
+        # Set initial value for category_choice
+        if self.instance and self.instance.pk:
+            if self.instance.category_new:
+                self.fields['category_choice'].initial = f"new_{self.instance.category_new.id}"
+            else:
+                self.fields['category_choice'].initial = self.instance.category
+
+    def get_category_choices(self):
+        choices = []
+        # Add legacy categories
+        choices.extend(Blog.CATEGORY_CHOICES)
+        # Add new categories
+        for cat in BlogCategory.objects.filter(is_active=True):
+            choices.append((f"new_{cat.id}", cat.name))
+        return choices
+
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+        category_choice = self.cleaned_data.get('category_choice')
+
+        if category_choice and category_choice.startswith('new_'):
+            # New category
+            category_id = category_choice.replace('new_', '')
+            instance.category_new_id = int(category_id)
+            instance.category = 'news'  # Set a default for legacy field
+        else:
+            # Legacy category
+            instance.category = category_choice
+            instance.category_new = None
+
+        if commit:
+            instance.save()
+        return instance
+
     class Meta:
         model = Blog
-        fields = ['title', 'summary', 'content', 'category', 'featured_image', 'attachment', 'attachment_name', 'is_published']
+        fields = ['title', 'summary', 'content', 'featured_image', 'attachment', 'attachment_name', 'is_published']
         widgets = {
             'title': forms.TextInput(attrs={
                 'class': 'w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white',

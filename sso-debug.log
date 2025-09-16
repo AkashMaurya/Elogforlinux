@@ -645,3 +645,959 @@ StripUnsafeNextMiddleware: request path=/student_section/student_support/ qs=
 StripUnsafeNextMiddleware: request path=/student_section/student_elog/ qs=
 StripUnsafeNextMiddleware: request path=/student_section/get-date-restrictions/ qs=
 StripUnsafeNextMiddleware: request path=/student_section/ qs=
+StripUnsafeNextMiddleware: request path=/login/ qs=next=/accounts/post-login-redirect/
+StripUnsafeNextMiddleware: removed unsafe next=/accounts/post-login-redirect/ from request /login/ original_qs=next=/accounts/post-login-redirect/ new_qs=
+StripUnsafeNextMiddleware: request path=/ qs=
+StripUnsafeNextMiddleware: request path=/login/ qs=
+StripUnsafeNextMiddleware: request path=/accounts/microsoft/direct/ qs=
+microsoft_direct: CALLED - method=GET path=/accounts/microsoft/direct/ user=None
+microsoft_direct: stashed state_id=t3A6Gh4QmiwZIWji
+microsoft_direct: persisted SSOState state_id=t3A6Gh4QmiwZIWji
+microsoft_direct: client_id=2b3039c5-f... tenant=9c021be8-508f-4638-b1df-52b0e3c615ac redirect_uri=https://elog.agu.edu.bh/accounts/microsoft/login/callback/
+microsoft_direct: redirecting to Microsoft OAuth URL: https://login.microsoftonline.com/9c021be8-508f-4638-b1df-52b0e3c615ac/oauth2/v2.0/authorize?client_...
+SSOStateRestoreMiddleware: callback path hit=/accounts/microsoft/login/callback/ session_keys=['socialaccount_states', 'account_authentication_methods', '_auth_user_id', '_auth_user_backend', '_auth_user_hash', 'first_name', 'last_name', 'username', 'email', 'role']
+SSO callback request host=elog.agu.edu.bh path=/accounts/microsoft/login/callback/ qs=code=1.AUcA6BsCnI9QOEax31Kw48YVrMU5MCs4_7FKklAi55HjOZkNAb5HAA.AgABBAIAAABVrSpeuWamRam2jAF1XRQEAwDs_wUA9P8RGDpKwf3hfqmjGJGLyEtlruZYbMJhWmcH0NTIWhpwfVYtxyk0Gmmp_yeE4MJYjDSYY6bf3BwNzRI967LSnA_Sz1AihWuJtsI05i-5LIQgtPhKH0w7ABd9Pgsc7Kcger2gUj49QL4Bsw2ahylRzLq4cTy22FLxJgvTwuY4-QOhiTDAjD6UKy1eMIyr2WGvn_xKm24kTo-vYMildC0GYBh17T0qC3aNpqXuelZT7SnEiPoLINnsP9wdoxKoIkm8nzp1rzt7bGa_2MmM51xdyh2NSIEGowaQgnaSG9Bs_m5cM9IgqYPYK8pjtKEv4XjRgjsLI9_I80-rL8OYYbc3aNHjJ-q7rpFqKhLRB2voGaQwBhzwSdAzDCYiQ16cWcRjjupPEyfALCI_RbU3E7LHtYGkWQbIUlOY6nyvn98Bs88nrtRYntP4NQd1gO8A94TL5_nh4JcoNGLJCGV5kJk_P0yg4Z4H4JAvtDkXuRv9Y7O6WIAd17rkHIUnRPmOnRmVoTDC1pChWctQADpEfQGSP9rXLsJ-_oBCGvGdoo-qvJFMcQ0-tdVU0UVNHa8xN3QGkHD3HiDhTdzOP6Yk0_gPDpwoHzer4KgQbdItUaSun6A5MMA6oLJLC51r4bSRySMvbn6Wr4e0g7MCzRYWiwJ88nwWk6iP4kx0y8jg48uwoGgz6XCI2zXTT8ZA_AOm4vvCdBDDQZ2vOv2W1TDnxSd1SKM_qfXpoGyjLm0uWE60vZPR84oAzxmNmLDKeCmHjF-v9TE6qxlA2ZoVSrwJIfIJCgKG4Ibu76nxRiytmU9-BZ1oOhQnL2bDC74H&state=t3A6Gh4QmiwZIWji&session_state=007cd909-3375-2366-c044-ba7e0bbdbbea scheme=https session_key=y206a1247tyw1xxjugfurm458m4a93gk cookies=['_ga', '_ga_VJJ9XSM8WD', 'csrftoken', 'sessionid', '_ga_J0W71H6Z1B'] raw_cookie=_ga=GA1.1.1015984867.1725884269; _ga_VJJ9XSM8WD=GS1.1.1725884268.1.0.1725884268.0.0.0; csrftoken=TRSLxj8e11N7Sjj3amYt2Awg4lRtP1QQ; sessionid=y206a1247tyw1xxjugfurm458m4a93gk; _ga_J0W71H6Z1B=GS2.1.s1757825544$o5$g1$t1757825574$j30$l0$h0; csrftoken=TRSLxj8e11N7Sjj3amYt2Awg4lRtP1QQ; sessionid=y206a1247tyw1xxjugfurm458m4a93gk session_keys=['socialaccount_states', 'account_authentication_methods', '_auth_user_id', '_auth_user_backend', '_auth_user_hash', 'first_name', 'last_name', 'username', 'email', 'role']
+StripUnsafeNextMiddleware: request path=/accounts/microsoft/login/callback/ qs=code=1.AUcA6BsCnI9QOEax31Kw48YVrMU5MCs4_7FKklAi55HjOZkNAb5HAA.AgABBAIAAABVrSpeuWamRam2jAF1XRQEAwDs_wUA9P8RGDpKwf3hfqmjGJGLyEtlruZYbMJhWmcH0NTIWhpwfVYtxyk0Gmmp_yeE4MJYjDSYY6bf3BwNzRI967LSnA_Sz1AihWuJtsI05i-5LIQgtPhKH0w7ABd9Pgsc7Kcger2gUj49QL4Bsw2ahylRzLq4cTy22FLxJgvTwuY4-QOhiTDAjD6UKy1eMIyr2WGvn_xKm24kTo-vYMildC0GYBh17T0qC3aNpqXuelZT7SnEiPoLINnsP9wdoxKoIkm8nzp1rzt7bGa_2MmM51xdyh2NSIEGowaQgnaSG9Bs_m5cM9IgqYPYK8pjtKEv4XjRgjsLI9_I80-rL8OYYbc3aNHjJ-q7rpFqKhLRB2voGaQwBhzwSdAzDCYiQ16cWcRjjupPEyfALCI_RbU3E7LHtYGkWQbIUlOY6nyvn98Bs88nrtRYntP4NQd1gO8A94TL5_nh4JcoNGLJCGV5kJk_P0yg4Z4H4JAvtDkXuRv9Y7O6WIAd17rkHIUnRPmOnRmVoTDC1pChWctQADpEfQGSP9rXLsJ-_oBCGvGdoo-qvJFMcQ0-tdVU0UVNHa8xN3QGkHD3HiDhTdzOP6Yk0_gPDpwoHzer4KgQbdItUaSun6A5MMA6oLJLC51r4bSRySMvbn6Wr4e0g7MCzRYWiwJ88nwWk6iP4kx0y8jg48uwoGgz6XCI2zXTT8ZA_AOm4vvCdBDDQZ2vOv2W1TDnxSd1SKM_qfXpoGyjLm0uWE60vZPR84oAzxmNmLDKeCmHjF-v9TE6qxlA2ZoVSrwJIfIJCgKG4Ibu76nxRiytmU9-BZ1oOhQnL2bDC74H&state=t3A6Gh4QmiwZIWji&session_state=007cd909-3375-2366-c044-ba7e0bbdbbea
+pre_social_login: existing=81 for email=akashm@agu.edu.bh
+pre_social_login: connected social to existing user pk=81
+social.get_connect_redirect_url: CALLED for user=81
+social.get_connect_redirect_url: manually logged in user 81
+social.get_connect_redirect_url: redirecting to /accounts/post-login-redirect/
+StripUnsafeNextMiddleware: request path=/accounts/post-login-redirect/ qs=
+post_login_redirect: called with user=81 auth=True session_info={'session_key': 'cs6ac2ax5v2tw36wa1akiarmiv8xvepf', 'session_keys': ['_auth_user_id', '_auth_user_backend', '_auth_user_hash'], 'has_socialaccount_states': False}
+post_login_redirect: user=81 role=student redirecting to /student_section/
+StripUnsafeNextMiddleware: request path=/student_section/ qs=
+StripUnsafeNextMiddleware: request path=/student_section/ qs=
+StripUnsafeNextMiddleware: request path=/student_section/student_support/ qs=
+StripUnsafeNextMiddleware: request path=/ qs=
+StripUnsafeNextMiddleware: request path=/ qs=
+StripUnsafeNextMiddleware: request path=/login/ qs=
+StripUnsafeNextMiddleware: request path=/update/ qs=
+StripUnsafeNextMiddleware: request path=/password_reset/ qs=
+StripUnsafeNextMiddleware: request path=/accounts/microsoft/direct/ qs=
+microsoft_direct: CALLED - method=GET path=/accounts/microsoft/direct/ user=None
+microsoft_direct: stashed state_id=SJ4fmrophhgtQWnq
+microsoft_direct: persisted SSOState state_id=SJ4fmrophhgtQWnq
+microsoft_direct: client_id=2b3039c5-f... tenant=9c021be8-508f-4638-b1df-52b0e3c615ac redirect_uri=https://elog.agu.edu.bh/accounts/microsoft/login/callback/
+microsoft_direct: redirecting to Microsoft OAuth URL: https://login.microsoftonline.com/9c021be8-508f-4638-b1df-52b0e3c615ac/oauth2/v2.0/authorize?client_...
+StripUnsafeNextMiddleware: request path=/update/ qs=category=update
+StripUnsafeNextMiddleware: request path=/update/ qs=category=announcement
+StripUnsafeNextMiddleware: request path=/update/ qs=category=feature
+StripUnsafeNextMiddleware: request path=/update/ qs=category=news
+StripUnsafeNextMiddleware: request path=/ qs=
+StripUnsafeNextMiddleware: request path=/owa/auth/logon.aspx qs=
+StripUnsafeNextMiddleware: request path=/student_login.aspx qs=
+StripUnsafeNextMiddleware: request path=/admin/config.php qs=
+StripUnsafeNextMiddleware: request path=/student_login.aspx qs=
+StripUnsafeNextMiddleware: request path=/ qs=
+StripUnsafeNextMiddleware: request path=/ qs=
+StripUnsafeNextMiddleware: request path=/ qs=
+StripUnsafeNextMiddleware: request path=/.well-known/assetlinks.json qs=
+StripUnsafeNextMiddleware: request path=/ qs=
+StripUnsafeNextMiddleware: request path=/ qs=
+StripUnsafeNextMiddleware: request path=/ qs=
+StripUnsafeNextMiddleware: request path=/ qs=
+StripUnsafeNextMiddleware: request path=/autodiscover/autodiscover.json qs=@zdi/Powershell
+StripUnsafeNextMiddleware: request path=/ qs=
+StripUnsafeNextMiddleware: request path=/robots.txt qs=
+StripUnsafeNextMiddleware: request path=/ qs=
+StripUnsafeNextMiddleware: request path=/apple-touch-icon-precomposed.png qs=
+StripUnsafeNextMiddleware: request path=/ qs=
+StripUnsafeNextMiddleware: request path=/apple-touch-icon.png qs=
+StripUnsafeNextMiddleware: request path=/ qs=
+StripUnsafeNextMiddleware: request path=/ qs=
+StripUnsafeNextMiddleware: request path=/apple-touch-icon-precomposed.png qs=
+StripUnsafeNextMiddleware: request path=/ qs=
+StripUnsafeNextMiddleware: request path=/apple-touch-icon.png qs=
+StripUnsafeNextMiddleware: request path=/ qs=
+StripUnsafeNextMiddleware: request path=/ qs=
+StripUnsafeNextMiddleware: request path=/login/ qs=
+StripUnsafeNextMiddleware: request path=/login/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/ qs=
+StripUnsafeNextMiddleware: request path=/login/ qs=next=/admin_section/
+StripUnsafeNextMiddleware: saw next=/admin_section/ but considered safe for path=/admin_section/ on request /login/ qs=next=/admin_section/
+StripUnsafeNextMiddleware: request path=/admin_section/add_user/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/edit-user/81/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/add_user/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/add_user/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/edit-user/81/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/edit-user/81/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/edit-user/81/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/edit-user/81/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/add_user/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/logout/ qs=
+StripUnsafeNextMiddleware: request path=/login/ qs=
+StripUnsafeNextMiddleware: request path=/login/ qs=
+StripUnsafeNextMiddleware: request path=/ qs=
+StripUnsafeNextMiddleware: request path=/login/ qs=
+StripUnsafeNextMiddleware: request path=/accounts/microsoft/direct/ qs=
+microsoft_direct: CALLED - method=GET path=/accounts/microsoft/direct/ user=None
+microsoft_direct: stashed state_id=Oo4yjSxYQg2IkiAP
+microsoft_direct: persisted SSOState state_id=Oo4yjSxYQg2IkiAP
+microsoft_direct: client_id=2b3039c5-f... tenant=9c021be8-508f-4638-b1df-52b0e3c615ac redirect_uri=https://elog.agu.edu.bh/accounts/microsoft/login/callback/
+microsoft_direct: redirecting to Microsoft OAuth URL: https://login.microsoftonline.com/9c021be8-508f-4638-b1df-52b0e3c615ac/oauth2/v2.0/authorize?client_...
+SSOStateRestoreMiddleware: callback path hit=/accounts/microsoft/login/callback/ session_keys=['socialaccount_states']
+SSO callback request host=elog.agu.edu.bh path=/accounts/microsoft/login/callback/ qs=code=1.AUcA6BsCnI9QOEax31Kw48YVrMU5MCs4_7FKklAi55HjOZkNAb5HAA.AgABBAIAAABVrSpeuWamRam2jAF1XRQEAwDs_wUA9P_7i_sNfQz5lbTZHI9dqUMuQHea_0JqnsyneVBR4_4vSrGdZ928E98Z8Ysz5c7a2ZolPNR4hQdYcPdLNLautEFCK4QUoBZUspB9vRTgor_acm4nWsSfbGzNC3L17wCUp7FYpfrWfCNn2Pkqg-wssSvIiersKmCtEIF2DOukGyIhjiY6N5Lw7lNrw3SUNgKJ6jHJfAutW-xLlCP2Szn2NnAyoviA3iCO3mrAezSQHIW41PN_rDRZrij4qfRr67NKMGF9F2KS3odlIVDZCOE54rTemXHs-pzwd0JUL1w2CsMg8QxazZ-_4vTfDHQBGOij4y_MGXaQkOQORNPuln4QlaPHenh6jdFR0f-UnDIRlmk5NuXiw-rwudwywr2BUchrQQA-O7i6kMjSHV4CYCMEuxi4y7VTzRZm07cGbQVPCtfv1r2iEFkcdYm7vmUELO-MyuYH-HT_eEt3jgDM61PTeZxs8Mupsuvr6eP7_QsDXaUEyZDb8oKkY3IdRCtasXhSRKK1IpvYG-896QjaOvQcd5QeMSB8NK_5PQs-xA_qqnBQpOZPYZj2oWdIUQ00kn4GJK2MeKiJa4rRXnlC7S8KkpPt3Wa5GAflsBFHjJmmLwlVkx9wjETj_WODTwXeWt8E8YmG4klCQaWl6eI-7rd1UhLPYZWL9r8nFmZ6c8MyHWzECtMObq8t7OHuLX3PNrzlDCBf2Ti4xw3Q--TUAs8PWLbxLLketMIwHMk4JtIoWJ1fu4gNZS19jTO6Ogeiu19Gc7mUL77bcILa6sjfzQkAJlD-nQk5QVSNXCrJLZFOCX90O-Psq6snpVEo&state=Oo4yjSxYQg2IkiAP&session_state=007cd909-3375-2366-c044-ba7e0bbdbbea scheme=https session_key=5zcril5mplk1pmc2owqji87uhk31dzrq cookies=['_ga', '_ga_VJJ9XSM8WD', 'csrftoken', 'sessionid', '_ga_J0W71H6Z1B'] raw_cookie=_ga=GA1.1.1015984867.1725884269; _ga_VJJ9XSM8WD=GS1.1.1725884268.1.0.1725884268.0.0.0; csrftoken=TRSLxj8e11N7Sjj3amYt2Awg4lRtP1QQ; sessionid=y206a1247tyw1xxjugfurm458m4a93gk; _ga_J0W71H6Z1B=GS2.1.s1757825544$o5$g1$t1757825574$j30$l0$h0; csrftoken=FBv4iJ651ebQJB16xjUOJd1No3ZcmRCH; sessionid=5zcril5mplk1pmc2owqji87uhk31dzrq session_keys=['socialaccount_states']
+StripUnsafeNextMiddleware: request path=/accounts/microsoft/login/callback/ qs=code=1.AUcA6BsCnI9QOEax31Kw48YVrMU5MCs4_7FKklAi55HjOZkNAb5HAA.AgABBAIAAABVrSpeuWamRam2jAF1XRQEAwDs_wUA9P_7i_sNfQz5lbTZHI9dqUMuQHea_0JqnsyneVBR4_4vSrGdZ928E98Z8Ysz5c7a2ZolPNR4hQdYcPdLNLautEFCK4QUoBZUspB9vRTgor_acm4nWsSfbGzNC3L17wCUp7FYpfrWfCNn2Pkqg-wssSvIiersKmCtEIF2DOukGyIhjiY6N5Lw7lNrw3SUNgKJ6jHJfAutW-xLlCP2Szn2NnAyoviA3iCO3mrAezSQHIW41PN_rDRZrij4qfRr67NKMGF9F2KS3odlIVDZCOE54rTemXHs-pzwd0JUL1w2CsMg8QxazZ-_4vTfDHQBGOij4y_MGXaQkOQORNPuln4QlaPHenh6jdFR0f-UnDIRlmk5NuXiw-rwudwywr2BUchrQQA-O7i6kMjSHV4CYCMEuxi4y7VTzRZm07cGbQVPCtfv1r2iEFkcdYm7vmUELO-MyuYH-HT_eEt3jgDM61PTeZxs8Mupsuvr6eP7_QsDXaUEyZDb8oKkY3IdRCtasXhSRKK1IpvYG-896QjaOvQcd5QeMSB8NK_5PQs-xA_qqnBQpOZPYZj2oWdIUQ00kn4GJK2MeKiJa4rRXnlC7S8KkpPt3Wa5GAflsBFHjJmmLwlVkx9wjETj_WODTwXeWt8E8YmG4klCQaWl6eI-7rd1UhLPYZWL9r8nFmZ6c8MyHWzECtMObq8t7OHuLX3PNrzlDCBf2Ti4xw3Q--TUAs8PWLbxLLketMIwHMk4JtIoWJ1fu4gNZS19jTO6Ogeiu19Gc7mUL77bcILa6sjfzQkAJlD-nQk5QVSNXCrJLZFOCX90O-Psq6snpVEo&state=Oo4yjSxYQg2IkiAP&session_state=007cd909-3375-2366-c044-ba7e0bbdbbea
+pre_social_login: existing=81 for email=akashm@agu.edu.bh
+pre_social_login: connected social to existing user pk=81
+social.get_connect_redirect_url: CALLED for user=81
+social.get_connect_redirect_url: manually logged in user 81
+social.get_connect_redirect_url: redirecting to /accounts/post-login-redirect/
+StripUnsafeNextMiddleware: request path=/accounts/post-login-redirect/ qs=
+post_login_redirect: called with user=81 auth=True session_info={'session_key': 'yqxjs6rtm6z2yyqafacj4uqkjga2tfh2', 'session_keys': ['socialaccount_states', '_auth_user_id', '_auth_user_backend', '_auth_user_hash'], 'has_socialaccount_states': True}
+post_login_redirect: user=81 role=admin redirecting to /admin_section/
+StripUnsafeNextMiddleware: request path=/admin_section/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/add_user/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/logout/ qs=
+StripUnsafeNextMiddleware: request path=/login/ qs=
+StripUnsafeNextMiddleware: request path=/ qs=
+StripUnsafeNextMiddleware: request path=/login/ qs=
+StripUnsafeNextMiddleware: request path=/ qs=
+StripUnsafeNextMiddleware: request path=/ qs=
+StripUnsafeNextMiddleware: request path=//cdn.js qs=
+StripUnsafeNextMiddleware: request path=/dist/cdn.min.js qs=
+StripUnsafeNextMiddleware: request path=/ qs=
+StripUnsafeNextMiddleware: request path=/login/ qs=
+StripUnsafeNextMiddleware: request path=/accounts/microsoft/direct/ qs=
+microsoft_direct: CALLED - method=GET path=/accounts/microsoft/direct/ user=None
+microsoft_direct: stashed state_id=Tq8YRskmU6tK8Uby
+microsoft_direct: persisted SSOState state_id=Tq8YRskmU6tK8Uby
+microsoft_direct: client_id=2b3039c5-f... tenant=9c021be8-508f-4638-b1df-52b0e3c615ac redirect_uri=https://elog.agu.edu.bh/accounts/microsoft/login/callback/
+microsoft_direct: redirecting to Microsoft OAuth URL: https://login.microsoftonline.com/9c021be8-508f-4638-b1df-52b0e3c615ac/oauth2/v2.0/authorize?client_...
+SSOStateRestoreMiddleware: callback path hit=/accounts/microsoft/login/callback/ session_keys=['socialaccount_states']
+SSO callback request host=elog.agu.edu.bh path=/accounts/microsoft/login/callback/ qs=code=1.AUcA6BsCnI9QOEax31Kw48YVrMU5MCs4_7FKklAi55HjOZkNAUxHAA.AgABBAIAAABVrSpeuWamRam2jAF1XRQEAwDs_wUA9P-1fK4Hc-VrIK8qe5PTF49SiVeRyLaZYeU36ckk-rr8YrQ5ZJHDxMYjt00oRNxdMOJk_Zxya5MAcKxONUO0_hyd7c5vOKMGEgguloAgF3YDNJjkJOJTyPtPvvcSp3dKYmg2jof_Tyd6borK4uaNa56IFRcdgysZs9TBvxbIQrAyH7yz4j09wunOiqvfiYZthe943tmqxRs4d5a4hiPAUxQGMaKbrlNHTlC3CBDM-3WP3McnHBHMBCpoCqslOijRpsK-0aqSochMe0itOLk5L1z76Ybs_st-trIdzydxFUeDyipiPhU8pR-UzjjNflnlkh_7kJSMzzFMYWBLR2Z7Z9PZ-IR8Ly7FU9EEhZWm4jEMgX8bdgZsIvHvaqKZvCQk2VEPc_SuTwqQ_NcnUO0rqdLsnjYarjLEBIq35eZheesEFPLH_ogQ4WxXXV3ADnUeBc3JOuKSmawCPJTvf-M7mMz6FoB53dm6d6CbP38Lby2Tfglk2XMAJHqQoo-sIPGtwcBPPMAebhAyyuJVMgaFg7oeUHhterr75RRC17YVMxZdAiKP-i8_qtHAbESSACgd9BkK4C4aw_5sApNFGa9G7qKLf5XKD0deSr434juGu4tcPYMHGzMSmwsGqHjBXM-REBKPPpxpTBOEYbrXFwqUf6NbTvRQBBV7cDMWOpOixnV7sbtvni4Kuv6mpr4gH-j0sAtx7aQOPtrg6cKnmHWJKj55iJ1fRzfh02sBV4i9Bs4hBMZ5h-agI83KoFkW9_ifs0TNT_YLvMDkfinzPsZnTBzmmNAuj0nlPA20OQ4JC8oV4ZTcV9HUqTYY-uEdFazLuM5o8cxSQ9sXovSSKKlZzzS9IVTU4AVNy6DNpvzeeZCsjqO_X1WLms8h5P3aNnTcsOQn_5O_EiiwbqqDX-nwDSiVOoPKl27Rvhl_C-zFDxlBlnLjF88&state=Tq8YRskmU6tK8Uby&session_state=007e3899-a79f-4d96-066a-997e882861cf scheme=https session_key=hzqwg2z8riuh62zd8sz95cc7ihsq285d cookies=['_ga', '_ga_J0W71H6Z1B', 'csrftoken', 'sessionid'] raw_cookie=_ga=GA1.1.979578291.1756284467; _ga_J0W71H6Z1B=GS2.1.s1757914746$o8$g0$t1757914763$j43$l0$h0; csrftoken=6ErrxCeZi6vS6PnADzUd4GazAu2bEGJ3; sessionid=hzqwg2z8riuh62zd8sz95cc7ihsq285d session_keys=['socialaccount_states']
+StripUnsafeNextMiddleware: request path=/accounts/microsoft/login/callback/ qs=code=1.AUcA6BsCnI9QOEax31Kw48YVrMU5MCs4_7FKklAi55HjOZkNAUxHAA.AgABBAIAAABVrSpeuWamRam2jAF1XRQEAwDs_wUA9P-1fK4Hc-VrIK8qe5PTF49SiVeRyLaZYeU36ckk-rr8YrQ5ZJHDxMYjt00oRNxdMOJk_Zxya5MAcKxONUO0_hyd7c5vOKMGEgguloAgF3YDNJjkJOJTyPtPvvcSp3dKYmg2jof_Tyd6borK4uaNa56IFRcdgysZs9TBvxbIQrAyH7yz4j09wunOiqvfiYZthe943tmqxRs4d5a4hiPAUxQGMaKbrlNHTlC3CBDM-3WP3McnHBHMBCpoCqslOijRpsK-0aqSochMe0itOLk5L1z76Ybs_st-trIdzydxFUeDyipiPhU8pR-UzjjNflnlkh_7kJSMzzFMYWBLR2Z7Z9PZ-IR8Ly7FU9EEhZWm4jEMgX8bdgZsIvHvaqKZvCQk2VEPc_SuTwqQ_NcnUO0rqdLsnjYarjLEBIq35eZheesEFPLH_ogQ4WxXXV3ADnUeBc3JOuKSmawCPJTvf-M7mMz6FoB53dm6d6CbP38Lby2Tfglk2XMAJHqQoo-sIPGtwcBPPMAebhAyyuJVMgaFg7oeUHhterr75RRC17YVMxZdAiKP-i8_qtHAbESSACgd9BkK4C4aw_5sApNFGa9G7qKLf5XKD0deSr434juGu4tcPYMHGzMSmwsGqHjBXM-REBKPPpxpTBOEYbrXFwqUf6NbTvRQBBV7cDMWOpOixnV7sbtvni4Kuv6mpr4gH-j0sAtx7aQOPtrg6cKnmHWJKj55iJ1fRzfh02sBV4i9Bs4hBMZ5h-agI83KoFkW9_ifs0TNT_YLvMDkfinzPsZnTBzmmNAuj0nlPA20OQ4JC8oV4ZTcV9HUqTYY-uEdFazLuM5o8cxSQ9sXovSSKKlZzzS9IVTU4AVNy6DNpvzeeZCsjqO_X1WLms8h5P3aNnTcsOQn_5O_EiiwbqqDX-nwDSiVOoPKl27Rvhl_C-zFDxlBlnLjF88&state=Tq8YRskmU6tK8Uby&session_state=007e3899-a79f-4d96-066a-997e882861cf
+pre_social_login: existing=80 for email=arpans@agu.edu.bh
+pre_social_login: connected social to existing user pk=80
+social.get_connect_redirect_url: CALLED for user=80
+social.get_connect_redirect_url: manually logged in user 80
+social.get_connect_redirect_url: redirecting to /accounts/post-login-redirect/
+StripUnsafeNextMiddleware: request path=/accounts/post-login-redirect/ qs=
+post_login_redirect: called with user=80 auth=True session_info={'session_key': 'fpoq791e98rh99bwlmaes1lgr24j4wsv', 'session_keys': ['socialaccount_states', '_auth_user_id', '_auth_user_backend', '_auth_user_hash'], 'has_socialaccount_states': True}
+post_login_redirect: user=80 role=student redirecting to /student_section/
+StripUnsafeNextMiddleware: request path=/student_section/ qs=
+StripUnsafeNextMiddleware: request path=/student_section/student_profile/ qs=
+StripUnsafeNextMiddleware: request path=/student_section/ qs=
+StripUnsafeNextMiddleware: request path=/student_section/student_final_records/ qs=
+StripUnsafeNextMiddleware: request path=/student_section/ qs=
+StripUnsafeNextMiddleware: request path=/student_section/student_profile/ qs=
+StripUnsafeNextMiddleware: request path=/student_section/update_profile_photo/ qs=
+StripUnsafeNextMiddleware: request path=/student_section/logout/ qs=
+StripUnsafeNextMiddleware: request path=/login/ qs=
+StripUnsafeNextMiddleware: request path=/accounts/microsoft/direct/ qs=
+microsoft_direct: CALLED - method=GET path=/accounts/microsoft/direct/ user=None
+microsoft_direct: stashed state_id=xqBn3SHsw2MAfENt
+microsoft_direct: persisted SSOState state_id=xqBn3SHsw2MAfENt
+microsoft_direct: client_id=2b3039c5-f... tenant=9c021be8-508f-4638-b1df-52b0e3c615ac redirect_uri=https://elog.agu.edu.bh/accounts/microsoft/login/callback/
+microsoft_direct: redirecting to Microsoft OAuth URL: https://login.microsoftonline.com/9c021be8-508f-4638-b1df-52b0e3c615ac/oauth2/v2.0/authorize?client_...
+SSOStateRestoreMiddleware: callback path hit=/accounts/microsoft/login/callback/ session_keys=['socialaccount_states']
+SSO callback request host=elog.agu.edu.bh path=/accounts/microsoft/login/callback/ qs=code=1.AUcA6BsCnI9QOEax31Kw48YVrMU5MCs4_7FKklAi55HjOZkNAUxHAA.AgABBAIAAABVrSpeuWamRam2jAF1XRQEAwDs_wUA9P97tSDH8mjhpsQnrKNn61U8P0kxT5lIZa8lLPlm5bexF5NRr-uzzUTpd4OKqloykS7gk0jqnui9Yt9y5qGG51CXrnswnX-bmkm-7Dll7pusx_mIXsLlfRzeRaZniJ80QJLkdeyBZw6_u9mEO2bdHKAOblSjmCogGlT4UBRbbuOfvtMKEBn5vwJFaJg9QAl277Xho3fsjk9m5hXbJTDP9lrklK4NNNENWQ2n42fHtV1ClDx24Ax_gutgBCXNX6-BkyvoE9QHA7n74tC2-0zbXhsVsSjbIAJvjhqOfm0fgN3gAkYRBaYbHdi8GBR0gNkONv4M10yOw8-sQ88CNaMa1LAWwOxMtKiSMIAQWkvY_V1hjvTVmmTw8HxVBbmAc8x7VnX-wUrndPzh80Nd-bK0pUsMRxrpcpyntgzjibIw6oU5lo6hv_NS-tsMD3w-ZDuc3DStvytdNKPt8lE0aoXRAbWH6Ap7VnWbmRNE1zwK0W9xVBVCpbB6HPSI_ZTIryknhpQWBtOsPunbqCd-3GfBj9iqwKU4e8VDV8bEYp3Qvtd-lApWDc8zRaOkN6z7cTVy4L4_vVd0MQElV5Yf-_hYkmSeobJTfBsArrHilq-ICUlSJyMME4Ggr-3C8FICtVkmBxHxEzOf0shgvfwX2_FjEsF2OBIpaGVBEGdnyOBoHQWkzrHsTWzjkCcpG_9OOuy9p15WFPjLymCNcIYSyweJODqoGIzXc6BJmxRIXLIPnOY3Ci9ozIXtLJsw0gaAMMi2G_2uGNEF9cKR1G3OFobCmLxnMiwP6Nu18xorsEHczuNHcBBwJ4uGMwA3J7IQlad6syoeBQGIHZGrCwFkD5s20rF_VXf1yZSXI5ANL8XGNgNqLOFjC_1rFhHhhqZ_lGRCuU6ufuIIceSMk4x471PFAOm1TLkOM0O_zFuIFc4F7WJPCGI1Z5nKDg&state=xqBn3SHsw2MAfENt&session_state=007e3899-a79f-4d96-066a-997e882861cf scheme=https session_key=cccdpxjkb1u8oxsxbwrf2yd0ct219ovd cookies=['_ga', '_ga_J0W71H6Z1B', 'csrftoken', 'sessionid'] raw_cookie=_ga=GA1.1.979578291.1756284467; _ga_J0W71H6Z1B=GS2.1.s1757914746$o8$g0$t1757914763$j43$l0$h0; csrftoken=rJdBUDgRH9HDBZXGANeQ9nMOOy27vvvU; sessionid=cccdpxjkb1u8oxsxbwrf2yd0ct219ovd session_keys=['socialaccount_states']
+StripUnsafeNextMiddleware: request path=/accounts/microsoft/login/callback/ qs=code=1.AUcA6BsCnI9QOEax31Kw48YVrMU5MCs4_7FKklAi55HjOZkNAUxHAA.AgABBAIAAABVrSpeuWamRam2jAF1XRQEAwDs_wUA9P97tSDH8mjhpsQnrKNn61U8P0kxT5lIZa8lLPlm5bexF5NRr-uzzUTpd4OKqloykS7gk0jqnui9Yt9y5qGG51CXrnswnX-bmkm-7Dll7pusx_mIXsLlfRzeRaZniJ80QJLkdeyBZw6_u9mEO2bdHKAOblSjmCogGlT4UBRbbuOfvtMKEBn5vwJFaJg9QAl277Xho3fsjk9m5hXbJTDP9lrklK4NNNENWQ2n42fHtV1ClDx24Ax_gutgBCXNX6-BkyvoE9QHA7n74tC2-0zbXhsVsSjbIAJvjhqOfm0fgN3gAkYRBaYbHdi8GBR0gNkONv4M10yOw8-sQ88CNaMa1LAWwOxMtKiSMIAQWkvY_V1hjvTVmmTw8HxVBbmAc8x7VnX-wUrndPzh80Nd-bK0pUsMRxrpcpyntgzjibIw6oU5lo6hv_NS-tsMD3w-ZDuc3DStvytdNKPt8lE0aoXRAbWH6Ap7VnWbmRNE1zwK0W9xVBVCpbB6HPSI_ZTIryknhpQWBtOsPunbqCd-3GfBj9iqwKU4e8VDV8bEYp3Qvtd-lApWDc8zRaOkN6z7cTVy4L4_vVd0MQElV5Yf-_hYkmSeobJTfBsArrHilq-ICUlSJyMME4Ggr-3C8FICtVkmBxHxEzOf0shgvfwX2_FjEsF2OBIpaGVBEGdnyOBoHQWkzrHsTWzjkCcpG_9OOuy9p15WFPjLymCNcIYSyweJODqoGIzXc6BJmxRIXLIPnOY3Ci9ozIXtLJsw0gaAMMi2G_2uGNEF9cKR1G3OFobCmLxnMiwP6Nu18xorsEHczuNHcBBwJ4uGMwA3J7IQlad6syoeBQGIHZGrCwFkD5s20rF_VXf1yZSXI5ANL8XGNgNqLOFjC_1rFhHhhqZ_lGRCuU6ufuIIceSMk4x471PFAOm1TLkOM0O_zFuIFc4F7WJPCGI1Z5nKDg&state=xqBn3SHsw2MAfENt&session_state=007e3899-a79f-4d96-066a-997e882861cf
+pre_social_login: existing=80 for email=arpans@agu.edu.bh
+pre_social_login: connected social to existing user pk=80
+social.get_connect_redirect_url: CALLED for user=80
+social.get_connect_redirect_url: manually logged in user 80
+social.get_connect_redirect_url: redirecting to /accounts/post-login-redirect/
+StripUnsafeNextMiddleware: request path=/accounts/post-login-redirect/ qs=
+post_login_redirect: called with user=80 auth=True session_info={'session_key': '5tqaprziczf4i1u5y9gz132pigx3ez6b', 'session_keys': ['socialaccount_states', '_auth_user_id', '_auth_user_backend', '_auth_user_hash'], 'has_socialaccount_states': True}
+post_login_redirect: user=80 role=student redirecting to /student_section/
+StripUnsafeNextMiddleware: request path=/student_section/ qs=
+StripUnsafeNextMiddleware: request path=/student_section/ qs=
+StripUnsafeNextMiddleware: request path=/student_section/student_profile/ qs=
+StripUnsafeNextMiddleware: request path=/student_section/update-contact-info/ qs=
+StripUnsafeNextMiddleware: request path=/student_section/student_elog/ qs=
+StripUnsafeNextMiddleware: request path=/student_section/get-date-restrictions/ qs=
+StripUnsafeNextMiddleware: request path=/student_section/get-activity-types/ qs=department=1
+StripUnsafeNextMiddleware: request path=/student_section/get-tutors/ qs=department=1
+StripUnsafeNextMiddleware: request path=/student_section/get-core-diagnosis/ qs=activity_type=1
+StripUnsafeNextMiddleware: request path=/student_section/ qs=
+StripUnsafeNextMiddleware: request path=/student_section/student_elog/ qs=
+StripUnsafeNextMiddleware: request path=/student_section/get-date-restrictions/ qs=
+StripUnsafeNextMiddleware: request path=/ qs=
+StripUnsafeNextMiddleware: request path=/login/ qs=
+StripUnsafeNextMiddleware: request path=/student_section/ qs=
+StripUnsafeNextMiddleware: request path=/ qs=
+StripUnsafeNextMiddleware: request path=/student_section/student_elog/ qs=
+StripUnsafeNextMiddleware: request path=/student_section/get-date-restrictions/ qs=
+StripUnsafeNextMiddleware: request path=/accounts/microsoft/direct/ qs=
+microsoft_direct: CALLED - method=GET path=/accounts/microsoft/direct/ user=None
+microsoft_direct: stashed state_id=X8b8hJqGKi7PdIeV
+microsoft_direct: persisted SSOState state_id=X8b8hJqGKi7PdIeV
+microsoft_direct: client_id=2b3039c5-f... tenant=9c021be8-508f-4638-b1df-52b0e3c615ac redirect_uri=https://elog.agu.edu.bh/accounts/microsoft/login/callback/
+microsoft_direct: redirecting to Microsoft OAuth URL: https://login.microsoftonline.com/9c021be8-508f-4638-b1df-52b0e3c615ac/oauth2/v2.0/authorize?client_...
+StripUnsafeNextMiddleware: request path=/student_section/ qs=
+SSOStateRestoreMiddleware: callback path hit=/accounts/microsoft/login/callback/ session_keys=['socialaccount_states']
+SSO callback request host=elog.agu.edu.bh path=/accounts/microsoft/login/callback/ qs=code=1.AUcA6BsCnI9QOEax31Kw48YVrMU5MCs4_7FKklAi55HjOZkNAb5HAA.AgABBAIAAABVrSpeuWamRam2jAF1XRQEAwDs_wUA9P-fVWn5laUVywbKxhebdTDMeYBlevghDeohvimGLc6191NCr93_IhkY1ynbvpxYYarDn0Y7z0gJzP-r2MEP6ApDKhydpRqjkUM0rWbE0fdKKrngLWzFDbrIG8N17gM46E6Y-A3R38-8o_YsBk8i4lv1UWOVXc_a46xZTN7wMm02A_YKY1eZHpsDyaR7VcxvU1enB9A5qHeDiZka-BdGubh5xeD5G9453s90vnqbHDpaRDztbfZ1-POQT3ult2iQ0qpMxNNcJeEeFpHxNHaQehx-DdSHeOSXuBmj28ATfyS2s0xm3J10Jbm7mSXFlnkcX_dF1HY0NOqFZfPHCi-93KYRV_Bmc-Df9uhm_H4zevXztED9iXhdLiVsPI9CtKfEwIx0jpxKaXbUIDuzx1S8p58ZUi13QM5nmhFEAAKMLLNzb0s2v89JRdYgA3yr2c3719XKOXN-ezPccdKQxniUtEB2u1viR0mPtFek_ZTifgQ5nF3iBxJU06lfmef8gsIKwxwxqRLit5ufs2wBVRVfpRpfKgHtBrt7K9BJTRQOEMnrqeocYEPLIYsNXrV9-pzhE0KjcidNnTHDkGht7xn5B3sZxB-4mfb4Lv-MmLuYnay4VYfGfDwQ1Us1uy0Ke85lJryYC4VdTDb7N2rDIDWyN2O9X-IftFLtlly_SL6svUvVeGK0f7PfqVEReXvVHVzF0r9HFdenP-RGpm3F-3BBCpJsgz0NLbUpwVCgW6EJOyrlWCH2yYVkratetc7T5V4Jo4St2ZwM9l3CkbOQW6fUx27_JgooL4QElGVgiOB8xiz3aia8yPVFbVTfidIqc733lf5SZM9dBpcOAhYyg0KmS8Mhe-plu53e_7X65bg8ygDEoZKLa3krxwdClE4OHoa20hJHn_HEHe2IBTcS8OIyzWrxwN6OOteC6FWgkktWOPjQPptzZDsMi_KWtA2xlsJBpGSM9nH_54X2OVpleSS4KdkIV6behno&state=X8b8hJqGKi7PdIeV&session_state=005bbc79-a206-f322-b2b6-03ebff2fd929 scheme=https session_key=0dy109o07sdq2t5cdruqq4dyxd7kgfyh cookies=['_ga', 'cookiesession1', '_ga_J0W71H6Z1B', 'csrftoken', 'sessionid'] raw_cookie=_ga=GA1.1.903680079.1746004090; cookiesession1=678A3E211A49F42E2A183AFAA4A600ED; _ga_J0W71H6Z1B=GS2.1.s1757845389$o5$g1$t1757845538$j54$l0$h0; csrftoken=OpsTnjRsZZkig8HZcDyIh2gTsluedLCO; sessionid=0dy109o07sdq2t5cdruqq4dyxd7kgfyh; csrftoken=OpsTnjRsZZkig8HZcDyIh2gTsluedLCO; sessionid=0dy109o07sdq2t5cdruqq4dyxd7kgfyh session_keys=['socialaccount_states']
+StripUnsafeNextMiddleware: request path=/accounts/microsoft/login/callback/ qs=code=1.AUcA6BsCnI9QOEax31Kw48YVrMU5MCs4_7FKklAi55HjOZkNAb5HAA.AgABBAIAAABVrSpeuWamRam2jAF1XRQEAwDs_wUA9P-fVWn5laUVywbKxhebdTDMeYBlevghDeohvimGLc6191NCr93_IhkY1ynbvpxYYarDn0Y7z0gJzP-r2MEP6ApDKhydpRqjkUM0rWbE0fdKKrngLWzFDbrIG8N17gM46E6Y-A3R38-8o_YsBk8i4lv1UWOVXc_a46xZTN7wMm02A_YKY1eZHpsDyaR7VcxvU1enB9A5qHeDiZka-BdGubh5xeD5G9453s90vnqbHDpaRDztbfZ1-POQT3ult2iQ0qpMxNNcJeEeFpHxNHaQehx-DdSHeOSXuBmj28ATfyS2s0xm3J10Jbm7mSXFlnkcX_dF1HY0NOqFZfPHCi-93KYRV_Bmc-Df9uhm_H4zevXztED9iXhdLiVsPI9CtKfEwIx0jpxKaXbUIDuzx1S8p58ZUi13QM5nmhFEAAKMLLNzb0s2v89JRdYgA3yr2c3719XKOXN-ezPccdKQxniUtEB2u1viR0mPtFek_ZTifgQ5nF3iBxJU06lfmef8gsIKwxwxqRLit5ufs2wBVRVfpRpfKgHtBrt7K9BJTRQOEMnrqeocYEPLIYsNXrV9-pzhE0KjcidNnTHDkGht7xn5B3sZxB-4mfb4Lv-MmLuYnay4VYfGfDwQ1Us1uy0Ke85lJryYC4VdTDb7N2rDIDWyN2O9X-IftFLtlly_SL6svUvVeGK0f7PfqVEReXvVHVzF0r9HFdenP-RGpm3F-3BBCpJsgz0NLbUpwVCgW6EJOyrlWCH2yYVkratetc7T5V4Jo4St2ZwM9l3CkbOQW6fUx27_JgooL4QElGVgiOB8xiz3aia8yPVFbVTfidIqc733lf5SZM9dBpcOAhYyg0KmS8Mhe-plu53e_7X65bg8ygDEoZKLa3krxwdClE4OHoa20hJHn_HEHe2IBTcS8OIyzWrxwN6OOteC6FWgkktWOPjQPptzZDsMi_KWtA2xlsJBpGSM9nH_54X2OVpleSS4KdkIV6behno&state=X8b8hJqGKi7PdIeV&session_state=005bbc79-a206-f322-b2b6-03ebff2fd929
+StripUnsafeNextMiddleware: request path=/student_section/student_elog/ qs=
+StripUnsafeNextMiddleware: request path=/student_section/get-date-restrictions/ qs=
+pre_social_login: existing=81 for email=akashm@agu.edu.bh
+pre_social_login: connected social to existing user pk=81
+social.get_connect_redirect_url: CALLED for user=81
+social.get_connect_redirect_url: manually logged in user 81
+social.get_connect_redirect_url: redirecting to /accounts/post-login-redirect/
+StripUnsafeNextMiddleware: request path=/accounts/post-login-redirect/ qs=
+post_login_redirect: called with user=81 auth=True session_info={'session_key': 'd3p7wn8w6gmba14gxjdlj4hx6ni7h0ui', 'session_keys': ['socialaccount_states', '_auth_user_id', '_auth_user_backend', '_auth_user_hash'], 'has_socialaccount_states': True}
+post_login_redirect: user=81 role=admin redirecting to /admin_section/
+StripUnsafeNextMiddleware: request path=/admin_section/ qs=
+StripUnsafeNextMiddleware: request path=/student_section/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/add_user/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/edit-user/80/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/edit-user/80/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/add_user/ qs=
+StripUnsafeNextMiddleware: request path=/student_section/ qs=
+StripUnsafeNextMiddleware: request path=/login/ qs=next=/student_section/
+StripUnsafeNextMiddleware: saw next=/student_section/ but considered safe for path=/student_section/ on request /login/ qs=next=/student_section/
+StripUnsafeNextMiddleware: request path=/admin_section/ qs=
+StripUnsafeNextMiddleware: request path=/accounts/microsoft/direct/ qs=
+microsoft_direct: CALLED - method=GET path=/accounts/microsoft/direct/ user=None
+microsoft_direct: stashed state_id=HoyHhmi9zDt7FUAU
+microsoft_direct: persisted SSOState state_id=HoyHhmi9zDt7FUAU
+microsoft_direct: client_id=2b3039c5-f... tenant=9c021be8-508f-4638-b1df-52b0e3c615ac redirect_uri=https://elog.agu.edu.bh/accounts/microsoft/login/callback/
+microsoft_direct: redirecting to Microsoft OAuth URL: https://login.microsoftonline.com/9c021be8-508f-4638-b1df-52b0e3c615ac/oauth2/v2.0/authorize?client_...
+SSOStateRestoreMiddleware: callback path hit=/accounts/microsoft/login/callback/ session_keys=['socialaccount_states']
+SSO callback request host=elog.agu.edu.bh path=/accounts/microsoft/login/callback/ qs=code=1.AUcA6BsCnI9QOEax31Kw48YVrMU5MCs4_7FKklAi55HjOZkNAUxHAA.AgABBAIAAABVrSpeuWamRam2jAF1XRQEAwDs_wUA9P8TLSgySPzk5Jvv86OV1hPUq6JgZSOXqQC6_kkIxqcomU6ce9QJ42naLi8eZpe0gqkHq8Cq1P19NNZCgD6NlupoQzBiZumYvZ1Qb5A_8Gj_lAsUsb1AdL1DqKl-dcJ7B0CK_7ln02Xog427D693ePy1PERAM1OGL7MKgY41k8D98F3tNf6TMF1R_SqVrQMTvqmH3OYNSPwH9zxMK0EgkHsHm3U1msQrc_6mhGnqtRej-dBXZYREc0vZdca-LkrP8dCRB4pS5ClO0AxM7PLWBBYlzZtmP2h71KAGn1PmNIv61AjvUumPjR_KCzG-jAmL_TMdRNOKM8mbeqDrfvMCHCQzzmpSJcaABO7nbhe__H-yOxmIE9Ej9x5bi8fqIQ7es_2hFbqnx_QMyMtKHH2p3lN6DhBaQehaVJ1k-XDlBg0lFCKEGw5C048dDZ-X7mddqiN3mJJgxOE_PGRE75J4GliugcgAX7VSZS0Rys9iSFCwNJYNhaFZnVViFGW9LkWgs2gUYRQ_gKepp6aujDw-72PKRElqcqwr0Er-EFJNvA1cslw7nRYDHpB-kSfQTiMeF2l_iF5GkcaJjMw-LpXNKOHhvgqO4HYBOfYkEu9Gi4TRI0XrlHtNeSpG71sP4RM4vEk9hIfcTjHh3-ZjHXURHsLIpxe6GPZdiqa-oFNa7yLTobQ5mi_fV6sKlFgfIx59GR3PlFGy83XIh1ZxxQX2FYVYBwJNKW-n6Q-Gccl8xWgEMnZolYJ-NgzTyr87508AQclN6GrAa9_LP0lT_qFfF9PDEXyuAHAG5t5Ejv4NYD7vt1VUq7A4eu_X3GCnSUI2lWAlzvUHBdZUw9_wNIjRV6mC2Lo1wphNGB7OpUCJv0E3CTUtkOOcAPFvDpnX9SfBiASLRwrmKCme4dRp4BMRq4XccPO0V5TJ44R6npKnU6hLD64ztL0pkw&state=HoyHhmi9zDt7FUAU&session_state=007e3899-a79f-4d96-066a-997e882861cf scheme=https session_key=iuqy6mkguyshlz9tmqkui41o0pum0lkx cookies=['_ga', '_ga_J0W71H6Z1B', 'csrftoken', 'sessionid'] raw_cookie=_ga=GA1.1.979578291.1756284467; _ga_J0W71H6Z1B=GS2.1.s1757914746$o8$g0$t1757914763$j43$l0$h0; csrftoken=E7o3a1UBcbV1GeWOBKBzptsYX9DvBeYl; sessionid=iuqy6mkguyshlz9tmqkui41o0pum0lkx session_keys=['socialaccount_states']
+StripUnsafeNextMiddleware: request path=/accounts/microsoft/login/callback/ qs=code=1.AUcA6BsCnI9QOEax31Kw48YVrMU5MCs4_7FKklAi55HjOZkNAUxHAA.AgABBAIAAABVrSpeuWamRam2jAF1XRQEAwDs_wUA9P8TLSgySPzk5Jvv86OV1hPUq6JgZSOXqQC6_kkIxqcomU6ce9QJ42naLi8eZpe0gqkHq8Cq1P19NNZCgD6NlupoQzBiZumYvZ1Qb5A_8Gj_lAsUsb1AdL1DqKl-dcJ7B0CK_7ln02Xog427D693ePy1PERAM1OGL7MKgY41k8D98F3tNf6TMF1R_SqVrQMTvqmH3OYNSPwH9zxMK0EgkHsHm3U1msQrc_6mhGnqtRej-dBXZYREc0vZdca-LkrP8dCRB4pS5ClO0AxM7PLWBBYlzZtmP2h71KAGn1PmNIv61AjvUumPjR_KCzG-jAmL_TMdRNOKM8mbeqDrfvMCHCQzzmpSJcaABO7nbhe__H-yOxmIE9Ej9x5bi8fqIQ7es_2hFbqnx_QMyMtKHH2p3lN6DhBaQehaVJ1k-XDlBg0lFCKEGw5C048dDZ-X7mddqiN3mJJgxOE_PGRE75J4GliugcgAX7VSZS0Rys9iSFCwNJYNhaFZnVViFGW9LkWgs2gUYRQ_gKepp6aujDw-72PKRElqcqwr0Er-EFJNvA1cslw7nRYDHpB-kSfQTiMeF2l_iF5GkcaJjMw-LpXNKOHhvgqO4HYBOfYkEu9Gi4TRI0XrlHtNeSpG71sP4RM4vEk9hIfcTjHh3-ZjHXURHsLIpxe6GPZdiqa-oFNa7yLTobQ5mi_fV6sKlFgfIx59GR3PlFGy83XIh1ZxxQX2FYVYBwJNKW-n6Q-Gccl8xWgEMnZolYJ-NgzTyr87508AQclN6GrAa9_LP0lT_qFfF9PDEXyuAHAG5t5Ejv4NYD7vt1VUq7A4eu_X3GCnSUI2lWAlzvUHBdZUw9_wNIjRV6mC2Lo1wphNGB7OpUCJv0E3CTUtkOOcAPFvDpnX9SfBiASLRwrmKCme4dRp4BMRq4XccPO0V5TJ44R6npKnU6hLD64ztL0pkw&state=HoyHhmi9zDt7FUAU&session_state=007e3899-a79f-4d96-066a-997e882861cf
+pre_social_login: existing=80 for email=arpans@agu.edu.bh
+pre_social_login: connected social to existing user pk=80
+social.get_connect_redirect_url: CALLED for user=80
+social.get_connect_redirect_url: manually logged in user 80
+social.get_connect_redirect_url: redirecting to /accounts/post-login-redirect/
+StripUnsafeNextMiddleware: request path=/accounts/post-login-redirect/ qs=
+post_login_redirect: called with user=80 auth=True session_info={'session_key': '5czt9riltuzh3wgbbbllc3cgs6yy8bbk', 'session_keys': ['socialaccount_states', '_auth_user_id', '_auth_user_backend', '_auth_user_hash'], 'has_socialaccount_states': True}
+post_login_redirect: user=80 role=admin redirecting to /admin_section/
+StripUnsafeNextMiddleware: request path=/admin_section/logout/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/ qs=
+StripUnsafeNextMiddleware: request path=/login/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/logout/ qs=
+StripUnsafeNextMiddleware: request path=/login/ qs=
+StripUnsafeNextMiddleware: request path=/update/ qs=
+StripUnsafeNextMiddleware: request path=/login/ qs=
+StripUnsafeNextMiddleware: request path=/accounts/microsoft/direct/ qs=
+microsoft_direct: CALLED - method=GET path=/accounts/microsoft/direct/ user=None
+microsoft_direct: stashed state_id=guCzjaf1AYHS0Rr9
+microsoft_direct: persisted SSOState state_id=guCzjaf1AYHS0Rr9
+microsoft_direct: client_id=2b3039c5-f... tenant=9c021be8-508f-4638-b1df-52b0e3c615ac redirect_uri=https://elog.agu.edu.bh/accounts/microsoft/login/callback/
+microsoft_direct: redirecting to Microsoft OAuth URL: https://login.microsoftonline.com/9c021be8-508f-4638-b1df-52b0e3c615ac/oauth2/v2.0/authorize?client_...
+SSOStateRestoreMiddleware: callback path hit=/accounts/microsoft/login/callback/ session_keys=['socialaccount_states']
+SSO callback request host=elog.agu.edu.bh path=/accounts/microsoft/login/callback/ qs=code=1.AUcA6BsCnI9QOEax31Kw48YVrMU5MCs4_7FKklAi55HjOZkNAUxHAA.AgABBAIAAABVrSpeuWamRam2jAF1XRQEAwDs_wUA9P8yOqpp3GYX7jNDdpZUyDYyQ-E-M_9J8_mdfFRwLJlG8NY-gh78-FeAmJDnkXciDYcgrEsf_WFX6M06djc9xdWx2CXe0oUNEXBM_7oYAbKz9F8uqJDxfDuCriTE0Z3DV-zscOuV2m98W6vcQwTtfxNzkFQX-XHTF_fy9LgI6eeyHAvMVcLY0Ecf6alrDmm05Byr0NbYGYorNZhvIrc5QwnmSjXJCo1oCoFfzG1-NBX7ALrNvTMGfYf7tT4tnKPuOm-8XNbnRbiK2oulqvt9nSwdGYMXBVv58H-NULOcm6BrUDarfr9EteuQ_rueLs3sNQBM64D-ZnnRLkV7jhPFovQUJp7qkOxgTa11GK97vJ-AffuE8iZIdkH22exmOkCOFBkTDRa1dscT4ORyVX7OTeVXr3rnElR_jm2-T-MRx3THKhNSAdwHKn58Y60cuc0vAL7u5mSMbfHg1O3pmrrZhUGkNgwUTVot3noACMcGVLyLsK774VqZ_WpJ1LhpJDy-_IYbYAZdEbHKLYCwrQ65x5OhUD7Z2XutUCVDRVAt_fvzqq0jfqgoQQC0hp0pHOzEymkA6NYjmIrqeok0s_0pxNU8ADCy_uwiRBQnV57SujNUfo5-bc_ddFl8ZU2mSZWIHFscIvyWFz8eSerOH1UV8L9IniIUlFu4meldzv5ubHzQNmATknMA28ny8dXT198V-FIoevAxBIgoFiyp1AJH4REZ3cW-P8I99Ugy-b5pIkvry5jx8HclZPyofipW9_GYpG3QIc-ejF0npAV2EC5XPY-4Cuz4wiNH4cw0oAnk4X66qc_1ir5QjyAOfKIMl57RaXNiWB2Voqg4AM2RSPFJSCLv764dhtGJMTEufaSlfJbEqjGsjMMn39fUtvbVPzLOuy83qwSiMiv9sEFzGgYr29EwOXd0YhMNOpfC8CiobzTN7b1gxn4&state=guCzjaf1AYHS0Rr9&session_state=007e3899-a79f-4d96-066a-997e882861cf scheme=https session_key=3hhzou1hvr7mded0rc3afk89t90at99s cookies=['_ga', '_ga_J0W71H6Z1B', 'csrftoken', 'sessionid'] raw_cookie=_ga=GA1.1.979578291.1756284467; _ga_J0W71H6Z1B=GS2.1.s1757914746$o8$g0$t1757914763$j43$l0$h0; csrftoken=aXcSq2GXcYBBZLjkd31SGpKdWoC0SRsY; sessionid=3hhzou1hvr7mded0rc3afk89t90at99s session_keys=['socialaccount_states']
+StripUnsafeNextMiddleware: request path=/accounts/microsoft/login/callback/ qs=code=1.AUcA6BsCnI9QOEax31Kw48YVrMU5MCs4_7FKklAi55HjOZkNAUxHAA.AgABBAIAAABVrSpeuWamRam2jAF1XRQEAwDs_wUA9P8yOqpp3GYX7jNDdpZUyDYyQ-E-M_9J8_mdfFRwLJlG8NY-gh78-FeAmJDnkXciDYcgrEsf_WFX6M06djc9xdWx2CXe0oUNEXBM_7oYAbKz9F8uqJDxfDuCriTE0Z3DV-zscOuV2m98W6vcQwTtfxNzkFQX-XHTF_fy9LgI6eeyHAvMVcLY0Ecf6alrDmm05Byr0NbYGYorNZhvIrc5QwnmSjXJCo1oCoFfzG1-NBX7ALrNvTMGfYf7tT4tnKPuOm-8XNbnRbiK2oulqvt9nSwdGYMXBVv58H-NULOcm6BrUDarfr9EteuQ_rueLs3sNQBM64D-ZnnRLkV7jhPFovQUJp7qkOxgTa11GK97vJ-AffuE8iZIdkH22exmOkCOFBkTDRa1dscT4ORyVX7OTeVXr3rnElR_jm2-T-MRx3THKhNSAdwHKn58Y60cuc0vAL7u5mSMbfHg1O3pmrrZhUGkNgwUTVot3noACMcGVLyLsK774VqZ_WpJ1LhpJDy-_IYbYAZdEbHKLYCwrQ65x5OhUD7Z2XutUCVDRVAt_fvzqq0jfqgoQQC0hp0pHOzEymkA6NYjmIrqeok0s_0pxNU8ADCy_uwiRBQnV57SujNUfo5-bc_ddFl8ZU2mSZWIHFscIvyWFz8eSerOH1UV8L9IniIUlFu4meldzv5ubHzQNmATknMA28ny8dXT198V-FIoevAxBIgoFiyp1AJH4REZ3cW-P8I99Ugy-b5pIkvry5jx8HclZPyofipW9_GYpG3QIc-ejF0npAV2EC5XPY-4Cuz4wiNH4cw0oAnk4X66qc_1ir5QjyAOfKIMl57RaXNiWB2Voqg4AM2RSPFJSCLv764dhtGJMTEufaSlfJbEqjGsjMMn39fUtvbVPzLOuy83qwSiMiv9sEFzGgYr29EwOXd0YhMNOpfC8CiobzTN7b1gxn4&state=guCzjaf1AYHS0Rr9&session_state=007e3899-a79f-4d96-066a-997e882861cf
+pre_social_login: existing=80 for email=arpans@agu.edu.bh
+pre_social_login: connected social to existing user pk=80
+social.get_connect_redirect_url: CALLED for user=80
+social.get_connect_redirect_url: manually logged in user 80
+social.get_connect_redirect_url: redirecting to /accounts/post-login-redirect/
+StripUnsafeNextMiddleware: request path=/accounts/post-login-redirect/ qs=
+post_login_redirect: called with user=80 auth=True session_info={'session_key': 'qaoh8o7a6yaayhvkigschnqic1czlltw', 'session_keys': ['socialaccount_states', '_auth_user_id', '_auth_user_backend', '_auth_user_hash'], 'has_socialaccount_states': True}
+post_login_redirect: user=80 role=admin redirecting to /admin_section/
+StripUnsafeNextMiddleware: request path=/admin_section/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/add_department/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/add_elogyear/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/add_elogyear/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/add_elogyear/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/add_department/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/add_activity_type/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/add_activity_type/ qs=download=activity_template&format=csv
+StripUnsafeNextMiddleware: request path=/admin_section/add_activity_type/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/add_activity_type/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/add_activity_type/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/add_activity_type/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/add_activity_type/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/delete_activity_type/1/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/add_activity_type/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/add_activity_type/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/sessions/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/api/activity-types/1/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/sessions/ qs=download=session_template&format=csv
+StripUnsafeNextMiddleware: request path=/admin_section/add_user/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/add_user/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/add_user/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/admin_profile/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/add_group/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/edit-group/1/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/add_student/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/edit-student/22/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/edit-student/22/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/add_student/ qs=
+StripUnsafeNextMiddleware: request path=/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/add_student/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/logout/ qs=
+StripUnsafeNextMiddleware: request path=/login/ qs=
+StripUnsafeNextMiddleware: request path=/login/ qs=
+StripUnsafeNextMiddleware: request path=/student_section/ qs=
+StripUnsafeNextMiddleware: request path=/student_section/student_profile/ qs=
+StripUnsafeNextMiddleware: request path=/student_section/student_profile/ qs=
+StripUnsafeNextMiddleware: request path=/student_section/student_profile/ qs=
+StripUnsafeNextMiddleware: request path=/student_section/student_elog/ qs=
+StripUnsafeNextMiddleware: request path=/student_section/get-date-restrictions/ qs=
+StripUnsafeNextMiddleware: request path=/student_section/get-activity-types/ qs=department=1
+StripUnsafeNextMiddleware: request path=/student_section/get-tutors/ qs=department=1
+StripUnsafeNextMiddleware: request path=/student_section/get-core-diagnosis/ qs=activity_type=4
+StripUnsafeNextMiddleware: request path=/student_section/get-core-diagnosis/ qs=activity_type=3
+StripUnsafeNextMiddleware: request path=/student_section/get-core-diagnosis/ qs=activity_type=4
+StripUnsafeNextMiddleware: request path=/student_section/logout/ qs=
+StripUnsafeNextMiddleware: request path=/login/ qs=
+StripUnsafeNextMiddleware: request path=/update/ qs=
+StripUnsafeNextMiddleware: request path=/accounts/microsoft/direct/ qs=
+microsoft_direct: CALLED - method=GET path=/accounts/microsoft/direct/ user=None
+microsoft_direct: stashed state_id=nJ6r8WZ4n78oBdwV
+microsoft_direct: persisted SSOState state_id=nJ6r8WZ4n78oBdwV
+microsoft_direct: client_id=2b3039c5-f... tenant=9c021be8-508f-4638-b1df-52b0e3c615ac redirect_uri=https://elog.agu.edu.bh/accounts/microsoft/login/callback/
+microsoft_direct: redirecting to Microsoft OAuth URL: https://login.microsoftonline.com/9c021be8-508f-4638-b1df-52b0e3c615ac/oauth2/v2.0/authorize?client_...
+SSOStateRestoreMiddleware: callback path hit=/accounts/microsoft/login/callback/ session_keys=['socialaccount_states']
+SSO callback request host=elog.agu.edu.bh path=/accounts/microsoft/login/callback/ qs=code=1.AUcA6BsCnI9QOEax31Kw48YVrMU5MCs4_7FKklAi55HjOZkNAb5HAA.AgABBAIAAABVrSpeuWamRam2jAF1XRQEAwDs_wUA9P_-mq_Bu8r_gSpAlY4Z4jPJQdcISojnxAnTVvwctIPvtMFzr9_FPrAbWslZOSLhIsw7OCTWiRQ3eofT35u9AFctvh4jV0YB_6MbChQQWsmc4a5GawqdYGprtxIbXT8YtJt4m1eXfZ3_mQL2YPqEg3O34qFj8iI0yS-Ch9j01BT_q_oKCfqqc2qvRodyA9H4K2fZFtnaVw7wJ_s5j8evUmt7kRsaamLZj-HLPbCJhYnZPUDiY4NHBgj9Rjyx6CGqxgVLnynEbNi9l-dnfBKMARzBKe0lZXry_EwxPkq-hBmwDTy2Zssrhvv4KmAmox9QE5ocvYRAaD_sSUifjKchaiM7V1bh5osys56tiC5ppDe4Q0HIGIcgrD-HYPW0beai0CtxF8JcgHvhXnB_yfpC6JsVUb8Ocn1Sj84V1O250Wcq_meV1HHU7Ical1_jF4x-uEJDhqnpL0A54x53MnygtIyci1hyNyZRtOmcDFmfEIPHdSXssA7qEwDoiSahTB1jhLVAf8e9zw9I5VY7kRWHpaEUPJnyrK-vS_iCUtHx-8Gi_3wJSR6szQPv9MOvP4g_vBme96HkpUflWA_pzLXc3LfQ607vBZVNTf29vn7wYfaMJ2ApRy5d7x-WmVaxkYbvZXn3Rrs1L5SWq9bJYSkLKWDW-jj30vZiDGvctypKGW4diiIAXquBwL7-DB35GNN_-uBYDAHS4NJWi7mqRxz0MpRIrkLBJsCUNb0sDgt-DDLv_cWDQN-TZkl43oFFfTYSPgsEnh6LFs6WiWceoOQYad0ozx0Fj4kapGNVs1GCSjOnG3UPqh9Yz-FbLojIFOyug4UE_LWdByqndy5-3GIUzYrJNV5q-IHe8QCiaFkO1ogazjl3zOnrNgiY4f5-P9mCZGOII2dKLRcEz1yOKjZYIJO9ZV_sTxHGhpw1sMKV-f1FR9SDoqQYup2ZDKWvePC1YblzNi71XVGyf7J33Vm79JuTG-EGjic&state=nJ6r8WZ4n78oBdwV&session_state=005bbc79-a206-f322-b2b6-03ebff2fd929 scheme=https session_key=asr07neo8283qjnidbzi0jp66f6udsa9 cookies=['_ga', 'cookiesession1', '_ga_J0W71H6Z1B', 'csrftoken', 'sessionid'] raw_cookie=_ga=GA1.1.903680079.1746004090; cookiesession1=678A3E211A49F42E2A183AFAA4A600ED; _ga_J0W71H6Z1B=GS2.1.s1757845389$o5$g1$t1757845538$j54$l0$h0; csrftoken=OpsTnjRsZZkig8HZcDyIh2gTsluedLCO; sessionid=0dy109o07sdq2t5cdruqq4dyxd7kgfyh; csrftoken=1SswKKDF4DnbPfsvdHndv8qz7uhDDMjh; sessionid=asr07neo8283qjnidbzi0jp66f6udsa9 session_keys=['socialaccount_states']
+StripUnsafeNextMiddleware: request path=/accounts/microsoft/login/callback/ qs=code=1.AUcA6BsCnI9QOEax31Kw48YVrMU5MCs4_7FKklAi55HjOZkNAb5HAA.AgABBAIAAABVrSpeuWamRam2jAF1XRQEAwDs_wUA9P_-mq_Bu8r_gSpAlY4Z4jPJQdcISojnxAnTVvwctIPvtMFzr9_FPrAbWslZOSLhIsw7OCTWiRQ3eofT35u9AFctvh4jV0YB_6MbChQQWsmc4a5GawqdYGprtxIbXT8YtJt4m1eXfZ3_mQL2YPqEg3O34qFj8iI0yS-Ch9j01BT_q_oKCfqqc2qvRodyA9H4K2fZFtnaVw7wJ_s5j8evUmt7kRsaamLZj-HLPbCJhYnZPUDiY4NHBgj9Rjyx6CGqxgVLnynEbNi9l-dnfBKMARzBKe0lZXry_EwxPkq-hBmwDTy2Zssrhvv4KmAmox9QE5ocvYRAaD_sSUifjKchaiM7V1bh5osys56tiC5ppDe4Q0HIGIcgrD-HYPW0beai0CtxF8JcgHvhXnB_yfpC6JsVUb8Ocn1Sj84V1O250Wcq_meV1HHU7Ical1_jF4x-uEJDhqnpL0A54x53MnygtIyci1hyNyZRtOmcDFmfEIPHdSXssA7qEwDoiSahTB1jhLVAf8e9zw9I5VY7kRWHpaEUPJnyrK-vS_iCUtHx-8Gi_3wJSR6szQPv9MOvP4g_vBme96HkpUflWA_pzLXc3LfQ607vBZVNTf29vn7wYfaMJ2ApRy5d7x-WmVaxkYbvZXn3Rrs1L5SWq9bJYSkLKWDW-jj30vZiDGvctypKGW4diiIAXquBwL7-DB35GNN_-uBYDAHS4NJWi7mqRxz0MpRIrkLBJsCUNb0sDgt-DDLv_cWDQN-TZkl43oFFfTYSPgsEnh6LFs6WiWceoOQYad0ozx0Fj4kapGNVs1GCSjOnG3UPqh9Yz-FbLojIFOyug4UE_LWdByqndy5-3GIUzYrJNV5q-IHe8QCiaFkO1ogazjl3zOnrNgiY4f5-P9mCZGOII2dKLRcEz1yOKjZYIJO9ZV_sTxHGhpw1sMKV-f1FR9SDoqQYup2ZDKWvePC1YblzNi71XVGyf7J33Vm79JuTG-EGjic&state=nJ6r8WZ4n78oBdwV&session_state=005bbc79-a206-f322-b2b6-03ebff2fd929
+pre_social_login: existing=81 for email=akashm@agu.edu.bh
+pre_social_login: connected social to existing user pk=81
+social.get_connect_redirect_url: CALLED for user=81
+social.get_connect_redirect_url: manually logged in user 81
+social.get_connect_redirect_url: redirecting to /accounts/post-login-redirect/
+StripUnsafeNextMiddleware: request path=/accounts/post-login-redirect/ qs=
+post_login_redirect: called with user=81 auth=True session_info={'session_key': 'v1s4wv47jc9skebx0cl42gvus2jzzf9a', 'session_keys': ['socialaccount_states', '_auth_user_id', '_auth_user_backend', '_auth_user_hash'], 'has_socialaccount_states': True}
+post_login_redirect: user=81 role=admin redirecting to /admin_section/
+StripUnsafeNextMiddleware: request path=/admin_section/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/add_user/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/edit-user/81/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/edit-user/81/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/add_user/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/logout/ qs=
+StripUnsafeNextMiddleware: request path=/login/ qs=
+StripUnsafeNextMiddleware: request path=/accounts/microsoft/direct/ qs=
+microsoft_direct: CALLED - method=GET path=/accounts/microsoft/direct/ user=None
+microsoft_direct: stashed state_id=64ndouARalxuZWJc
+microsoft_direct: persisted SSOState state_id=64ndouARalxuZWJc
+microsoft_direct: client_id=2b3039c5-f... tenant=9c021be8-508f-4638-b1df-52b0e3c615ac redirect_uri=https://elog.agu.edu.bh/accounts/microsoft/login/callback/
+microsoft_direct: redirecting to Microsoft OAuth URL: https://login.microsoftonline.com/9c021be8-508f-4638-b1df-52b0e3c615ac/oauth2/v2.0/authorize?client_...
+SSOStateRestoreMiddleware: callback path hit=/accounts/microsoft/login/callback/ session_keys=['socialaccount_states']
+SSO callback request host=elog.agu.edu.bh path=/accounts/microsoft/login/callback/ qs=code=1.AUcA6BsCnI9QOEax31Kw48YVrMU5MCs4_7FKklAi55HjOZkNAb5HAA.AgABBAIAAABVrSpeuWamRam2jAF1XRQEAwDs_wUA9P8EHAYcJJbqDGGWhXFI8rRS-S-mtL2I4SUijm0qZwgMHdr8Zy2ThKMJj7dcg1rn8NQMAWxegVBpAlvCbaHmb376MsRS49mg044JXqefEpQy1TaALcnvAOTuxNeu2aNGp_TKPqeinv32p3MUtzBYbdSP16sIEqlkQfHp5pyqlHY7Mqj6zcMuWTnVFga5BpEeknQAUCBatS2hvWofbA4XDfRfOWAxMZnj-_JyHOGGkc6qpG-9PualDcXqiwjw-431qHRSPYX6R_-hLE4M3lZQzFMfNDvrg5SCAOOmOA62KHP54yvay0fEkB7wk-r2L1VE_-NdS6ayy1-QyCVTwrOuX6vRHkB7hBQpWLAcB7F3e_4Kap7BayNw9VGKxZAUva2z5lhCbntnYqmUK3-iLgn0ifsEj_awmBhYkZHc9aBu-9s4eQlWgutyb4ox7h2SJrYUBmmaaNtTgvpcjl8XM7VEk7lXDySiqzngSdAwZBH9yismf2nSEBQSoZ3wl1pfWyutFiHAuawWNg9RnMQqE1-KPnQ6G3yLOgdid6aGech0NH1s5OG0RBbgu9Ap5r5Mz0pMYySvWTy2Q-HTZDMYhdOXmUdfQuEovArGla9uv60xS7YWUntPWe05ZG-OY7-Wo7IXAC2VjE8TKzq7tQTOjM_n0gyg1MPiiIgXXftVFfUmH4FomjCI6hYt7XerfKI-101rXIE89_Fvmb2JUmnmOaKjjzMRQZnHbsbx_huKWNppV5NAgLsoVR5ANPTIdET0DLT2rcGYrCCztppE6YgZk_8yvUoQpc_qqdVFwPZkaX2yBkszyHo-edP3wIR8dZ820TnE24l2Tnj6AUTSAirYdDihu6Od2E2-uVac_Yb_71nG1QZ0odsU02KD95yVorCt2-6teh8BDCNv7vduBj8i1pAoDkacpCxoZFWUumpTSqpkbkKSdGGavdtjaNYMFxhyHWwpOVmmdjm2Jol8G7pDoPv-D6I_PsaoGhI&state=64ndouARalxuZWJc&session_state=005bbc79-a206-f322-b2b6-03ebff2fd929 scheme=https session_key=ebfjrzl48as1cmi3i06v7jt5c9qa8k0b cookies=['_ga', 'cookiesession1', '_ga_J0W71H6Z1B', 'csrftoken', 'sessionid'] raw_cookie=_ga=GA1.1.903680079.1746004090; cookiesession1=678A3E211A49F42E2A183AFAA4A600ED; _ga_J0W71H6Z1B=GS2.1.s1757845389$o5$g1$t1757845538$j54$l0$h0; csrftoken=OpsTnjRsZZkig8HZcDyIh2gTsluedLCO; sessionid=0dy109o07sdq2t5cdruqq4dyxd7kgfyh; csrftoken=0twFSbRMcsuqkUjvaDztoqtUaNtn0Y4c; sessionid=ebfjrzl48as1cmi3i06v7jt5c9qa8k0b session_keys=['socialaccount_states']
+StripUnsafeNextMiddleware: request path=/accounts/microsoft/login/callback/ qs=code=1.AUcA6BsCnI9QOEax31Kw48YVrMU5MCs4_7FKklAi55HjOZkNAb5HAA.AgABBAIAAABVrSpeuWamRam2jAF1XRQEAwDs_wUA9P8EHAYcJJbqDGGWhXFI8rRS-S-mtL2I4SUijm0qZwgMHdr8Zy2ThKMJj7dcg1rn8NQMAWxegVBpAlvCbaHmb376MsRS49mg044JXqefEpQy1TaALcnvAOTuxNeu2aNGp_TKPqeinv32p3MUtzBYbdSP16sIEqlkQfHp5pyqlHY7Mqj6zcMuWTnVFga5BpEeknQAUCBatS2hvWofbA4XDfRfOWAxMZnj-_JyHOGGkc6qpG-9PualDcXqiwjw-431qHRSPYX6R_-hLE4M3lZQzFMfNDvrg5SCAOOmOA62KHP54yvay0fEkB7wk-r2L1VE_-NdS6ayy1-QyCVTwrOuX6vRHkB7hBQpWLAcB7F3e_4Kap7BayNw9VGKxZAUva2z5lhCbntnYqmUK3-iLgn0ifsEj_awmBhYkZHc9aBu-9s4eQlWgutyb4ox7h2SJrYUBmmaaNtTgvpcjl8XM7VEk7lXDySiqzngSdAwZBH9yismf2nSEBQSoZ3wl1pfWyutFiHAuawWNg9RnMQqE1-KPnQ6G3yLOgdid6aGech0NH1s5OG0RBbgu9Ap5r5Mz0pMYySvWTy2Q-HTZDMYhdOXmUdfQuEovArGla9uv60xS7YWUntPWe05ZG-OY7-Wo7IXAC2VjE8TKzq7tQTOjM_n0gyg1MPiiIgXXftVFfUmH4FomjCI6hYt7XerfKI-101rXIE89_Fvmb2JUmnmOaKjjzMRQZnHbsbx_huKWNppV5NAgLsoVR5ANPTIdET0DLT2rcGYrCCztppE6YgZk_8yvUoQpc_qqdVFwPZkaX2yBkszyHo-edP3wIR8dZ820TnE24l2Tnj6AUTSAirYdDihu6Od2E2-uVac_Yb_71nG1QZ0odsU02KD95yVorCt2-6teh8BDCNv7vduBj8i1pAoDkacpCxoZFWUumpTSqpkbkKSdGGavdtjaNYMFxhyHWwpOVmmdjm2Jol8G7pDoPv-D6I_PsaoGhI&state=64ndouARalxuZWJc&session_state=005bbc79-a206-f322-b2b6-03ebff2fd929
+pre_social_login: existing=81 for email=akashm@agu.edu.bh
+pre_social_login: connected social to existing user pk=81
+social.get_connect_redirect_url: CALLED for user=81
+social.get_connect_redirect_url: manually logged in user 81
+social.get_connect_redirect_url: redirecting to /accounts/post-login-redirect/
+StripUnsafeNextMiddleware: request path=/accounts/post-login-redirect/ qs=
+post_login_redirect: called with user=81 auth=True session_info={'session_key': 'yyigm6aetnglrcrsqe9rjfbef5ix13xu', 'session_keys': ['socialaccount_states', '_auth_user_id', '_auth_user_backend', '_auth_user_hash'], 'has_socialaccount_states': True}
+post_login_redirect: user=81 role=student redirecting to /student_section/
+StripUnsafeNextMiddleware: request path=/student_section/ qs=
+StripUnsafeNextMiddleware: request path=/student_section/student_profile/ qs=
+StripUnsafeNextMiddleware: request path=/student_section/update_profile_photo/ qs=
+StripUnsafeNextMiddleware: request path=/student_section/student_profile/ qs=
+StripUnsafeNextMiddleware: request path=/student_section/update_profile_photo/ qs=
+StripUnsafeNextMiddleware: request path=/student_section/student_final_records/ qs=
+StripUnsafeNextMiddleware: request path=/student_section/student_elog/ qs=
+StripUnsafeNextMiddleware: request path=/student_section/get-date-restrictions/ qs=
+StripUnsafeNextMiddleware: request path=/student_section/student_support/ qs=
+StripUnsafeNextMiddleware: request path=/student_section/student_profile/ qs=
+StripUnsafeNextMiddleware: request path=/ qs=
+StripUnsafeNextMiddleware: request path=/login/ qs=
+StripUnsafeNextMiddleware: request path=/accounts/microsoft/direct/ qs=
+microsoft_direct: CALLED - method=GET path=/accounts/microsoft/direct/ user=None
+microsoft_direct: stashed state_id=aYzKqVU5xfCsWpDJ
+microsoft_direct: persisted SSOState state_id=aYzKqVU5xfCsWpDJ
+microsoft_direct: client_id=2b3039c5-f... tenant=9c021be8-508f-4638-b1df-52b0e3c615ac redirect_uri=https://elog.agu.edu.bh/accounts/microsoft/login/callback/
+microsoft_direct: redirecting to Microsoft OAuth URL: https://login.microsoftonline.com/9c021be8-508f-4638-b1df-52b0e3c615ac/oauth2/v2.0/authorize?client_...
+SSOStateRestoreMiddleware: callback path hit=/accounts/microsoft/login/callback/ session_keys=['socialaccount_states']
+SSO callback request host=elog.agu.edu.bh path=/accounts/microsoft/login/callback/ qs=code=1.AUcA6BsCnI9QOEax31Kw48YVrMU5MCs4_7FKklAi55HjOZkNAUxHAA.AgABBAIAAABVrSpeuWamRam2jAF1XRQEAwDs_wUA9P-0aE5057xPUgRy0L-wTSn2w4GZgvHUimYrkuyZThxqTWg0xXGX8CONs9zzPCd-o7EKcYNrXKEaiJfFgnnWdM53nt0TCEbL9U0A5mSBN9B_vC2oVe_pbTZDdMgPDoIEkRmCpDaE17IgyE3qgAeo3ZtB9rMHtFeXcP1GvdB-5CK7sLeTIr_LyOwPhwR76dElpDUgz6Vti37pz180NLsX_oEXSXcc-LyJSXO75No2fEQKiSSwOQ3R5Xji4_5TSxGpOTrukJWo1jY5zSh51uM2tiOUGRbK6oujlVsSE4v2TjPtHRj2mb49Cev_6lWpmNLP0hay-WaxXDUgZrcGfnl2lACnlR63TW6Muv6XoCNQgbFSIKB6Um1qFf9lgZogtUb27UvOi1eo8v0zad4y86ukDTp2NDuo7l1O996Fs_ITT0Mdemqaj8w1I_Tjhl_uQdCvhzYKgE_vioinPuogv_rju8eoHscXbWH8-5Ah7hKdJU0dEbG1yiwWX5mOn_hUUVSwJ4szTMgoQXj9qasblCizOjVdl1F76uFYgpmawx2zcJkBJ0X1sxSMFHY3XZFRRB79opq3qNj-unuagKeyoLHpXYzLpvUik2bawwiaGZJ2UCO4NFX34xK6GebnnP15D5xwDGsb3cIx8fMDcfBCyMkoE7owEopzx5niSb_AcSi7u8HAAQZqlqOGAgxY1709iwHhGEVOcgGXKaCxQMIUaKEIzeyumKbD38BqQEOPxZReUgNVWG5kXcnj2ZWHnbyL1KCYKnk6TZleTpIUaW-Z07l3oQjcjAD60n6scczQsQjcRqpryCCbHcAev6Y4OaPg0gyEepB9_z4BJJOQBybPk33J5mVgHV9xmDxzycDcaYr54p4paNreScF_8NX_aRgUdzFXFm12k2TXM4Rphlq33siVuaqPtZ01l6yPYCnNd0oxm0AWu60_tiQ7CDA&state=aYzKqVU5xfCsWpDJ&session_state=007e3899-a79f-4d96-066a-997e882861cf scheme=https session_key=my7iqp9zhb1zyyqpg6jm22jczgwunrrb cookies=['_ga', '_ga_J0W71H6Z1B', 'csrftoken', 'sessionid'] raw_cookie=_ga=GA1.1.979578291.1756284467; _ga_J0W71H6Z1B=GS2.1.s1757914746$o8$g0$t1757914763$j43$l0$h0; csrftoken=vEgtUgN1LOAwYhQROffoBmmw8Fs5g3Mw; sessionid=my7iqp9zhb1zyyqpg6jm22jczgwunrrb session_keys=['socialaccount_states']
+StripUnsafeNextMiddleware: request path=/accounts/microsoft/login/callback/ qs=code=1.AUcA6BsCnI9QOEax31Kw48YVrMU5MCs4_7FKklAi55HjOZkNAUxHAA.AgABBAIAAABVrSpeuWamRam2jAF1XRQEAwDs_wUA9P-0aE5057xPUgRy0L-wTSn2w4GZgvHUimYrkuyZThxqTWg0xXGX8CONs9zzPCd-o7EKcYNrXKEaiJfFgnnWdM53nt0TCEbL9U0A5mSBN9B_vC2oVe_pbTZDdMgPDoIEkRmCpDaE17IgyE3qgAeo3ZtB9rMHtFeXcP1GvdB-5CK7sLeTIr_LyOwPhwR76dElpDUgz6Vti37pz180NLsX_oEXSXcc-LyJSXO75No2fEQKiSSwOQ3R5Xji4_5TSxGpOTrukJWo1jY5zSh51uM2tiOUGRbK6oujlVsSE4v2TjPtHRj2mb49Cev_6lWpmNLP0hay-WaxXDUgZrcGfnl2lACnlR63TW6Muv6XoCNQgbFSIKB6Um1qFf9lgZogtUb27UvOi1eo8v0zad4y86ukDTp2NDuo7l1O996Fs_ITT0Mdemqaj8w1I_Tjhl_uQdCvhzYKgE_vioinPuogv_rju8eoHscXbWH8-5Ah7hKdJU0dEbG1yiwWX5mOn_hUUVSwJ4szTMgoQXj9qasblCizOjVdl1F76uFYgpmawx2zcJkBJ0X1sxSMFHY3XZFRRB79opq3qNj-unuagKeyoLHpXYzLpvUik2bawwiaGZJ2UCO4NFX34xK6GebnnP15D5xwDGsb3cIx8fMDcfBCyMkoE7owEopzx5niSb_AcSi7u8HAAQZqlqOGAgxY1709iwHhGEVOcgGXKaCxQMIUaKEIzeyumKbD38BqQEOPxZReUgNVWG5kXcnj2ZWHnbyL1KCYKnk6TZleTpIUaW-Z07l3oQjcjAD60n6scczQsQjcRqpryCCbHcAev6Y4OaPg0gyEepB9_z4BJJOQBybPk33J5mVgHV9xmDxzycDcaYr54p4paNreScF_8NX_aRgUdzFXFm12k2TXM4Rphlq33siVuaqPtZ01l6yPYCnNd0oxm0AWu60_tiQ7CDA&state=aYzKqVU5xfCsWpDJ&session_state=007e3899-a79f-4d96-066a-997e882861cf
+pre_social_login: existing=80 for email=arpans@agu.edu.bh
+pre_social_login: connected social to existing user pk=80
+social.get_connect_redirect_url: CALLED for user=80
+social.get_connect_redirect_url: manually logged in user 80
+social.get_connect_redirect_url: redirecting to /accounts/post-login-redirect/
+StripUnsafeNextMiddleware: request path=/accounts/post-login-redirect/ qs=
+post_login_redirect: called with user=80 auth=True session_info={'session_key': '4vvlxwbbct5d5qe631xow2c66r4xefd5', 'session_keys': ['socialaccount_states', '_auth_user_id', '_auth_user_backend', '_auth_user_hash'], 'has_socialaccount_states': True}
+post_login_redirect: user=80 role=admin redirecting to /admin_section/
+StripUnsafeNextMiddleware: request path=/admin_section/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/admin_blogs/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/blog/create/ qs=
+StripUnsafeNextMiddleware: request path=/update/ qs=
+StripUnsafeNextMiddleware: request path=/update/ qs=category=news
+StripUnsafeNextMiddleware: request path=/update/ qs=category=announcement
+StripUnsafeNextMiddleware: request path=/update/ qs=category=feature
+StripUnsafeNextMiddleware: request path=/update/ qs=category=announcement
+StripUnsafeNextMiddleware: request path=/update/ qs=category=update
+StripUnsafeNextMiddleware: request path=/update/ qs=category=announcement
+StripUnsafeNextMiddleware: request path=/update/ qs=category=announcement
+StripUnsafeNextMiddleware: request path=/update/ qs=
+StripUnsafeNextMiddleware: request path=/update/ qs=category=update
+StripUnsafeNextMiddleware: request path=/update/ qs=
+StripUnsafeNextMiddleware: request path=/update/ qs=category=feature
+StripUnsafeNextMiddleware: request path=/ qs=
+StripUnsafeNextMiddleware: request path=/login/ qs=
+StripUnsafeNextMiddleware: request path=/accounts/microsoft/direct/ qs=
+microsoft_direct: CALLED - method=GET path=/accounts/microsoft/direct/ user=None
+microsoft_direct: stashed state_id=lsez3PH7FRzFr608
+microsoft_direct: persisted SSOState state_id=lsez3PH7FRzFr608
+microsoft_direct: client_id=2b3039c5-f... tenant=9c021be8-508f-4638-b1df-52b0e3c615ac redirect_uri=https://elog.agu.edu.bh/accounts/microsoft/login/callback/
+microsoft_direct: redirecting to Microsoft OAuth URL: https://login.microsoftonline.com/9c021be8-508f-4638-b1df-52b0e3c615ac/oauth2/v2.0/authorize?client_...
+SSOStateRestoreMiddleware: callback path hit=/accounts/microsoft/login/callback/ session_keys=['socialaccount_states']
+SSO callback request host=elog.agu.edu.bh path=/accounts/microsoft/login/callback/ qs=code=1.AUcA6BsCnI9QOEax31Kw48YVrMU5MCs4_7FKklAi55HjOZkNAfNHAA.AgABBAIAAABVrSpeuWamRam2jAF1XRQEAwDs_wUA9P9FK0RVq7O9hiJB_LD0b3MPE58v2OPRT3RzBRzRoYii69p64AFfkGlcDb_dCrwKO-J4LM1yPvhKDFalOTgV98hkst4yOrBPmi4fT--vgAoYtHOXkKFHfaldUl6u3fAAuQjZS5_n7fmvIdIp818-9yp_zymcdYK1rIM2KQECThRCLBjowWMMdsSVVA96CxIQn0kOtHO4maaoRo3LLhLNE-SnRkORXTh5RxXnSzTWyDXyuEVt2D_8_YIQaS25vXmlMrlmGfKl7FF5BxrsK6ztRH3LbyGoYP6pa2fiNwGFY_mL0UZVV1X0YWCSLGGVi785whQCIYd21rf7NMx46SjlCBrwPtiZ3yCDx4E_PIYYpLjz2Ot4lrIrcO8pmA_2y4oqNroS12v3O-alLYocWOEb0XUC2YMPjYq59eV7TYZ-KgWGoSNNEkpoiMnmBOXjWW2QzfJNENnCFRMBpAIpigJw8EZdBVxxtpGqZFTqEqnRiwbXi-ELyDnOCILdJAPcuWqN7Mllg0JmZKVfaNtRpdwcuiqiFYBuPgHhxe1jTLIIxBBYgJ75spM5d1LTCVx__VxW3hVBzQWD4Yw_0LtGM5N9W7MD9NR4ievMpoA6vLoLsj-ezac7tSZy11W_5ynAuH1wdsJjQ-re2YJxzbXMA--dOLdRAC7tH8-0xKlH7XtGcmx1c1h2VAVn31vaTxm6ePALxh0eBQlyEg_duARxOGVBZrkR0g8MTgoGcTsgB8fCkju_gQ4-cZ3fKG3nttkHj392CK9nQpsC7wmpUijuVJ5GYD2_6J5-Trt2U0-NiM6G2vTepheFpWuFuzKFQ-NkNAfP0qewTmtEoCnjTLgUWKOM4wGPfXURhTD-GN_rU6Qt-LWqh3uBP4SqOvLRuLESRS3IGRt0hdR65UrhBr-iKmfGFNznBshQQ0PCXYbOnmHA5OcpX-Ga1DOsb_yb4ioYn-o&state=lsez3PH7FRzFr608&session_state=007d0019-0c46-24ff-81ad-651a0c3c96e4 scheme=https session_key=5rulctiiw2493hauzndr0wl366dopyc1 cookies=['_ga_J0W71H6Z1B', '_ga', 'csrftoken', 'sessionid'] raw_cookie=_ga_J0W71H6Z1B=GS2.1.s1758003458$o1$g0$t1758003458$j60$l0$h0; _ga=GA1.1.810959309.1758003458; csrftoken=2q7vEZUdzVGSXKFIoC2pnCtgooNS3Wiv; sessionid=5rulctiiw2493hauzndr0wl366dopyc1 session_keys=['socialaccount_states']
+StripUnsafeNextMiddleware: request path=/accounts/microsoft/login/callback/ qs=code=1.AUcA6BsCnI9QOEax31Kw48YVrMU5MCs4_7FKklAi55HjOZkNAfNHAA.AgABBAIAAABVrSpeuWamRam2jAF1XRQEAwDs_wUA9P9FK0RVq7O9hiJB_LD0b3MPE58v2OPRT3RzBRzRoYii69p64AFfkGlcDb_dCrwKO-J4LM1yPvhKDFalOTgV98hkst4yOrBPmi4fT--vgAoYtHOXkKFHfaldUl6u3fAAuQjZS5_n7fmvIdIp818-9yp_zymcdYK1rIM2KQECThRCLBjowWMMdsSVVA96CxIQn0kOtHO4maaoRo3LLhLNE-SnRkORXTh5RxXnSzTWyDXyuEVt2D_8_YIQaS25vXmlMrlmGfKl7FF5BxrsK6ztRH3LbyGoYP6pa2fiNwGFY_mL0UZVV1X0YWCSLGGVi785whQCIYd21rf7NMx46SjlCBrwPtiZ3yCDx4E_PIYYpLjz2Ot4lrIrcO8pmA_2y4oqNroS12v3O-alLYocWOEb0XUC2YMPjYq59eV7TYZ-KgWGoSNNEkpoiMnmBOXjWW2QzfJNENnCFRMBpAIpigJw8EZdBVxxtpGqZFTqEqnRiwbXi-ELyDnOCILdJAPcuWqN7Mllg0JmZKVfaNtRpdwcuiqiFYBuPgHhxe1jTLIIxBBYgJ75spM5d1LTCVx__VxW3hVBzQWD4Yw_0LtGM5N9W7MD9NR4ievMpoA6vLoLsj-ezac7tSZy11W_5ynAuH1wdsJjQ-re2YJxzbXMA--dOLdRAC7tH8-0xKlH7XtGcmx1c1h2VAVn31vaTxm6ePALxh0eBQlyEg_duARxOGVBZrkR0g8MTgoGcTsgB8fCkju_gQ4-cZ3fKG3nttkHj392CK9nQpsC7wmpUijuVJ5GYD2_6J5-Trt2U0-NiM6G2vTepheFpWuFuzKFQ-NkNAfP0qewTmtEoCnjTLgUWKOM4wGPfXURhTD-GN_rU6Qt-LWqh3uBP4SqOvLRuLESRS3IGRt0hdR65UrhBr-iKmfGFNznBshQQ0PCXYbOnmHA5OcpX-Ga1DOsb_yb4ioYn-o&state=lsez3PH7FRzFr608&session_state=007d0019-0c46-24ff-81ad-651a0c3c96e4
+pre_social_login: existing=None for email=minipeter@agu.edu.bh
+save_user: created new SSO user minipeter@agu.edu.bh
+StripUnsafeNextMiddleware: request path=/accounts/post-login-redirect/ qs=
+post_login_redirect: called with user=83 auth=True session_info={'session_key': '8yvkk9879avuc9f85sp1ylqy2ybhps8j', 'session_keys': ['socialaccount_states', '_auth_user_id', '_auth_user_backend', '_auth_user_hash', 'first_name', 'last_name', 'username', 'email', 'role'], 'has_socialaccount_states': True}
+post_login_redirect: user=83 role=defaultuser redirecting to /defaultuser/
+StripUnsafeNextMiddleware: request path=/defaultuser/ qs=
+StripUnsafeNextMiddleware: request path=/student_section/logout/ qs=
+StripUnsafeNextMiddleware: request path=/login/ qs=
+StripUnsafeNextMiddleware: request path=/defaultuser/ qs=
+StripUnsafeNextMiddleware: request path=/defaultuser/ qs=
+StripUnsafeNextMiddleware: request path=/defaultuser/ qs=
+StripUnsafeNextMiddleware: request path=/login/ qs=
+StripUnsafeNextMiddleware: request path=/defaultuser/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/ qs=
+StripUnsafeNextMiddleware: request path=/defaultuser/ qs=
+StripUnsafeNextMiddleware: request path=/defaultuser/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/add_user/ qs=
+StripUnsafeNextMiddleware: request path=/defaultuser/ qs=
+StripUnsafeNextMiddleware: request path=/defaultuser/ qs=
+StripUnsafeNextMiddleware: request path=/defaultuser/ qs=
+StripUnsafeNextMiddleware: request path=/defaultuser/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/edit-user/83/ qs=
+StripUnsafeNextMiddleware: request path=/defaultuser/ qs=
+StripUnsafeNextMiddleware: request path=/defaultuser/ qs=
+StripUnsafeNextMiddleware: request path=/defaultuser/ qs=
+StripUnsafeNextMiddleware: request path=/defaultuser/ qs=
+StripUnsafeNextMiddleware: request path=/defaultuser/ qs=
+StripUnsafeNextMiddleware: request path=/defaultuser/ qs=
+StripUnsafeNextMiddleware: request path=/defaultuser/ qs=
+StripUnsafeNextMiddleware: request path=/defaultuser/ qs=
+StripUnsafeNextMiddleware: request path=/defaultuser/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/edit-user/83/ qs=
+StripUnsafeNextMiddleware: request path=/defaultuser/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/add_user/ qs=
+StripUnsafeNextMiddleware: request path=/defaultuser/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/add_student/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/edit-student/23/ qs=
+StripUnsafeNextMiddleware: request path=/defaultuser/ qs=
+StripUnsafeNextMiddleware: request path=/defaultuser/ qs=
+StripUnsafeNextMiddleware: request path=/defaultuser/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/edit-student/23/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/add_student/ qs=
+StripUnsafeNextMiddleware: request path=/defaultuser/ qs=
+StripUnsafeNextMiddleware: request path=/defaultuser/ qs=
+StripUnsafeNextMiddleware: request path=/defaultuser/ qs=
+StripUnsafeNextMiddleware: request path=/defaultuser/ qs=
+StripUnsafeNextMiddleware: request path=/defaultuser/ qs=
+StripUnsafeNextMiddleware: request path=/defaultuser/ qs=
+StripUnsafeNextMiddleware: request path=/defaultuser/ qs=
+StripUnsafeNextMiddleware: request path=/defaultuser/ qs=
+StripUnsafeNextMiddleware: request path=/defaultuser/ qs=
+StripUnsafeNextMiddleware: request path=/defaultuser/ qs=
+StripUnsafeNextMiddleware: request path=/defaultuser/ qs=
+StripUnsafeNextMiddleware: request path=/defaultuser/ qs=
+StripUnsafeNextMiddleware: request path=/defaultuser/ qs=
+StripUnsafeNextMiddleware: request path=/defaultuser/ qs=
+StripUnsafeNextMiddleware: request path=/defaultuser/ qs=
+StripUnsafeNextMiddleware: request path=/defaultuser/ qs=
+StripUnsafeNextMiddleware: request path=/defaultuser/ qs=
+StripUnsafeNextMiddleware: request path=/defaultuser/ qs=
+StripUnsafeNextMiddleware: request path=/defaultuser/ qs=
+StripUnsafeNextMiddleware: request path=/defaultuser/ qs=
+StripUnsafeNextMiddleware: request path=/defaultuser/ qs=
+StripUnsafeNextMiddleware: request path=/defaultuser/ qs=
+StripUnsafeNextMiddleware: request path=/defaultuser/ qs=
+SSOStateRestoreMiddleware: callback path hit=/accounts/microsoft/login/callback/ session_keys=[]
+Restored SSOState state_id=lsez3PH7FRzFr608 into session
+SSO callback request host=elog.agu.edu.bh path=/accounts/microsoft/login/callback/ qs=code=1.AUcA6BsCnI9QOEax31Kw48YVrMU5MCs4_7FKklAi55HjOZkNAfNHAA.AgABBAIAAABVrSpeuWamRam2jAF1XRQEAwDs_wUA9P_1g1li4SV077xaU2cHLIRaFhTsCNY-m5ay-XEqipa9mXaDGsjxtn3pzMkSCXUvdry9KKoi5nioxKMDVaanxoHmzYH2IaAyU04ghCTdtXS2rp5jZeKMrtPHUAV2c6IsaAqqKkvX91pC4mi6GHHDEPxbRG7GTmMFD5lpietPONUeF0uhWX5ABPtCdgkM0F4U9Y8hzY1ND9_YJ6113cRO8q2P1WnEhDDgZOIlG2NqPb_8zIbsKgXNSJjOR1YAHmgjv0FNLQBubBSq7GUc6YlPF2Vvdgs3u9c7lUDyLMJ_7HbO0C1apM24aI2SYZI0I9ATKJsQk5AQIhYxUXFqtoL5s9Pi37IkQwFvsWn39Xd8Z7zyHJ4IG9jWX_97eG8AnXYT2n8uAsuzpjl0YjsXNpM1Ff22Hy0XYmzlKzRtMmjq_LOCDOZHJx58T59j6EJCWlcJlgIOXDJTRv5BKq3Ugj04kPhXe5LuutkUNYw2cm9FZIsOVAWH-5qntU_At-1vP-GsdeTx1ToGaSIa_blnm23wEW1-ZKScC71w4fX9AphivSOT8dqZ-WJGM8kiTyE8cV8Fqdqc6K9SEA70EKY4zYf2phSmNiOK9tqyPDubh9kReRw7MX2GksQqw52Nn4tezfMyV9EGqZVr9H6qRPBQrAAEfYqUVR6MZDh9dBwREFfnPL0eBcuCl182igu8hB4OxMduGFrS-8OsE6nPWOrD0mMv2fSGOkZMgoka_5L1koSlHnKYQBVviye05zy6CO2cq9SMPpTdA5AGav_v_n5OrRNGJmRACUyYx3jB3EHOr4Udwz2Nwwjp3bANBOd4xaaGGUEEaTiadX8_-IGYUn_yNXyldUGEg_zb6IMhqbgtJLohIKKKXLRdAgmXFNEm5wO0gNUxgTy6j8HmPp4PKQpEFhe5VtYSlO9wfk7Z4xrZrulst20Xk_7nNqe4erCJgCiA&state=lsez3PH7FRzFr608&session_state=007d0019-0c46-24ff-81ad-651a0c3c96e4 scheme=https session_key=e1d5cxbhwepkoq1kyvs16wppaht4i7ti cookies=['_ga_J0W71H6Z1B', '_ga', 'messages', 'csrftoken'] raw_cookie=_ga_J0W71H6Z1B=GS2.1.s1758003458$o1$g0$t1758003458$j60$l0$h0; _ga=GA1.1.810959309.1758003458; messages=W1siX19qc29uX21lc3NhZ2UiLDAsMjUsIlN1Y2Nlc3NmdWxseSBzaWduZWQgaW4gYXMgbWluaXBldGVyLiIsIiJdXQ:1uyP0t:Xyva2OXIA9S8J6VV2kkTHQHs8zfefm3qNz6q58E-G6k; csrftoken=Rjptqw2ZQOdlkAWvbR8Q2T8pWmUAFBDf session_keys=['socialaccount_states']
+StripUnsafeNextMiddleware: request path=/accounts/microsoft/login/callback/ qs=code=1.AUcA6BsCnI9QOEax31Kw48YVrMU5MCs4_7FKklAi55HjOZkNAfNHAA.AgABBAIAAABVrSpeuWamRam2jAF1XRQEAwDs_wUA9P_1g1li4SV077xaU2cHLIRaFhTsCNY-m5ay-XEqipa9mXaDGsjxtn3pzMkSCXUvdry9KKoi5nioxKMDVaanxoHmzYH2IaAyU04ghCTdtXS2rp5jZeKMrtPHUAV2c6IsaAqqKkvX91pC4mi6GHHDEPxbRG7GTmMFD5lpietPONUeF0uhWX5ABPtCdgkM0F4U9Y8hzY1ND9_YJ6113cRO8q2P1WnEhDDgZOIlG2NqPb_8zIbsKgXNSJjOR1YAHmgjv0FNLQBubBSq7GUc6YlPF2Vvdgs3u9c7lUDyLMJ_7HbO0C1apM24aI2SYZI0I9ATKJsQk5AQIhYxUXFqtoL5s9Pi37IkQwFvsWn39Xd8Z7zyHJ4IG9jWX_97eG8AnXYT2n8uAsuzpjl0YjsXNpM1Ff22Hy0XYmzlKzRtMmjq_LOCDOZHJx58T59j6EJCWlcJlgIOXDJTRv5BKq3Ugj04kPhXe5LuutkUNYw2cm9FZIsOVAWH-5qntU_At-1vP-GsdeTx1ToGaSIa_blnm23wEW1-ZKScC71w4fX9AphivSOT8dqZ-WJGM8kiTyE8cV8Fqdqc6K9SEA70EKY4zYf2phSmNiOK9tqyPDubh9kReRw7MX2GksQqw52Nn4tezfMyV9EGqZVr9H6qRPBQrAAEfYqUVR6MZDh9dBwREFfnPL0eBcuCl182igu8hB4OxMduGFrS-8OsE6nPWOrD0mMv2fSGOkZMgoka_5L1koSlHnKYQBVviye05zy6CO2cq9SMPpTdA5AGav_v_n5OrRNGJmRACUyYx3jB3EHOr4Udwz2Nwwjp3bANBOd4xaaGGUEEaTiadX8_-IGYUn_yNXyldUGEg_zb6IMhqbgtJLohIKKKXLRdAgmXFNEm5wO0gNUxgTy6j8HmPp4PKQpEFhe5VtYSlO9wfk7Z4xrZrulst20Xk_7nNqe4erCJgCiA&state=lsez3PH7FRzFr608&session_state=007d0019-0c46-24ff-81ad-651a0c3c96e4
+StripUnsafeNextMiddleware: request path=/accounts/microsoft/direct/ qs=
+microsoft_direct: CALLED - method=GET path=/accounts/microsoft/direct/ user=None
+microsoft_direct: stashed state_id=solXL5COjYOCx2tt
+microsoft_direct: persisted SSOState state_id=solXL5COjYOCx2tt
+microsoft_direct: client_id=2b3039c5-f... tenant=9c021be8-508f-4638-b1df-52b0e3c615ac redirect_uri=https://elog.agu.edu.bh/accounts/microsoft/login/callback/
+microsoft_direct: redirecting to Microsoft OAuth URL: https://login.microsoftonline.com/9c021be8-508f-4638-b1df-52b0e3c615ac/oauth2/v2.0/authorize?client_...
+SSOStateRestoreMiddleware: callback path hit=/accounts/microsoft/login/callback/ session_keys=['socialaccount_states']
+SSO callback request host=elog.agu.edu.bh path=/accounts/microsoft/login/callback/ qs=code=1.AUcA6BsCnI9QOEax31Kw48YVrMU5MCs4_7FKklAi55HjOZkNAfNHAA.AgABBAIAAABVrSpeuWamRam2jAF1XRQEAwDs_wUA9P-oX_i2gTjz6ciZ3TdYRTxebmip0Ze5EB_eQnm9JV8J3nCGECEDJdKh8fqopa6fnnqdzy46H1QCLzDXhWY6SP3txWhSKTf0e7l9O2YtE0nADH3WNFrhgaCvwBYNSixQrWx06S6PL6F3OCB7ccstjXpBBijfgGZ37-kQ5HjYoF6qLOfmWOz9H088SEu-bn5vrGqO-y4c5rtWr7K5locYg9S6g7d4-p2UV1INgwdwbz5loYotYajeRv5ZPWdOd7YsBOq3b8QgQroo0BzdkwhjZCSdjmixxT6wA3grDyBPhGBxXC1HwcL4iGfUarnfQGO3gOallgLcHbvnKSfqgWyu8AnzpIe4VpPPO4AvToknAAM3SutDTW4lUNeAroJ0LUEfDaF6Qu3agBsW0ZEcCDUAQtC29Lv8S4ij-1ImymXTTWbSPz0MPiqA5T1xO8cx-gYEdT14t6Ydb4lvR8c6XvPomu8Yq02Z5h5Yx51IraOUehrb6Kr8iLimLchKUh-Cl379i_l2n3iLGObw0Qxdcl6BUtwvqwFXb4YYEjc5R-CFGOru16G-_X6eXjiReEeHBEjbeKyUenfC8z_ICKsrSm1GTrLVAacurRqmbVX4amtDFtyeoW4Ze31X9-Ku7oZ1pdXRmADLrQktNRqS_Lkj7-bYYQ4G4wCcxYL1WhVeHvLh-II8hIsfhK_LKUMldDzIGEbzYQE7jIJ6zgmzQy6ZHmjRJGfEUcORQGlx_o-EuLqoyF7Po-3weuDZb7lcfy1QdaBeNAU_cjcj7dSEb-1qaof9FS1YPhg_C_y4lFG7h9-OHWywSek8S3b_WNaOYropRQskcBjqEdXaMu8M-iOgmREMR98rU3eXOcQAFQjeicvGsGyCuodsHQIThyq0maF1jyGIEEvL2czu0jTvWwKOlSi7R2lxCMOhLvwRZiLPvCRU6ghWkBP16-X3ZltSFwij&state=solXL5COjYOCx2tt&session_state=007d0019-0c46-24ff-81ad-651a0c3c96e4 scheme=https session_key=zojhp6ji3uitxm6881faxy6f0iylrc25 cookies=['_ga_J0W71H6Z1B', '_ga', 'messages', 'csrftoken', 'sessionid'] raw_cookie=_ga_J0W71H6Z1B=GS2.1.s1758003458$o1$g0$t1758003458$j60$l0$h0; _ga=GA1.1.810959309.1758003458; messages=W1siX19qc29uX21lc3NhZ2UiLDAsMjUsIlN1Y2Nlc3NmdWxseSBzaWduZWQgaW4gYXMgbWluaXBldGVyLiIsIiJdXQ:1uyP0t:Xyva2OXIA9S8J6VV2kkTHQHs8zfefm3qNz6q58E-G6k; csrftoken=Rjptqw2ZQOdlkAWvbR8Q2T8pWmUAFBDf; sessionid=zojhp6ji3uitxm6881faxy6f0iylrc25 session_keys=['socialaccount_states']
+StripUnsafeNextMiddleware: request path=/accounts/microsoft/login/callback/ qs=code=1.AUcA6BsCnI9QOEax31Kw48YVrMU5MCs4_7FKklAi55HjOZkNAfNHAA.AgABBAIAAABVrSpeuWamRam2jAF1XRQEAwDs_wUA9P-oX_i2gTjz6ciZ3TdYRTxebmip0Ze5EB_eQnm9JV8J3nCGECEDJdKh8fqopa6fnnqdzy46H1QCLzDXhWY6SP3txWhSKTf0e7l9O2YtE0nADH3WNFrhgaCvwBYNSixQrWx06S6PL6F3OCB7ccstjXpBBijfgGZ37-kQ5HjYoF6qLOfmWOz9H088SEu-bn5vrGqO-y4c5rtWr7K5locYg9S6g7d4-p2UV1INgwdwbz5loYotYajeRv5ZPWdOd7YsBOq3b8QgQroo0BzdkwhjZCSdjmixxT6wA3grDyBPhGBxXC1HwcL4iGfUarnfQGO3gOallgLcHbvnKSfqgWyu8AnzpIe4VpPPO4AvToknAAM3SutDTW4lUNeAroJ0LUEfDaF6Qu3agBsW0ZEcCDUAQtC29Lv8S4ij-1ImymXTTWbSPz0MPiqA5T1xO8cx-gYEdT14t6Ydb4lvR8c6XvPomu8Yq02Z5h5Yx51IraOUehrb6Kr8iLimLchKUh-Cl379i_l2n3iLGObw0Qxdcl6BUtwvqwFXb4YYEjc5R-CFGOru16G-_X6eXjiReEeHBEjbeKyUenfC8z_ICKsrSm1GTrLVAacurRqmbVX4amtDFtyeoW4Ze31X9-Ku7oZ1pdXRmADLrQktNRqS_Lkj7-bYYQ4G4wCcxYL1WhVeHvLh-II8hIsfhK_LKUMldDzIGEbzYQE7jIJ6zgmzQy6ZHmjRJGfEUcORQGlx_o-EuLqoyF7Po-3weuDZb7lcfy1QdaBeNAU_cjcj7dSEb-1qaof9FS1YPhg_C_y4lFG7h9-OHWywSek8S3b_WNaOYropRQskcBjqEdXaMu8M-iOgmREMR98rU3eXOcQAFQjeicvGsGyCuodsHQIThyq0maF1jyGIEEvL2czu0jTvWwKOlSi7R2lxCMOhLvwRZiLPvCRU6ghWkBP16-X3ZltSFwij&state=solXL5COjYOCx2tt&session_state=007d0019-0c46-24ff-81ad-651a0c3c96e4
+pre_social_login: existing=83 for email=minipeter@agu.edu.bh
+pre_social_login: connected social to existing user pk=83
+social.get_connect_redirect_url: CALLED for user=83
+social.get_connect_redirect_url: manually logged in user 83
+social.get_connect_redirect_url: redirecting to /accounts/post-login-redirect/
+StripUnsafeNextMiddleware: request path=/accounts/post-login-redirect/ qs=
+post_login_redirect: called with user=83 auth=True session_info={'session_key': '28et6y54etcai65xnp4prf3cmpm1gdvj', 'session_keys': ['socialaccount_states', '_auth_user_id', '_auth_user_backend', '_auth_user_hash'], 'has_socialaccount_states': True}
+post_login_redirect: user=83 role=student redirecting to /student_section/
+StripUnsafeNextMiddleware: request path=/student_section/ qs=
+StripUnsafeNextMiddleware: request path=/student_section/student_elog/ qs=
+StripUnsafeNextMiddleware: request path=/student_section/get-date-restrictions/ qs=
+StripUnsafeNextMiddleware: request path=/student_section/get-activity-types/ qs=department=5
+StripUnsafeNextMiddleware: request path=/student_section/get-tutors/ qs=department=5
+StripUnsafeNextMiddleware: request path=/student_section/get-activity-types/ qs=department=2
+StripUnsafeNextMiddleware: request path=/student_section/get-tutors/ qs=department=2
+StripUnsafeNextMiddleware: request path=/student_section/get-activity-types/ qs=department=1
+StripUnsafeNextMiddleware: request path=/student_section/get-tutors/ qs=department=1
+StripUnsafeNextMiddleware: request path=/student_section/get-core-diagnosis/ qs=activity_type=8
+StripUnsafeNextMiddleware: request path=/student_section/get-core-diagnosis/ qs=activity_type=4
+StripUnsafeNextMiddleware: request path=/student_section/get-activity-types/ qs=department=8
+StripUnsafeNextMiddleware: request path=/student_section/get-tutors/ qs=department=8
+StripUnsafeNextMiddleware: request path=/owa/auth/x.js qs=
+StripUnsafeNextMiddleware: request path=/student_section/get-activity-types/ qs=department=1
+StripUnsafeNextMiddleware: request path=/student_section/get-tutors/ qs=department=1
+StripUnsafeNextMiddleware: request path=/update/ qs=category=update
+StripUnsafeNextMiddleware: request path=/password_reset/ qs=
+StripUnsafeNextMiddleware: request path=/student_section/get-core-diagnosis/ qs=activity_type=5
+StripUnsafeNextMiddleware: request path=/ qs=
+StripUnsafeNextMiddleware: request path=/login/ qs=
+StripUnsafeNextMiddleware: request path=/accounts/microsoft/direct/ qs=
+microsoft_direct: CALLED - method=GET path=/accounts/microsoft/direct/ user=80
+microsoft_direct: stashed state_id=iYbFkxW6gvjKOB0G
+microsoft_direct: persisted SSOState state_id=iYbFkxW6gvjKOB0G
+microsoft_direct: client_id=2b3039c5-f... tenant=9c021be8-508f-4638-b1df-52b0e3c615ac redirect_uri=https://elog.agu.edu.bh/accounts/microsoft/login/callback/
+microsoft_direct: redirecting to Microsoft OAuth URL: https://login.microsoftonline.com/9c021be8-508f-4638-b1df-52b0e3c615ac/oauth2/v2.0/authorize?client_...
+SSOStateRestoreMiddleware: callback path hit=/accounts/microsoft/login/callback/ session_keys=['socialaccount_states', '_auth_user_id', '_auth_user_backend', '_auth_user_hash', 'first_name', 'last_name', 'username', 'email', 'role']
+SSO callback request host=elog.agu.edu.bh path=/accounts/microsoft/login/callback/ qs=code=1.AUcA6BsCnI9QOEax31Kw48YVrMU5MCs4_7FKklAi55HjOZkNAUxHAA.AgABBAIAAABVrSpeuWamRam2jAF1XRQEAwDs_wUA9P8RKV2g4gJjBF7barY6FzC05sb8Z9oiGCgGc8A7kZL2vPt4SI_STX3v8mPsWq6hau9d_nDy2eCTsoCXg0RUTGzZg2qpj13XHr-6ILnzXYdHqV3WNEQEmdodKuiUIKQfgF-GlzzJ9rihDSb1mxWZ_qq-aK445MiJ1nYYlI0DRglcQckfH3vKKGsQ-zgrSh5H4_rVAot38NyT0lCECYn2wxf46-gVYmP6vvzSz2UBGVmxi5x1ZtfZWS8KYch3Z-iskj3E4wsICT2s8-AYdoIFs9jBaU0DBJ-VnSa7veV7y2dgi0fM4rFj8-WCb7OlIqzUtIcokiIZoLQrJkiBpZn59zbQvXpq6n2YG8sapibmONzYqrLskEDo2vQXOUme1tdDlJ4JBPjalsbAmZBzmM19yuXli4dEtVcLM2sn4obn3Id4Sselp57Gsw9-wslfr55TsFeefg69uvnx8_c_-GALe9gZ-3qauZ1nJ4DXW1wGrXfdsbU3up2EyzDaRBzHbniD_-EHF-ZW7U2H3P4oVjZhjZBqvY47AmTLKftsQ2F2fFOWGgs9jQwgCrYsTMoOPK-Xo-SfAOQKNoog4NSykpHwUZ9Os3XmkpZ08kwNHoJnuzE7oLw_eW1KoldPxwN9YI6-RaSqXeH3S2DMVVHEvNe4jHFqmyaiD_ll3Urt5kGrWznzfMVAHCGONlgrbZGk56VEBmpvdEnUUuG7GWicHIuxNBT_nDixtDi9hPHtLrk-Q7_iDlVB2EQjXSCGu1plmmzh_hXs1P5PJSxSjkJTv4Qm2C0bS312SQGBvO7mxdPY5cEFS5f2c-sxvc2-IEUz43wMZZ_qJ26USrpZe4qe5NYmySfgCPZQKpQT-YEgm8doMcoizj3vocthlXRn4vnC1t9F7SmCwevpYo2RcmjZwT2SiJ2nHztN_C5mRabkbwNj6K0WsZwh9Dxa0xbK&state=iYbFkxW6gvjKOB0G&session_state=007e3899-a79f-4d96-066a-997e882861cf scheme=https session_key=4vvlxwbbct5d5qe631xow2c66r4xefd5 cookies=['_ga', '_ga_J0W71H6Z1B', 'csrftoken', 'sessionid'] raw_cookie=_ga=GA1.1.979578291.1756284467; _ga_J0W71H6Z1B=GS2.1.s1757914746$o8$g0$t1757914763$j43$l0$h0; csrftoken=ImQ6l3kVuAA23XsJpVnUGwfuQXdem6tq; sessionid=4vvlxwbbct5d5qe631xow2c66r4xefd5 session_keys=['socialaccount_states', '_auth_user_id', '_auth_user_backend', '_auth_user_hash', 'first_name', 'last_name', 'username', 'email', 'role']
+StripUnsafeNextMiddleware: request path=/accounts/microsoft/login/callback/ qs=code=1.AUcA6BsCnI9QOEax31Kw48YVrMU5MCs4_7FKklAi55HjOZkNAUxHAA.AgABBAIAAABVrSpeuWamRam2jAF1XRQEAwDs_wUA9P8RKV2g4gJjBF7barY6FzC05sb8Z9oiGCgGc8A7kZL2vPt4SI_STX3v8mPsWq6hau9d_nDy2eCTsoCXg0RUTGzZg2qpj13XHr-6ILnzXYdHqV3WNEQEmdodKuiUIKQfgF-GlzzJ9rihDSb1mxWZ_qq-aK445MiJ1nYYlI0DRglcQckfH3vKKGsQ-zgrSh5H4_rVAot38NyT0lCECYn2wxf46-gVYmP6vvzSz2UBGVmxi5x1ZtfZWS8KYch3Z-iskj3E4wsICT2s8-AYdoIFs9jBaU0DBJ-VnSa7veV7y2dgi0fM4rFj8-WCb7OlIqzUtIcokiIZoLQrJkiBpZn59zbQvXpq6n2YG8sapibmONzYqrLskEDo2vQXOUme1tdDlJ4JBPjalsbAmZBzmM19yuXli4dEtVcLM2sn4obn3Id4Sselp57Gsw9-wslfr55TsFeefg69uvnx8_c_-GALe9gZ-3qauZ1nJ4DXW1wGrXfdsbU3up2EyzDaRBzHbniD_-EHF-ZW7U2H3P4oVjZhjZBqvY47AmTLKftsQ2F2fFOWGgs9jQwgCrYsTMoOPK-Xo-SfAOQKNoog4NSykpHwUZ9Os3XmkpZ08kwNHoJnuzE7oLw_eW1KoldPxwN9YI6-RaSqXeH3S2DMVVHEvNe4jHFqmyaiD_ll3Urt5kGrWznzfMVAHCGONlgrbZGk56VEBmpvdEnUUuG7GWicHIuxNBT_nDixtDi9hPHtLrk-Q7_iDlVB2EQjXSCGu1plmmzh_hXs1P5PJSxSjkJTv4Qm2C0bS312SQGBvO7mxdPY5cEFS5f2c-sxvc2-IEUz43wMZZ_qJ26USrpZe4qe5NYmySfgCPZQKpQT-YEgm8doMcoizj3vocthlXRn4vnC1t9F7SmCwevpYo2RcmjZwT2SiJ2nHztN_C5mRabkbwNj6K0WsZwh9Dxa0xbK&state=iYbFkxW6gvjKOB0G&session_state=007e3899-a79f-4d96-066a-997e882861cf
+pre_social_login: existing=80 for email=arpans@agu.edu.bh
+pre_social_login: connected social to existing user pk=80
+social.get_connect_redirect_url: CALLED for user=80
+social.get_connect_redirect_url: manually logged in user 80
+social.get_connect_redirect_url: redirecting to /accounts/post-login-redirect/
+StripUnsafeNextMiddleware: request path=/accounts/post-login-redirect/ qs=
+post_login_redirect: called with user=80 auth=True session_info={'session_key': '4vvlxwbbct5d5qe631xow2c66r4xefd5', 'session_keys': ['socialaccount_states', '_auth_user_id', '_auth_user_backend', '_auth_user_hash', 'first_name', 'last_name', 'username', 'email', 'role'], 'has_socialaccount_states': True}
+post_login_redirect: user=80 role=admin redirecting to /admin_section/
+StripUnsafeNextMiddleware: request path=/admin_section/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/sessions/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/sessions/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/sessions/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/sessions/ qs=
+StripUnsafeNextMiddleware: request path=/ qs=
+StripUnsafeNextMiddleware: request path=/login/ qs=
+StripUnsafeNextMiddleware: request path=/login/ qs=
+StripUnsafeNextMiddleware: request path=/student_section/ qs=
+StripUnsafeNextMiddleware: request path=/student_section/student_profile/ qs=
+StripUnsafeNextMiddleware: request path=/student_section/student_elog/ qs=
+StripUnsafeNextMiddleware: request path=/student_section/get-date-restrictions/ qs=
+StripUnsafeNextMiddleware: request path=/student_section/get-activity-types/ qs=department=1
+StripUnsafeNextMiddleware: request path=/student_section/get-tutors/ qs=department=1
+StripUnsafeNextMiddleware: request path=/student_section/get-core-diagnosis/ qs=activity_type=4
+StripUnsafeNextMiddleware: request path=/student_section/get-core-diagnosis/ qs=activity_type=3
+StripUnsafeNextMiddleware: request path=/student_section/get-core-diagnosis/ qs=activity_type=4
+StripUnsafeNextMiddleware: request path=/student_section/get-core-diagnosis/ qs=activity_type=3
+StripUnsafeNextMiddleware: request path=/student_section/get-core-diagnosis/ qs=activity_type=8
+StripUnsafeNextMiddleware: request path=/student_section/get-core-diagnosis/ qs=activity_type=2
+StripUnsafeNextMiddleware: request path=/student_section/ qs=
+StripUnsafeNextMiddleware: request path=/student_section/ qs=
+StripUnsafeNextMiddleware: request path=/student_section/student_elog/ qs=
+StripUnsafeNextMiddleware: request path=/student_section/get-date-restrictions/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/add_training_site/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/delete-training-site/1/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/add_training_site/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/add_training_site/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/add_training_site/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/add_training_site/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/add_training_site/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/add_training_site/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/add_training_site/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/add_training_site/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/add_training_site/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/add_training_site/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/add_training_site/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/add_department/ qs=
+StripUnsafeNextMiddleware: request path=/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/add_student/ qs=
+StripUnsafeNextMiddleware: request path=/ qs=
+StripUnsafeNextMiddleware: request path=/login/ qs=
+StripUnsafeNextMiddleware: request path=/login/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/admin_blogs/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/blog/create/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/blog/create/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/admin_blogs/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/blog/1/ qs=
+StripUnsafeNextMiddleware: request path=/ qs=
+StripUnsafeNextMiddleware: request path=/login/ qs=
+StripUnsafeNextMiddleware: request path=/login/ qs=
+StripUnsafeNextMiddleware: request path=/student_section/ qs=
+StripUnsafeNextMiddleware: request path=/student_section/student_profile/ qs=
+StripUnsafeNextMiddleware: request path=/student_section/student_elog/ qs=
+StripUnsafeNextMiddleware: request path=/student_section/get-date-restrictions/ qs=
+StripUnsafeNextMiddleware: request path=/student_section/get-activity-types/ qs=department=1
+StripUnsafeNextMiddleware: request path=/student_section/get-tutors/ qs=department=1
+StripUnsafeNextMiddleware: request path=/student_section/get-core-diagnosis/ qs=activity_type=3
+StripUnsafeNextMiddleware: request path=/student_section/ qs=
+StripUnsafeNextMiddleware: request path=/student_section/student_elog/ qs=
+StripUnsafeNextMiddleware: request path=/student_section/get-date-restrictions/ qs=
+StripUnsafeNextMiddleware: request path=/student_section/get-activity-types/ qs=department=1
+StripUnsafeNextMiddleware: request path=/student_section/get-tutors/ qs=department=1
+StripUnsafeNextMiddleware: request path=/student_section/get-core-diagnosis/ qs=activity_type=6
+StripUnsafeNextMiddleware: request path=/student_section/get-core-diagnosis/ qs=activity_type=4
+StripUnsafeNextMiddleware: request path=/student_section/get-core-diagnosis/ qs=activity_type=3
+StripUnsafeNextMiddleware: request path=/student_section/logout/ qs=
+StripUnsafeNextMiddleware: request path=/login/ qs=
+StripUnsafeNextMiddleware: request path=/accounts/microsoft/direct/ qs=
+microsoft_direct: CALLED - method=GET path=/accounts/microsoft/direct/ user=None
+microsoft_direct: stashed state_id=DjMxkq4wCYkuTK55
+microsoft_direct: persisted SSOState state_id=DjMxkq4wCYkuTK55
+microsoft_direct: client_id=2b3039c5-f... tenant=9c021be8-508f-4638-b1df-52b0e3c615ac redirect_uri=https://elog.agu.edu.bh/accounts/microsoft/login/callback/
+microsoft_direct: redirecting to Microsoft OAuth URL: https://login.microsoftonline.com/9c021be8-508f-4638-b1df-52b0e3c615ac/oauth2/v2.0/authorize?client_...
+SSOStateRestoreMiddleware: callback path hit=/accounts/microsoft/login/callback/ session_keys=['socialaccount_states']
+SSO callback request host=elog.agu.edu.bh path=/accounts/microsoft/login/callback/ qs=code=1.AUcA6BsCnI9QOEax31Kw48YVrMU5MCs4_7FKklAi55HjOZkNAQBHAA.AgABBAIAAABVrSpeuWamRam2jAF1XRQEAwDs_wUA9P-sMyeF7HTKZdCsb0yKpgTBXuLtPU8E3UqZtdjf_u8EzgDQSYZbNZJ9Dg1A9HnWxW4sPearNSf3q4Sy7TS5Be0eZVbVUd41Gfw0RisQLxqcbwBDseBfue3n-29tFE-E3peQ7YdpXpZdpu811AFQGucbjA_LZrEQ6M-_nWM7REJTPuSPPyMIkn1ZsZQlfWawNu_uOnJ1u4HVn1NC-PsxZnaVuz7QCIjIP0BcWmf1OT8HOfcyyp-UY6Yz4WVtJp8rz0XuYRdN-e9cpn7decDyKBpXcbmShiY4dviFkIMSPT2RkVGpyeOhUgpsTpL0tXK8p-75N-d06qbTkQiZvti5PCvRlnllK-Er3sgwFeiZ3jywa4KM0DVM4vAJfjqDLSaZny_zWvwdK4HaX3sTJXWtJcr67gqN4e-xNJLW5rQz0NJjfyVFAl4TTM_ur57RniXMsav1Zd7I5vYtdGHsUMIBGG3txIqDbsroumDBfV4wtDBw_d9G9lxLT0TmIB1w_fvV_rH9I4fF62R0fTe1QJsnma7LrDxlTq8NnAKa3xjwZHNS9zngUhT3F4MHXtgy9bHwbDMJtQ5_d-U7CIuxQhm6Xx5xYstoNyrIkcarW2lw1Ie7OVnbBQfQXeT3YgGrifuyVZnRUz75NhDqBfCN3zH9P1GkI4IeUJMtOkPs_nnRP9qvYF-wgWzQj99fNCb0YBaSo0Q0Cfm0Y1J_wTthf-9P7152uK_4PT3yj68C02gFkjJbpY94EdsBHsYOhkAcJMwOhiKQP10JeV4-9B8R1-uY99QjIO_bARZud6jEnt7T-9h43snyecb9sQ&state=DjMxkq4wCYkuTK55&session_state=008bcd29-aa7a-d918-fede-b197a6d75321 scheme=https session_key=tf2mntj8gadsjcwewpe7ih6k3we7xc19 cookies=['csrftoken', 'sessionid'] raw_cookie=csrftoken=NeHixjX7gBKPvkCv0zNnCHZRimptmHRM; sessionid=tf2mntj8gadsjcwewpe7ih6k3we7xc19 session_keys=['socialaccount_states']
+StripUnsafeNextMiddleware: request path=/accounts/microsoft/login/callback/ qs=code=1.AUcA6BsCnI9QOEax31Kw48YVrMU5MCs4_7FKklAi55HjOZkNAQBHAA.AgABBAIAAABVrSpeuWamRam2jAF1XRQEAwDs_wUA9P-sMyeF7HTKZdCsb0yKpgTBXuLtPU8E3UqZtdjf_u8EzgDQSYZbNZJ9Dg1A9HnWxW4sPearNSf3q4Sy7TS5Be0eZVbVUd41Gfw0RisQLxqcbwBDseBfue3n-29tFE-E3peQ7YdpXpZdpu811AFQGucbjA_LZrEQ6M-_nWM7REJTPuSPPyMIkn1ZsZQlfWawNu_uOnJ1u4HVn1NC-PsxZnaVuz7QCIjIP0BcWmf1OT8HOfcyyp-UY6Yz4WVtJp8rz0XuYRdN-e9cpn7decDyKBpXcbmShiY4dviFkIMSPT2RkVGpyeOhUgpsTpL0tXK8p-75N-d06qbTkQiZvti5PCvRlnllK-Er3sgwFeiZ3jywa4KM0DVM4vAJfjqDLSaZny_zWvwdK4HaX3sTJXWtJcr67gqN4e-xNJLW5rQz0NJjfyVFAl4TTM_ur57RniXMsav1Zd7I5vYtdGHsUMIBGG3txIqDbsroumDBfV4wtDBw_d9G9lxLT0TmIB1w_fvV_rH9I4fF62R0fTe1QJsnma7LrDxlTq8NnAKa3xjwZHNS9zngUhT3F4MHXtgy9bHwbDMJtQ5_d-U7CIuxQhm6Xx5xYstoNyrIkcarW2lw1Ie7OVnbBQfQXeT3YgGrifuyVZnRUz75NhDqBfCN3zH9P1GkI4IeUJMtOkPs_nnRP9qvYF-wgWzQj99fNCb0YBaSo0Q0Cfm0Y1J_wTthf-9P7152uK_4PT3yj68C02gFkjJbpY94EdsBHsYOhkAcJMwOhiKQP10JeV4-9B8R1-uY99QjIO_bARZud6jEnt7T-9h43snyecb9sQ&state=DjMxkq4wCYkuTK55&session_state=008bcd29-aa7a-d918-fede-b197a6d75321
+pre_social_login: existing=80 for email=arpans@agu.edu.bh
+pre_social_login: connected social to existing user pk=80
+social.get_connect_redirect_url: CALLED for user=80
+social.get_connect_redirect_url: manually logged in user 80
+social.get_connect_redirect_url: redirecting to /accounts/post-login-redirect/
+StripUnsafeNextMiddleware: request path=/accounts/post-login-redirect/ qs=
+post_login_redirect: called with user=80 auth=True session_info={'session_key': 'uwlemb4rl77xej2pt5yuftms6qda5vsr', 'session_keys': ['socialaccount_states', '_auth_user_id', '_auth_user_backend', '_auth_user_hash'], 'has_socialaccount_states': True}
+post_login_redirect: user=80 role=admin redirecting to /admin_section/
+StripUnsafeNextMiddleware: request path=/admin_section/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/sessions/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/add_student/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/admin_profile/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/api/get-user-data/ qs=user_type=student
+StripUnsafeNextMiddleware: request path=/admin_section/logout/ qs=
+StripUnsafeNextMiddleware: request path=/login/ qs=
+StripUnsafeNextMiddleware: request path=/ qs=
+StripUnsafeNextMiddleware: request path=/login/ qs=
+StripUnsafeNextMiddleware: request path=/accounts/microsoft/direct/ qs=
+microsoft_direct: CALLED - method=GET path=/accounts/microsoft/direct/ user=None
+microsoft_direct: stashed state_id=ogFmFuVYddwhQ3dk
+microsoft_direct: persisted SSOState state_id=ogFmFuVYddwhQ3dk
+microsoft_direct: client_id=2b3039c5-f... tenant=9c021be8-508f-4638-b1df-52b0e3c615ac redirect_uri=https://elog.agu.edu.bh/accounts/microsoft/login/callback/
+microsoft_direct: redirecting to Microsoft OAuth URL: https://login.microsoftonline.com/9c021be8-508f-4638-b1df-52b0e3c615ac/oauth2/v2.0/authorize?client_...
+SSOStateRestoreMiddleware: callback path hit=/accounts/microsoft/login/callback/ session_keys=['socialaccount_states']
+SSO callback request host=elog.agu.edu.bh path=/accounts/microsoft/login/callback/ qs=code=1.AUcA6BsCnI9QOEax31Kw48YVrMU5MCs4_7FKklAi55HjOZkNAZVHAA.AgABBAIAAABVrSpeuWamRam2jAF1XRQEAwDs_wUA9P8Q-dzJJav0FdaXMkjHXKI6P-2oJQssILzzdPGXDRaUXZ421gIvjbEJOLfXt7MUWRrqdTlQ_o7x-x3NDyHLbdvGSPvsJHssofUoqdCwYeqEqDPZGtOEpNwbOUYkZOKq6ROOHB6-Jn-dA-i3vRgVsDyY71IIHjPx4ocLcowYK6G-vMUOjVC1_Cm7TdNLpG_vzcjZPSrSh0zgdTmEgknXbvR7AGZxfqZVmNNxda8Dn5vtoTSubrpL578m6uM_vuq7tue-iNTC1BMQJqStINEktYTzbtWZCj4vs1iBzsKca4lN8qcUJL1Kvv9eVMqzskrtGnu6gd-LG8VMVdSp5Ynf_WqrocPDv5-f-I53AkQORbW4twJWHjZoJEzzeHzsvlsEAEGDS_HHrkKfIv14kUUj1WM7qEbFZbauF3IBOH_1MUtZSFk-qmf1wEvZCFYdiF-_-CkPR8uYqS9zvL1q84HoXSRxshxMDevPHqgzezCb4RCyTgbG_XH3OQEwE_iOTf424y1jt0UXCReimETtO53Qwp1BATVBjtvhBpN1wpEsram-B6IBAmORlITt5rADz2CP4OizmLlQz9tq6LUwuS_dZqO1I4zy7HTp1Ld43t__zALld5Lwk8GC1gNjjQXTGr3sOXs6045zl9_nlH04A72uX7oTppCVwwjfvxRs6SsYaVdew_yb1eUMcWGi9l_VHLFdh52lRVn0hi3UL-oKUmy-t3QBJVEbicOhGwcgMUg9J49eIVKUQYY0Es8_5ZyFr7_En8jGs20_BDtS1QEoyJTciecxZnNGYMQFNi7xxG5TdWxR33_15kt8Q61szugNPFZLbC4iAQy4E-q7v_bT19wzdvlu-wQUlIw9i7hBBt1Aj3sTnAt1MKm0ordJ3hdzOESU3uwEmU6R8yeyJNZpieRxemCQCoqGsnHyNppkvD4oBbo0w228yqOIg_PGSSrftRoDg1fn0UR9dw&state=ogFmFuVYddwhQ3dk&session_state=007ed4d9-219d-23ec-f054-e4773a3f2208 scheme=https session_key=js0n4krrfbsmim6bh34dhgqoc99766mh cookies=['_ga_VJJ9XSM8WD', '_ga', '_ga_J0W71H6Z1B', 'csrftoken', 'sessionid'] raw_cookie=_ga_VJJ9XSM8WD=GS1.1.1727172255.13.1.1727172512.0.0.0; _ga=GA1.1.1041071148.1749965865; _ga_J0W71H6Z1B=GS2.1.s1757933551$o17$g0$t1757933551$j60$l0$h0; csrftoken=nyphxmfUEXHTTwWx5TyyW8tBPPbY1eGz; sessionid=js0n4krrfbsmim6bh34dhgqoc99766mh session_keys=['socialaccount_states']
+StripUnsafeNextMiddleware: request path=/accounts/microsoft/login/callback/ qs=code=1.AUcA6BsCnI9QOEax31Kw48YVrMU5MCs4_7FKklAi55HjOZkNAZVHAA.AgABBAIAAABVrSpeuWamRam2jAF1XRQEAwDs_wUA9P8Q-dzJJav0FdaXMkjHXKI6P-2oJQssILzzdPGXDRaUXZ421gIvjbEJOLfXt7MUWRrqdTlQ_o7x-x3NDyHLbdvGSPvsJHssofUoqdCwYeqEqDPZGtOEpNwbOUYkZOKq6ROOHB6-Jn-dA-i3vRgVsDyY71IIHjPx4ocLcowYK6G-vMUOjVC1_Cm7TdNLpG_vzcjZPSrSh0zgdTmEgknXbvR7AGZxfqZVmNNxda8Dn5vtoTSubrpL578m6uM_vuq7tue-iNTC1BMQJqStINEktYTzbtWZCj4vs1iBzsKca4lN8qcUJL1Kvv9eVMqzskrtGnu6gd-LG8VMVdSp5Ynf_WqrocPDv5-f-I53AkQORbW4twJWHjZoJEzzeHzsvlsEAEGDS_HHrkKfIv14kUUj1WM7qEbFZbauF3IBOH_1MUtZSFk-qmf1wEvZCFYdiF-_-CkPR8uYqS9zvL1q84HoXSRxshxMDevPHqgzezCb4RCyTgbG_XH3OQEwE_iOTf424y1jt0UXCReimETtO53Qwp1BATVBjtvhBpN1wpEsram-B6IBAmORlITt5rADz2CP4OizmLlQz9tq6LUwuS_dZqO1I4zy7HTp1Ld43t__zALld5Lwk8GC1gNjjQXTGr3sOXs6045zl9_nlH04A72uX7oTppCVwwjfvxRs6SsYaVdew_yb1eUMcWGi9l_VHLFdh52lRVn0hi3UL-oKUmy-t3QBJVEbicOhGwcgMUg9J49eIVKUQYY0Es8_5ZyFr7_En8jGs20_BDtS1QEoyJTciecxZnNGYMQFNi7xxG5TdWxR33_15kt8Q61szugNPFZLbC4iAQy4E-q7v_bT19wzdvlu-wQUlIw9i7hBBt1Aj3sTnAt1MKm0ordJ3hdzOESU3uwEmU6R8yeyJNZpieRxemCQCoqGsnHyNppkvD4oBbo0w228yqOIg_PGSSrftRoDg1fn0UR9dw&state=ogFmFuVYddwhQ3dk&session_state=007ed4d9-219d-23ec-f054-e4773a3f2208
+pre_social_login: existing=None for email=mohamedhks@agu.edu.bh
+save_user: created new SSO user mohamedhks@agu.edu.bh
+StripUnsafeNextMiddleware: request path=/accounts/post-login-redirect/ qs=
+post_login_redirect: called with user=84 auth=True session_info={'session_key': 'a4ejeybzidnmvwa91g4fopafze9zpil4', 'session_keys': ['socialaccount_states', '_auth_user_id', '_auth_user_backend', '_auth_user_hash', 'first_name', 'last_name', 'username', 'email', 'role'], 'has_socialaccount_states': True}
+post_login_redirect: user=84 role=defaultuser redirecting to /defaultuser/
+StripUnsafeNextMiddleware: request path=/defaultuser/ qs=
+StripUnsafeNextMiddleware: request path=/ qs=
+StripUnsafeNextMiddleware: request path=/accounts/microsoft/direct/ qs=
+microsoft_direct: CALLED - method=GET path=/accounts/microsoft/direct/ user=None
+microsoft_direct: stashed state_id=THAIeRPvMKpooS2C
+microsoft_direct: persisted SSOState state_id=THAIeRPvMKpooS2C
+microsoft_direct: client_id=2b3039c5-f... tenant=9c021be8-508f-4638-b1df-52b0e3c615ac redirect_uri=https://elog.agu.edu.bh/accounts/microsoft/login/callback/
+microsoft_direct: redirecting to Microsoft OAuth URL: https://login.microsoftonline.com/9c021be8-508f-4638-b1df-52b0e3c615ac/oauth2/v2.0/authorize?client_...
+StripUnsafeNextMiddleware: request path=/admin_section/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/sessions/ qs=
+StripUnsafeNextMiddleware: request path=/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/sessions/ qs=page=3
+StripUnsafeNextMiddleware: request path=/admin_section/sessions/ qs=page=5
+StripUnsafeNextMiddleware: request path=/admin_section/sessions/ qs=page=6
+StripUnsafeNextMiddleware: request path=/admin_section/sessions/ qs=page=8
+StripUnsafeNextMiddleware: request path=/admin_section/sessions/ qs=page=7
+StripUnsafeNextMiddleware: request path=/admin_section/sessions/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/sessions/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/sessions/ qs=
+StripUnsafeNextMiddleware: request path=/robots.txt qs=
+StripUnsafeNextMiddleware: request path=/robots.txt qs=
+StripUnsafeNextMiddleware: request path=/admin_section/sessions/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/sessions/ qs=
+StripUnsafeNextMiddleware: request path=/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/add_activity_type/ qs=
+StripUnsafeNextMiddleware: request path=/update/ qs=
+StripUnsafeNextMiddleware: request path=/blog/1/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/add_activity_type/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/add_activity_type/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/add_activity_type/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/sessions/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/sessions/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/sessions/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/add_activity_type/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/add_department/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/add_activity_type/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/sessions/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/sessions/ qs=page=2
+StripUnsafeNextMiddleware: request path=/admin_section/sessions/ qs=page=4
+StripUnsafeNextMiddleware: request path=/admin_section/sessions/ qs=page=5
+StripUnsafeNextMiddleware: request path=/admin_section/sessions/ qs=page=6
+StripUnsafeNextMiddleware: request path=/admin_section/sessions/ qs=page=7
+StripUnsafeNextMiddleware: request path=/admin_section/sessions/ qs=page=8
+StripUnsafeNextMiddleware: request path=/admin_section/admin_blogs/ qs=
+StripUnsafeNextMiddleware: request path=/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/add_activity_type/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/add_activity_type/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/add_activity_type/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/add_activity_type/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/sessions/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/sessions/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/sessions/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/sessions/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/sessions/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/sessions/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/sessions/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/sessions/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/sessions/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/sessions/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/add_department/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/sessions/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/sessions/ qs=page=2
+StripUnsafeNextMiddleware: request path=/admin_section/sessions/ qs=page=3
+StripUnsafeNextMiddleware: request path=/admin_section/sessions/ qs=page=4
+StripUnsafeNextMiddleware: request path=/admin_section/sessions/ qs=page=5
+StripUnsafeNextMiddleware: request path=/admin_section/sessions/ qs=page=6
+StripUnsafeNextMiddleware: request path=/admin_section/sessions/ qs=page=7
+StripUnsafeNextMiddleware: request path=/admin_section/sessions/ qs=page=8
+StripUnsafeNextMiddleware: request path=/admin_section/sessions/ qs=page=9
+StripUnsafeNextMiddleware: request path=/admin_section/sessions/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/sessions/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/sessions/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/sessions/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/sessions/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/sessions/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/sessions/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/sessions/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/sessions/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/sessions/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/sessions/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/sessions/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/department_report/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/logout/ qs=
+StripUnsafeNextMiddleware: request path=/login/ qs=
+StripUnsafeNextMiddleware: request path=/accounts/microsoft/direct/ qs=
+microsoft_direct: CALLED - method=GET path=/accounts/microsoft/direct/ user=None
+microsoft_direct: stashed state_id=GH5fU9GHfkk8oHL8
+microsoft_direct: persisted SSOState state_id=GH5fU9GHfkk8oHL8
+microsoft_direct: client_id=2b3039c5-f... tenant=9c021be8-508f-4638-b1df-52b0e3c615ac redirect_uri=https://elog.agu.edu.bh/accounts/microsoft/login/callback/
+microsoft_direct: redirecting to Microsoft OAuth URL: https://login.microsoftonline.com/9c021be8-508f-4638-b1df-52b0e3c615ac/oauth2/v2.0/authorize?client_...
+SSOStateRestoreMiddleware: callback path hit=/accounts/microsoft/login/callback/ session_keys=['socialaccount_states']
+SSO callback request host=elog.agu.edu.bh path=/accounts/microsoft/login/callback/ qs=code=1.AUcA6BsCnI9QOEax31Kw48YVrMU5MCs4_7FKklAi55HjOZkNAb5HAA.AgABBAIAAABVrSpeuWamRam2jAF1XRQEAwDs_wUA9P-2q17lq-2YgX_zMb7LrqTuV9SmOf6i6ZebO6HZvKo_7EjOKSGEpsv2fRBHaVgpR1bG6NMbnNHYrXyCO0QqYkoXakCaJGVm-QK6By9ZUzgj7HuucRe9amJIvrorW6VqITdGtWDbrtkYuA7tXh-kkoHUs8IHipjPRqklA2E0_5MlDIAGzvFd2jRvezSC4mReTJ6WcziKS7zp4oa7KdYK9hX1H4zT7MXGj8hXQWdY4tfrVt9PPcAD7RDEKlfs7bTtOakiLLYetcIOQZEvn5OuC14i6MOXZGr4w1lpKfU_V-PFWMGb_3murbM7AIe2hh_D7fFdDyFYKjw34dVADrIhe2ZL6lH8wSnQCLLtVEMa9jeIn8xH0dXSQoCJmQTkqi0wz8w1ofmysCw1uaVTQ-GzR1dSf4wd0YMIENCqXR3rw3m4tZQYSVzJYBnIw2HZ4B6h9lXerrDK2Nzp3MBSpmL8h_Gyvi-OZ0Cn89vkqCjeP-DwpK9Eud16TpMB6ISVzmZy0rom22jnFcRhew4Rk1BY5s3dn7YtnA8msT1Ac5o6dDs0JAKNdcUSw7R-UKsbaYpZRFYs4K_3k_giV66atkoVM-P5rM57tuo1mZY0XLQFmbg0tlCJ180jL7Tt3dQ_tnoL1UbmOjs9vbUJneXgfZpkQIgNu0SaUc0AUNjVXxsSt6-Wjdh8JuKGNaK6TWZw8kYJkbA70Dwb-As2nAgLJhijoWgJbrtW83zEg16KZqkTnckEFqMPqqdd6mbZ5YjVkhpUy3qCjmIsnNw0Jl3IhkeGgju3gTTT679pG3duhsXs1zLY0U1OcSXhA2cevKIx2B8iLNpe7aCN7-q1nYNNJVCPAXhxSoxaQRaFFesM7-3LVeKR8wzmEtyqegV_9Pt7TrZYvsRl9r5Pp8PT5WLCBVi15tAYjzw3SWNNwWo6Ka-TT6y9I0TWpvc5mB-NAh_a-BPcmmmPw-o8SOA2cI_RNi6aXAbjHPKhuw8k&state=GH5fU9GHfkk8oHL8&session_state=005bbc79-a206-f322-b2b6-03ebff2fd929 scheme=https session_key=o6sd4ztg092tx7pzp51mvjobvrrl3s9q cookies=['_ga', 'cookiesession1', '_ga_J0W71H6Z1B', 'csrftoken', 'sessionid'] raw_cookie=_ga=GA1.1.903680079.1746004090; cookiesession1=678A3E211A49F42E2A183AFAA4A600ED; _ga_J0W71H6Z1B=GS2.1.s1757845389$o5$g1$t1757845538$j54$l0$h0; csrftoken=OpsTnjRsZZkig8HZcDyIh2gTsluedLCO; sessionid=0dy109o07sdq2t5cdruqq4dyxd7kgfyh; csrftoken=ZdH9EggGO2ACyn83W1TVEM3WEDYDBjFD; sessionid=o6sd4ztg092tx7pzp51mvjobvrrl3s9q session_keys=['socialaccount_states']
+StripUnsafeNextMiddleware: request path=/accounts/microsoft/login/callback/ qs=code=1.AUcA6BsCnI9QOEax31Kw48YVrMU5MCs4_7FKklAi55HjOZkNAb5HAA.AgABBAIAAABVrSpeuWamRam2jAF1XRQEAwDs_wUA9P-2q17lq-2YgX_zMb7LrqTuV9SmOf6i6ZebO6HZvKo_7EjOKSGEpsv2fRBHaVgpR1bG6NMbnNHYrXyCO0QqYkoXakCaJGVm-QK6By9ZUzgj7HuucRe9amJIvrorW6VqITdGtWDbrtkYuA7tXh-kkoHUs8IHipjPRqklA2E0_5MlDIAGzvFd2jRvezSC4mReTJ6WcziKS7zp4oa7KdYK9hX1H4zT7MXGj8hXQWdY4tfrVt9PPcAD7RDEKlfs7bTtOakiLLYetcIOQZEvn5OuC14i6MOXZGr4w1lpKfU_V-PFWMGb_3murbM7AIe2hh_D7fFdDyFYKjw34dVADrIhe2ZL6lH8wSnQCLLtVEMa9jeIn8xH0dXSQoCJmQTkqi0wz8w1ofmysCw1uaVTQ-GzR1dSf4wd0YMIENCqXR3rw3m4tZQYSVzJYBnIw2HZ4B6h9lXerrDK2Nzp3MBSpmL8h_Gyvi-OZ0Cn89vkqCjeP-DwpK9Eud16TpMB6ISVzmZy0rom22jnFcRhew4Rk1BY5s3dn7YtnA8msT1Ac5o6dDs0JAKNdcUSw7R-UKsbaYpZRFYs4K_3k_giV66atkoVM-P5rM57tuo1mZY0XLQFmbg0tlCJ180jL7Tt3dQ_tnoL1UbmOjs9vbUJneXgfZpkQIgNu0SaUc0AUNjVXxsSt6-Wjdh8JuKGNaK6TWZw8kYJkbA70Dwb-As2nAgLJhijoWgJbrtW83zEg16KZqkTnckEFqMPqqdd6mbZ5YjVkhpUy3qCjmIsnNw0Jl3IhkeGgju3gTTT679pG3duhsXs1zLY0U1OcSXhA2cevKIx2B8iLNpe7aCN7-q1nYNNJVCPAXhxSoxaQRaFFesM7-3LVeKR8wzmEtyqegV_9Pt7TrZYvsRl9r5Pp8PT5WLCBVi15tAYjzw3SWNNwWo6Ka-TT6y9I0TWpvc5mB-NAh_a-BPcmmmPw-o8SOA2cI_RNi6aXAbjHPKhuw8k&state=GH5fU9GHfkk8oHL8&session_state=005bbc79-a206-f322-b2b6-03ebff2fd929
+pre_social_login: existing=81 for email=akashm@agu.edu.bh
+pre_social_login: connected social to existing user pk=81
+social.get_connect_redirect_url: CALLED for user=81
+social.get_connect_redirect_url: manually logged in user 81
+social.get_connect_redirect_url: redirecting to /accounts/post-login-redirect/
+StripUnsafeNextMiddleware: request path=/accounts/post-login-redirect/ qs=
+post_login_redirect: called with user=81 auth=True session_info={'session_key': '68tcnmf8srmvy2ngjypi869uxfpzuwoz', 'session_keys': ['socialaccount_states', '_auth_user_id', '_auth_user_backend', '_auth_user_hash'], 'has_socialaccount_states': True}
+post_login_redirect: user=81 role=student redirecting to /student_section/
+StripUnsafeNextMiddleware: request path=/student_section/ qs=
+StripUnsafeNextMiddleware: request path=/student_section/student_support/ qs=
+StripUnsafeNextMiddleware: request path=/student_section/student_final_records/ qs=
+StripUnsafeNextMiddleware: request path=/student_section/generate-records-pdf/ qs=status=pending
+StripUnsafeNextMiddleware: request path=/student_login.aspx qs=
+StripUnsafeNextMiddleware: request path=/student_section/student_final_records/ qs=
+StripUnsafeNextMiddleware: request path=/student_section/student_profile/ qs=
+StripUnsafeNextMiddleware: request path=/student_section/update_profile_photo/ qs=
+StripUnsafeNextMiddleware: request path=/student_section/student_profile/ qs=
+StripUnsafeNextMiddleware: request path=/student_section/logout/ qs=
+StripUnsafeNextMiddleware: request path=/login/ qs=
+StripUnsafeNextMiddleware: request path=/accounts/microsoft/direct/ qs=
+microsoft_direct: CALLED - method=GET path=/accounts/microsoft/direct/ user=None
+microsoft_direct: stashed state_id=8yhSpsnaeVTHIERG
+microsoft_direct: persisted SSOState state_id=8yhSpsnaeVTHIERG
+microsoft_direct: client_id=2b3039c5-f... tenant=9c021be8-508f-4638-b1df-52b0e3c615ac redirect_uri=https://elog.agu.edu.bh/accounts/microsoft/login/callback/
+microsoft_direct: redirecting to Microsoft OAuth URL: https://login.microsoftonline.com/9c021be8-508f-4638-b1df-52b0e3c615ac/oauth2/v2.0/authorize?client_...
+SSOStateRestoreMiddleware: callback path hit=/accounts/microsoft/login/callback/ session_keys=['socialaccount_states']
+SSO callback request host=elog.agu.edu.bh path=/accounts/microsoft/login/callback/ qs=code=1.AUcA6BsCnI9QOEax31Kw48YVrMU5MCs4_7FKklAi55HjOZkNAb5HAA.AgABBAIAAABVrSpeuWamRam2jAF1XRQEAwDs_wUA9P96Rcp4WZhc_TruEAQDctnTU219GyIJg3oCPy3S-N4Kcc8BH3pjiMn5shjI2q7OLFYJGDLY0HXvUwq7Me8NFVaTvFYyVZXHQGu8JpXSnmKlDq8DsGSKdIutnUXG0thxgS8OM_XRnVNv999ahjK1_eag9XSyrzo5kQSJAXc9vGydYNWtgwzmeK2MvrF6Ht6A_I_3DXhZ2IxtgKCLkN1N9QjpSeYv-sxXPADlugrLsMpRiu5xeUiZJlu25PhygGSOUrWnK7kR7FnuSlO5vyWzbCDeHvSCk3IqHKlMhb2c6PSbPMu2z6WhF3DozbNyWZE6caOVINhlwLA3XtQPFmy2eF5h0U0npB_TqXMDO4nI5I07LBMIUCThA0M45NK1flBmE_8bW1YV7fGGiXfsW1m1ddxjUB8a56Z4Z0iDRhXVNNX6myEE3T9eKs7W2cMdH0zJp6IehJWCnNVyJB-lFQ89RQLeV0VVNH4xM4VV8hU4IJB1HVac-ZR2Mu3xFzH6qydcvcjIp1ObuozzRbsjgkTveCP4bEAnav-L4zDoIw7_OReV5nTir9QDofeYERKQ6zdqzpVESY_Vrn6SvWb7QpDaTL1EQPq69PuxbmovbANjsbO8eV_kXrD75KDWVEQt6aUfGiijfPgpMg0wjZhmGIfDMZFvC8pMRZd6rrTPXhe9m7q15T9BVZoiGOle2fq67q4EN50CxYx2Vpzr6A0Zi7cPoU2SqkY4WoXgxiHm9AdCd5QNzTyHtw84753KWX3pDseCZ7soedTxIR8yh6_2NWEMX0GaNHZp8uKOFDkasXsHY77wotmrlnAzkonQ-QPKaaxd4Jxz0mL9VGR-i5tk8jBCNu6Lz4U0dXBfMt1gswJk4PU9PUOwOqsrxg4PNPnh10BEsELfYkmvB2bbePEt00sT3UIoA7hKZeSzqu3IfzZYnUjKt-7kOo5Rco9o60iJEE82dxNKKhJujDLnKzTU2Y-viuS4gnKsIA&state=8yhSpsnaeVTHIERG&session_state=005bbc79-a206-f322-b2b6-03ebff2fd929 scheme=https session_key=ceckgzvix93lox020x1yfbcnocj60smb cookies=['_ga', 'cookiesession1', '_ga_J0W71H6Z1B', 'csrftoken', 'sessionid'] raw_cookie=_ga=GA1.1.903680079.1746004090; cookiesession1=678A3E211A49F42E2A183AFAA4A600ED; _ga_J0W71H6Z1B=GS2.1.s1757845389$o5$g1$t1757845538$j54$l0$h0; csrftoken=OpsTnjRsZZkig8HZcDyIh2gTsluedLCO; sessionid=0dy109o07sdq2t5cdruqq4dyxd7kgfyh; csrftoken=DU6G4cgesXZANa876WkBi5hPgzyTKI6C; sessionid=ceckgzvix93lox020x1yfbcnocj60smb session_keys=['socialaccount_states']
+StripUnsafeNextMiddleware: request path=/accounts/microsoft/login/callback/ qs=code=1.AUcA6BsCnI9QOEax31Kw48YVrMU5MCs4_7FKklAi55HjOZkNAb5HAA.AgABBAIAAABVrSpeuWamRam2jAF1XRQEAwDs_wUA9P96Rcp4WZhc_TruEAQDctnTU219GyIJg3oCPy3S-N4Kcc8BH3pjiMn5shjI2q7OLFYJGDLY0HXvUwq7Me8NFVaTvFYyVZXHQGu8JpXSnmKlDq8DsGSKdIutnUXG0thxgS8OM_XRnVNv999ahjK1_eag9XSyrzo5kQSJAXc9vGydYNWtgwzmeK2MvrF6Ht6A_I_3DXhZ2IxtgKCLkN1N9QjpSeYv-sxXPADlugrLsMpRiu5xeUiZJlu25PhygGSOUrWnK7kR7FnuSlO5vyWzbCDeHvSCk3IqHKlMhb2c6PSbPMu2z6WhF3DozbNyWZE6caOVINhlwLA3XtQPFmy2eF5h0U0npB_TqXMDO4nI5I07LBMIUCThA0M45NK1flBmE_8bW1YV7fGGiXfsW1m1ddxjUB8a56Z4Z0iDRhXVNNX6myEE3T9eKs7W2cMdH0zJp6IehJWCnNVyJB-lFQ89RQLeV0VVNH4xM4VV8hU4IJB1HVac-ZR2Mu3xFzH6qydcvcjIp1ObuozzRbsjgkTveCP4bEAnav-L4zDoIw7_OReV5nTir9QDofeYERKQ6zdqzpVESY_Vrn6SvWb7QpDaTL1EQPq69PuxbmovbANjsbO8eV_kXrD75KDWVEQt6aUfGiijfPgpMg0wjZhmGIfDMZFvC8pMRZd6rrTPXhe9m7q15T9BVZoiGOle2fq67q4EN50CxYx2Vpzr6A0Zi7cPoU2SqkY4WoXgxiHm9AdCd5QNzTyHtw84753KWX3pDseCZ7soedTxIR8yh6_2NWEMX0GaNHZp8uKOFDkasXsHY77wotmrlnAzkonQ-QPKaaxd4Jxz0mL9VGR-i5tk8jBCNu6Lz4U0dXBfMt1gswJk4PU9PUOwOqsrxg4PNPnh10BEsELfYkmvB2bbePEt00sT3UIoA7hKZeSzqu3IfzZYnUjKt-7kOo5Rco9o60iJEE82dxNKKhJujDLnKzTU2Y-viuS4gnKsIA&state=8yhSpsnaeVTHIERG&session_state=005bbc79-a206-f322-b2b6-03ebff2fd929
+pre_social_login: existing=81 for email=akashm@agu.edu.bh
+pre_social_login: connected social to existing user pk=81
+social.get_connect_redirect_url: CALLED for user=81
+social.get_connect_redirect_url: manually logged in user 81
+social.get_connect_redirect_url: redirecting to /accounts/post-login-redirect/
+StripUnsafeNextMiddleware: request path=/accounts/post-login-redirect/ qs=
+post_login_redirect: called with user=81 auth=True session_info={'session_key': 'wadc9ea16qo6lhhw2ujjl1e919ceiafv', 'session_keys': ['socialaccount_states', '_auth_user_id', '_auth_user_backend', '_auth_user_hash'], 'has_socialaccount_states': True}
+post_login_redirect: user=81 role=student redirecting to /student_section/
+StripUnsafeNextMiddleware: request path=/student_section/ qs=
+StripUnsafeNextMiddleware: request path=/student_section/student_profile/ qs=
+StripUnsafeNextMiddleware: request path=/student_section/update_profile_photo/ qs=
+StripUnsafeNextMiddleware: request path=/student_section/student_profile/ qs=
+StripUnsafeNextMiddleware: request path=/student_section/student_profile/ qs=
+StripUnsafeNextMiddleware: request path=/student_section/ qs=
+StripUnsafeNextMiddleware: request path=/student_section/student_support/ qs=
+StripUnsafeNextMiddleware: request path=/student_section/student_elog/ qs=
+StripUnsafeNextMiddleware: request path=/student_section/get-date-restrictions/ qs=
+StripUnsafeNextMiddleware: request path=/student_section/student_final_records/ qs=
+StripUnsafeNextMiddleware: request path=/student_section/student_elog/ qs=
+StripUnsafeNextMiddleware: request path=/student_section/get-date-restrictions/ qs=
+StripUnsafeNextMiddleware: request path=/student_section/get-tutors/ qs=department=1
+StripUnsafeNextMiddleware: request path=/student_section/get-activity-types/ qs=department=1
+StripUnsafeNextMiddleware: request path=/student_section/get-core-diagnosis/ qs=activity_type=6
+StripUnsafeNextMiddleware: request path=/student_section/get-core-diagnosis/ qs=activity_type=4
+StripUnsafeNextMiddleware: request path=/student_section/get-core-diagnosis/ qs=activity_type=3
+StripUnsafeNextMiddleware: request path=/student_section/logout/ qs=
+StripUnsafeNextMiddleware: request path=/login/ qs=
+StripUnsafeNextMiddleware: request path=/login/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/bulk-import-users/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/add_user/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/add_activity_type/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/sessions/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/sessions/ qs=page=9
+StripUnsafeNextMiddleware: request path=/admin_section/sessions/ qs=q=Sickle+cell+disease+1
+StripUnsafeNextMiddleware: request path=/admin_section/sessions/ qs=q=Sickle
+StripUnsafeNextMiddleware: request path=/admin_section/department_report/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/student_report/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/tutor_report/ qs=
+StripUnsafeNextMiddleware: request path=/robots.txt qs=
+StripUnsafeNextMiddleware: request path=/privacy_policy.aspx qs=
+StripUnsafeNextMiddleware: request path=/admin_section/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/export-department-logs/ qs=format=excel&years=1&department=1
+StripUnsafeNextMiddleware: request path=/admin_section/api/get-user-data/ qs=user_type=student
+StripUnsafeNextMiddleware: request path=/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/add_user/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/add_user/ qs=role=&q=mini
+StripUnsafeNextMiddleware: request path=/ qs=
+StripUnsafeNextMiddleware: request path=/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/add_student/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/department_report/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/student_report/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/tutor_report/ qs=
+StripUnsafeNextMiddleware: request path=/ qs=
+StripUnsafeNextMiddleware: request path=/login/ qs=
+StripUnsafeNextMiddleware: request path=/accounts/microsoft/direct/ qs=
+microsoft_direct: CALLED - method=GET path=/accounts/microsoft/direct/ user=None
+microsoft_direct: stashed state_id=oYVC7kSF8r4pnEV7
+microsoft_direct: persisted SSOState state_id=oYVC7kSF8r4pnEV7
+microsoft_direct: client_id=2b3039c5-f... tenant=9c021be8-508f-4638-b1df-52b0e3c615ac redirect_uri=https://elog.agu.edu.bh/accounts/microsoft/login/callback/
+microsoft_direct: redirecting to Microsoft OAuth URL: https://login.microsoftonline.com/9c021be8-508f-4638-b1df-52b0e3c615ac/oauth2/v2.0/authorize?client_...
+SSOStateRestoreMiddleware: callback path hit=/accounts/microsoft/login/callback/ session_keys=['socialaccount_states']
+SSO callback request host=elog.agu.edu.bh path=/accounts/microsoft/login/callback/ qs=code=1.AUcA6BsCnI9QOEax31Kw48YVrMU5MCs4_7FKklAi55HjOZkNAUxHAA.AgABBAIAAABVrSpeuWamRam2jAF1XRQEAwDs_wUA9P9r8KAqDjGnLhrNMZ3uuiKG4X63rLVbU97BZNTb0DyJpv3nJsJfJHqvtkMeKFXJQORKbRkXo3EdnmCxQqjzjgnJrT8gapEolD8YxizKjmiQIBG_B2QWUuTq2Dgq5xMVsS5-1RYDgemxe8vO_Va00gLi6izQF3bA3eRCQTe6eHRuSriFY-dlALqOLTcxzDRWEjV_rCD5l3rmd9PjSm-5j9JrKmg6OrO5URCIcqPcU0rM7Qr-DlVHbWaZsYgPqzuYGP37ub5_JnFAs1RwDXAiA-ZLR3F-i8t7H8qNHh0cD21htDzshI5DJI3tradRkvOouAMRHqhhq2vxFwpc8Zcf0nlYzZBiYNcnJQ-EaYJ7eDnEaUUrvbAvJ-M5UvcIivytPylfLjnauHHmGTJqGoZ8A36M-jFLPte7xMsqK-N7sDmuZfEnqlVN7EPjDveCsTUnQYNsBeAzxdnBryMKtY0V5Oeglfa5yMk24BBQ8TQc9JUnONvixbOAZMTDarH0fc-kxn1olQ_k8om73fkW7XY95ifWPkUbgrlotXQgZBTph-3TAhM9cifgVwKlsR9Yo-m0hKXxL9Os6z3FTbmgYBC-sn7_ZJwB1xwgvZKx6vptNLuTLogLNDoJJcm8tTVrlFFYvxbjQN0Z5LCIqKMxbW1PnTzLMxqNQQm34G1z6F1Xu7zth22rC-mQtRoXfeDUirE_CAzoRZYzqfBe644rqHvmq4-y61sqsVtNNqxmCFX973v_8fvQl7nHKhu3Jq-AFBRHzB9VJ2vVhs6VJoNfDgC80gs-xhpCxCFwltGgR_ObcZnaKCUy_yo7d-3u&state=oYVC7kSF8r4pnEV7&session_state=008b57f9-5ba4-e7f7-8f1a-8a84bb8c20af scheme=https session_key=2aphppun29dktr1qt2nqo4q4y7t9e9qd cookies=['_ga', '_ga_J0W71H6Z1B', 'csrftoken', 'sessionid'] raw_cookie=_ga=GA1.1.1403595890.1757740030; _ga_J0W71H6Z1B=deleted; csrftoken=mceDxWVc64iDsp0ZrTIQAaieX8SYba4I; sessionid=2aphppun29dktr1qt2nqo4q4y7t9e9qd; csrftoken=mceDxWVc64iDsp0ZrTIQAaieX8SYba4I; sessionid=2aphppun29dktr1qt2nqo4q4y7t9e9qd session_keys=['socialaccount_states']
+StripUnsafeNextMiddleware: request path=/accounts/microsoft/login/callback/ qs=code=1.AUcA6BsCnI9QOEax31Kw48YVrMU5MCs4_7FKklAi55HjOZkNAUxHAA.AgABBAIAAABVrSpeuWamRam2jAF1XRQEAwDs_wUA9P9r8KAqDjGnLhrNMZ3uuiKG4X63rLVbU97BZNTb0DyJpv3nJsJfJHqvtkMeKFXJQORKbRkXo3EdnmCxQqjzjgnJrT8gapEolD8YxizKjmiQIBG_B2QWUuTq2Dgq5xMVsS5-1RYDgemxe8vO_Va00gLi6izQF3bA3eRCQTe6eHRuSriFY-dlALqOLTcxzDRWEjV_rCD5l3rmd9PjSm-5j9JrKmg6OrO5URCIcqPcU0rM7Qr-DlVHbWaZsYgPqzuYGP37ub5_JnFAs1RwDXAiA-ZLR3F-i8t7H8qNHh0cD21htDzshI5DJI3tradRkvOouAMRHqhhq2vxFwpc8Zcf0nlYzZBiYNcnJQ-EaYJ7eDnEaUUrvbAvJ-M5UvcIivytPylfLjnauHHmGTJqGoZ8A36M-jFLPte7xMsqK-N7sDmuZfEnqlVN7EPjDveCsTUnQYNsBeAzxdnBryMKtY0V5Oeglfa5yMk24BBQ8TQc9JUnONvixbOAZMTDarH0fc-kxn1olQ_k8om73fkW7XY95ifWPkUbgrlotXQgZBTph-3TAhM9cifgVwKlsR9Yo-m0hKXxL9Os6z3FTbmgYBC-sn7_ZJwB1xwgvZKx6vptNLuTLogLNDoJJcm8tTVrlFFYvxbjQN0Z5LCIqKMxbW1PnTzLMxqNQQm34G1z6F1Xu7zth22rC-mQtRoXfeDUirE_CAzoRZYzqfBe644rqHvmq4-y61sqsVtNNqxmCFX973v_8fvQl7nHKhu3Jq-AFBRHzB9VJ2vVhs6VJoNfDgC80gs-xhpCxCFwltGgR_ObcZnaKCUy_yo7d-3u&state=oYVC7kSF8r4pnEV7&session_state=008b57f9-5ba4-e7f7-8f1a-8a84bb8c20af
+pre_social_login: existing=80 for email=arpans@agu.edu.bh
+pre_social_login: connected social to existing user pk=80
+social.get_connect_redirect_url: CALLED for user=80
+social.get_connect_redirect_url: manually logged in user 80
+social.get_connect_redirect_url: redirecting to /accounts/post-login-redirect/
+StripUnsafeNextMiddleware: request path=/accounts/post-login-redirect/ qs=
+post_login_redirect: called with user=80 auth=True session_info={'session_key': 'zneupbq02skphbdvlxxoyeknw9gia4yh', 'session_keys': ['socialaccount_states', '_auth_user_id', '_auth_user_backend', '_auth_user_hash'], 'has_socialaccount_states': True}
+post_login_redirect: user=80 role=admin redirecting to /admin_section/
+StripUnsafeNextMiddleware: request path=/admin_section/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/date_restrictions/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/student_report/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/department_report/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/tutor_report/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/student_report/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/department_report/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/tutor_report/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/student_report/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/tutor_report/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/department_report/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/department_report/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/department_report/ qs=
+StripUnsafeNextMiddleware: request path=/login/ qs=next=/accounts/3rdparty/
+StripUnsafeNextMiddleware: removed unsafe next=/accounts/3rdparty/ from request /login/ original_qs=next=/accounts/3rdparty/ new_qs=
+StripUnsafeNextMiddleware: request path=/admin_section/student_report/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/tutor_report/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/tutor_report/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/student_report/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/department_report/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/tutor_report/ qs=
+StripUnsafeNextMiddleware: request path=/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/tutor_report/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/add_student/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/department_report/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/student_report/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/student_report/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/tutor_report/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/tutor_report/ qs=department=1&doctor=&q=
+StripUnsafeNextMiddleware: request path=/admin_section/tutor_report/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/tutor_report/ qs=department=1&doctor=&q=
+StripUnsafeNextMiddleware: request path=/admin_section/tutor_report/ qs=department=1&doctor=&q=
+StripUnsafeNextMiddleware: request path=/robots.txt qs=
+StripUnsafeNextMiddleware: request path=/student_login.aspx qs=
+StripUnsafeNextMiddleware: request path=/admin_section/tutor_report/ qs=department=1&doctor=&q=
+StripUnsafeNextMiddleware: request path=/admin_section/tutor_report/export/ qs=department=1&doctor=&q=&format=pdf
+StripUnsafeNextMiddleware: request path=/admin_section/tutor_report/export/ qs=department=1&doctor=&q=&format=excel
+StripUnsafeNextMiddleware: request path=/admin_section/tutor_report/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/tutor_report/export/ qs=format=pdf
+StripUnsafeNextMiddleware: request path=/admin_section/tutor_report/export/ qs=format=excel
+StripUnsafeNextMiddleware: request path=/admin_section/tutor_report/export/ qs=format=excel
+StripUnsafeNextMiddleware: request path=/admin_section/student_report/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/student_report/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/student_report/ qs=department=1&student=&q=
+StripUnsafeNextMiddleware: request path=/admin_section/student_report/ qs=department=1&student=21&q=
+StripUnsafeNextMiddleware: request path=/admin_section/student_report/ qs=department=1&student=21&q=
+StripUnsafeNextMiddleware: request path=/admin_section/student_report/ qs=department=1&student=21&q=
+StripUnsafeNextMiddleware: request path=/admin_section/student_report/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/department_report/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/department_report/ qs=department=1&year=1&section=1
+StripUnsafeNextMiddleware: request path=/admin_section/department_report/export/ qs=department=1&year=1&section=1&format=pdf
+StripUnsafeNextMiddleware: request path=/admin_section/department_report/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/department_report/ qs=department=&year=&section=1
+StripUnsafeNextMiddleware: request path=/admin_section/department_report/ qs=department=1&year=1&section=1
+StripUnsafeNextMiddleware: request path=/admin_section/department_report/export/ qs=department=1&year=1&section=1&format=excel
+StripUnsafeNextMiddleware: request path=/admin_section/department_report/ qs=department=1&year=1&section=1
+StripUnsafeNextMiddleware: request path=/admin_section/department_report/export/ qs=department=1&year=1&section=1&format=pdf
+StripUnsafeNextMiddleware: request path=/admin_section/department_report/ qs=department=1&year=1&section=1
+StripUnsafeNextMiddleware: request path=/admin_section/department_report/ qs=department=1&year=1&section=1
+StripUnsafeNextMiddleware: request path=/admin_section/department_report/export/ qs=department=1&year=1&section=1&format=excel
+StripUnsafeNextMiddleware: request path=/admin_section/department_report/ qs=department=4&year=1&section=1
+StripUnsafeNextMiddleware: request path=/admin_section/student_report/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/student_report/ qs=department=5&student=&q=
+StripUnsafeNextMiddleware: request path=/admin_section/student_report/ qs=department=1&student=&q=
+StripUnsafeNextMiddleware: request path=/admin_section/student_report/ qs=department=1&student=21&q=
+StripUnsafeNextMiddleware: request path=/admin_section/student_report/ qs=department=&student=21&q=
+StripUnsafeNextMiddleware: request path=/admin_section/student_report/ qs=department=&student=21&q=
+StripUnsafeNextMiddleware: request path=/admin_section/department_report/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/student_report/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/student_report/ qs=department=&student=&q=
+StripUnsafeNextMiddleware: request path=/admin_section/student_report/ qs=department=1&student=&q=
+StripUnsafeNextMiddleware: request path=/admin_section/student_report/ qs=department=1&student=21&q=
+StripUnsafeNextMiddleware: request path=/admin_section/student_report/ qs=department=1&student=21&q=
+StripUnsafeNextMiddleware: request path=/admin_section/tutor_report/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/tutor_report/ qs=department=1&doctor=&q=
+StripUnsafeNextMiddleware: request path=/admin_section/tutor_report/export/ qs=department=1&doctor=&q=&format=pdf
+StripUnsafeNextMiddleware: request path=/admin_section/tutor_report/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/tutor_report/export/ qs=format=pdf
+StripUnsafeNextMiddleware: request path=/admin_section/tutor_report/ qs=department=1&doctor=&q=
+StripUnsafeNextMiddleware: request path=/admin_section/tutor_report/export/ qs=department=1&doctor=&q=&format=pdf
+StripUnsafeNextMiddleware: request path=/admin_section/tutor_report/export/ qs=department=1&doctor=&q=&format=excel
+StripUnsafeNextMiddleware: request path=/admin_section/tutor_report/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/tutor_report/export/ qs=format=excel
+StripUnsafeNextMiddleware: request path=/admin_section/department_report/ qs=
+StripUnsafeNextMiddleware: request path=/developmentserver/metadatauploader qs=
+StripUnsafeNextMiddleware: request path=/admin_section/department_report/export/ qs=format=pdf
+StripUnsafeNextMiddleware: request path=/admin_section/department_report/export/ qs=format=excel
+StripUnsafeNextMiddleware: request path=/admin_section/department_report/ qs=department=1&year=1&section=1
+StripUnsafeNextMiddleware: request path=/admin_section/department_report/export/ qs=department=1&year=1&section=1&format=pdf
+StripUnsafeNextMiddleware: request path=/admin_section/department_report/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/department_report/export/ qs=format=excel
+StripUnsafeNextMiddleware: request path=/admin_section/department_report/ qs=department=1&year=1&section=1
+StripUnsafeNextMiddleware: request path=/admin_section/department_report/export/ qs=department=1&year=1&section=1&format=excel
+StripUnsafeNextMiddleware: request path=/admin_section/department_report/ qs=department=1&year=1&section=1
+StripUnsafeNextMiddleware: request path=/admin_section/admin_profile/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/update-profile-photo/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/admin_profile/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/logout/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/logout/ qs=
+StripUnsafeNextMiddleware: request path=/login/ qs=
+StripUnsafeNextMiddleware: request path=/accounts/microsoft/direct/ qs=
+microsoft_direct: CALLED - method=GET path=/accounts/microsoft/direct/ user=None
+microsoft_direct: stashed state_id=EAKSk8OUly5tZipk
+microsoft_direct: persisted SSOState state_id=EAKSk8OUly5tZipk
+microsoft_direct: client_id=2b3039c5-f... tenant=9c021be8-508f-4638-b1df-52b0e3c615ac redirect_uri=https://elog.agu.edu.bh/accounts/microsoft/login/callback/
+microsoft_direct: redirecting to Microsoft OAuth URL: https://login.microsoftonline.com/9c021be8-508f-4638-b1df-52b0e3c615ac/oauth2/v2.0/authorize?client_...
+SSOStateRestoreMiddleware: callback path hit=/accounts/microsoft/login/callback/ session_keys=['socialaccount_states']
+SSO callback request host=elog.agu.edu.bh path=/accounts/microsoft/login/callback/ qs=code=1.AUcA6BsCnI9QOEax31Kw48YVrMU5MCs4_7FKklAi55HjOZkNAb5HAA.AgABBAIAAABVrSpeuWamRam2jAF1XRQEAwDs_wUA9P8v7Bo2oHw44Vh1D1H-tY16OtiSj4rCTiroSFYq-NFt-Il8TwPyTOKKGhklbdS57ljQ4WDWqGAgDK2sD2wlvG0H33fWsbYVSY5keTqR5vWAZExbU1vnoQzxakmjdZp2LTaFcKDRM1kimVaXUGGKc2uVOpD9vM-OSyws5nsDsaS3GniZqxIH9kgYCG7qb03ftt53Fq6HYHBAT6F-ugbBMVpeRlh1dRSpYUEDp1HTHpFoNSQ6wOl4oOGXJ1liGYqjIkRNUx9Rgr2LG2gNImS_StxdlSmsLm8GZsV-FMNQyOhznnACi4O8zlOaTJkHmSTTFMsDwbSay6iHd_ZySM8zVMnymhZWv9WQgTR5KplfVC2c9YT2PirlYoi_-MQO0MpCwUB8RIJCjCEJbcdTvUsFQc2-GN1LxrWqgQ4K5DcY9kMuZ8UCBdw1oXaPTx2GjHUeFNQBxE3jCRgjMgQcDzyCCtEhyWiU-B_rVInQoLBpsvGGbttkxnYDlBFdtndoz9qYBMyQQ57QJByjlxkM4Elh--c2iWqBVvEW6fWPHgdi90HXNfagh__SiaxshX7VcjrQ4OtIIBn8VK5TEuE0Fyix39zYGq1cjv9VX66vUYHfhHummGLBDuUrOmArIC4d09VVjG5RsGhddRDkOQsIQnA02YV_9F6eLDYj0DJc-2eEmHxMRFipc6UyDMBfodr_eX2qRHoGRXDRFbDqElFbLylM6vPkV3tKvIJGv8HqZtOH0J0lXDDMpcmbKLYWr4x8w4VTu02B4Gqj-JQBOWlqzsivz0pV9EuWjM0bNaDzrwQGkheTNJsC1cvkV7NNpY3AvMn97zJorYRJKS2fSn_OnBBRKyoejEEk3ywFJz1OBh9M8KSGJAdj9BEro4UeeK2MrKd1DzE_Uvwj4WxIhR3VwC5tj-PBW1_099WZF7aUKHG7K6VX14JhZ39yojO4GZ8Ywk-I3ycSbVNIpS1NXdvrPIPC9uUTBdw&state=EAKSk8OUly5tZipk&session_state=005bbc79-a206-f322-b2b6-03ebff2fd929 scheme=https session_key=zzno790zksdckxvt0ciq1mqk3w9oyh6u cookies=['_ga', 'cookiesession1', '_ga_J0W71H6Z1B', 'csrftoken', 'sessionid'] raw_cookie=_ga=GA1.1.903680079.1746004090; cookiesession1=678A3E211A49F42E2A183AFAA4A600ED; _ga_J0W71H6Z1B=GS2.1.s1757845389$o5$g1$t1757845538$j54$l0$h0; csrftoken=OpsTnjRsZZkig8HZcDyIh2gTsluedLCO; sessionid=0dy109o07sdq2t5cdruqq4dyxd7kgfyh; csrftoken=XGtfT19WNJosInUpRRvjem6FcL7fNuQN; sessionid=zzno790zksdckxvt0ciq1mqk3w9oyh6u session_keys=['socialaccount_states']
+StripUnsafeNextMiddleware: request path=/accounts/microsoft/login/callback/ qs=code=1.AUcA6BsCnI9QOEax31Kw48YVrMU5MCs4_7FKklAi55HjOZkNAb5HAA.AgABBAIAAABVrSpeuWamRam2jAF1XRQEAwDs_wUA9P8v7Bo2oHw44Vh1D1H-tY16OtiSj4rCTiroSFYq-NFt-Il8TwPyTOKKGhklbdS57ljQ4WDWqGAgDK2sD2wlvG0H33fWsbYVSY5keTqR5vWAZExbU1vnoQzxakmjdZp2LTaFcKDRM1kimVaXUGGKc2uVOpD9vM-OSyws5nsDsaS3GniZqxIH9kgYCG7qb03ftt53Fq6HYHBAT6F-ugbBMVpeRlh1dRSpYUEDp1HTHpFoNSQ6wOl4oOGXJ1liGYqjIkRNUx9Rgr2LG2gNImS_StxdlSmsLm8GZsV-FMNQyOhznnACi4O8zlOaTJkHmSTTFMsDwbSay6iHd_ZySM8zVMnymhZWv9WQgTR5KplfVC2c9YT2PirlYoi_-MQO0MpCwUB8RIJCjCEJbcdTvUsFQc2-GN1LxrWqgQ4K5DcY9kMuZ8UCBdw1oXaPTx2GjHUeFNQBxE3jCRgjMgQcDzyCCtEhyWiU-B_rVInQoLBpsvGGbttkxnYDlBFdtndoz9qYBMyQQ57QJByjlxkM4Elh--c2iWqBVvEW6fWPHgdi90HXNfagh__SiaxshX7VcjrQ4OtIIBn8VK5TEuE0Fyix39zYGq1cjv9VX66vUYHfhHummGLBDuUrOmArIC4d09VVjG5RsGhddRDkOQsIQnA02YV_9F6eLDYj0DJc-2eEmHxMRFipc6UyDMBfodr_eX2qRHoGRXDRFbDqElFbLylM6vPkV3tKvIJGv8HqZtOH0J0lXDDMpcmbKLYWr4x8w4VTu02B4Gqj-JQBOWlqzsivz0pV9EuWjM0bNaDzrwQGkheTNJsC1cvkV7NNpY3AvMn97zJorYRJKS2fSn_OnBBRKyoejEEk3ywFJz1OBh9M8KSGJAdj9BEro4UeeK2MrKd1DzE_Uvwj4WxIhR3VwC5tj-PBW1_099WZF7aUKHG7K6VX14JhZ39yojO4GZ8Ywk-I3ycSbVNIpS1NXdvrPIPC9uUTBdw&state=EAKSk8OUly5tZipk&session_state=005bbc79-a206-f322-b2b6-03ebff2fd929
+pre_social_login: existing=81 for email=akashm@agu.edu.bh
+pre_social_login: connected social to existing user pk=81
+social.get_connect_redirect_url: CALLED for user=81
+social.get_connect_redirect_url: manually logged in user 81
+social.get_connect_redirect_url: redirecting to /accounts/post-login-redirect/
+StripUnsafeNextMiddleware: request path=/accounts/post-login-redirect/ qs=
+post_login_redirect: called with user=81 auth=True session_info={'session_key': '5vxore8dmi58j8ekkbfihm2mq39iwxud', 'session_keys': ['socialaccount_states', '_auth_user_id', '_auth_user_backend', '_auth_user_hash'], 'has_socialaccount_states': True}
+post_login_redirect: user=81 role=student redirecting to /student_section/
+StripUnsafeNextMiddleware: request path=/student_section/ qs=
+StripUnsafeNextMiddleware: request path=/student_section/student_profile/ qs=
+StripUnsafeNextMiddleware: request path=/student_section/update_profile_photo/ qs=
+StripUnsafeNextMiddleware: request path=/student_section/student_profile/ qs=
+StripUnsafeNextMiddleware: request path=/student_section/logout/ qs=
+StripUnsafeNextMiddleware: request path=/login/ qs=
+StripUnsafeNextMiddleware: request path=/login/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/department_report/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/department_report/ qs=department=1&year=1&section=1
+StripUnsafeNextMiddleware: request path=/admin_section/department_report/export/ qs=department=1&year=1&section=1&format=pdf
+StripUnsafeNextMiddleware: request path=/admin_section/department_report/export/ qs=department=1&year=1&section=1&format=excel
+StripUnsafeNextMiddleware: request path=/admin_section/department_report/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/department_report/export/ qs=format=pdf
+StripUnsafeNextMiddleware: request path=/admin_section/department_report/export/ qs=format=excel
+StripUnsafeNextMiddleware: request path=/admin_section/student_report/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/student_report/ qs=department=1&student=&q=
+StripUnsafeNextMiddleware: request path=/admin_section/student_report/ qs=department=1&student=21&q=
+StripUnsafeNextMiddleware: request path=/admin_section/student_report/ qs=department=1&student=21&q=

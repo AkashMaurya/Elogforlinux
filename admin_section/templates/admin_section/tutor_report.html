@@ -24,10 +24,7 @@
         </p>
       </div>
       <div class="flex justify-end">
-        <button onclick="exportReport()"
-          class="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 text-sm font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition-colors duration-200">
-          <i class="fas fa-download mr-2"></i> Export
-        </button>
+        <!-- Old export button removed - using new export section below -->
       </div>
     </div>
   </div>
@@ -103,6 +100,25 @@
           </div>
         </div>
       </form>
+    </div>
+  </div>
+
+  <!-- Export Actions -->
+  <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg mb-8 print:hidden">
+    <div class="px-6 py-4">
+      <h3 class="text-lg font-semibold text-gray-900 dark:text-white flex items-center mb-4">
+        <i class="fas fa-download text-green-600 dark:text-green-400 mr-2"></i> Export Report
+      </h3>
+      <div class="flex flex-wrap gap-3">
+        <button onclick="exportToPDF()" class="inline-flex items-center px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-medium rounded-lg transition-colors duration-200">
+          <i class="fas fa-file-pdf mr-2"></i>
+          Export as PDF
+        </button>
+        <button onclick="exportToExcel()" class="inline-flex items-center px-4 py-2 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg transition-colors duration-200">
+          <i class="fas fa-file-excel mr-2"></i>
+          Export as Excel
+        </button>
+      </div>
     </div>
   </div>
 
@@ -629,13 +645,22 @@
     });
   });
 
-  // Print and export functions
-  function printReport() {
-    window.print();
+  // Export functions
+
+  // Export to PDF
+  function exportToPDF() {
+    const params = new URLSearchParams(window.location.search);
+    params.set('format', 'pdf');
+    const exportUrl = '/admin_section/tutor_report/export/?' + params.toString();
+    window.open(exportUrl, '_blank');
   }
 
-  function exportReport() {
-    alert('Export functionality will be implemented soon');
+  // Export to Excel
+  function exportToExcel() {
+    const params = new URLSearchParams(window.location.search);
+    params.set('format', 'excel');
+    const exportUrl = '/admin_section/tutor_report/export/?' + params.toString();
+    window.open(exportUrl, '_blank');
   }
 </script>
 {% endblock extra_scripts %}

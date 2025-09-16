@@ -20,7 +20,7 @@ from student_section.models import SupportTicket, StudentLogFormModel
 from doctor_section.models import DoctorSupportTicket
 
 # Forms
-from .forms import BulkUserUploadForm, CSVUploadForm, BlogForm
+from .forms import BulkUserUploadForm, CSVUploadForm, BlogForm, BlogCategoryForm
 from student_section.forms import AdminResponseForm
 from doctor_section.forms import AdminDoctorResponseForm, BatchReviewForm, LogReviewForm
 from django.core.paginator import Paginator
@@ -193,6 +193,257 @@ def department_report(request):
     }
 
     return render(request, 'admin_section/department_report.html', context)
+
+
+@login_required
+def department_report_export(request):
+    """Export Department Report as PDF or Excel"""
+    if request.user.role != 'admin':
+        messages.error(request, "You don't have permission to access this page.")
+        return redirect('admin_section:admin_dash')
+
+    export_format = request.GET.get('format', 'pdf')
+
+    # Get the same data as the main report
+    departments = Department.objects.all()
+
+    # Get filter parameters
+    selected_department = request.GET.get('department')
+    selected_year = request.GET.get('year')
+
+    # Filter departments if specific department selected
+    if selected_department:
+        departments = departments.filter(id=selected_department)
+
+    # Prepare data for export
+    department_data = []
+    for dept in departments:
+        # Get logs for this department (students are connected to departments through logs)
+        logs = StudentLogFormModel.objects.filter(department=dept)
+        if selected_year:
+            logs = logs.filter(student__group__log_year__year_name=selected_year)
+
+        # Get unique students who have logs in this department
+        student_ids = logs.values_list('student_id', flat=True).distinct()
+        students = Student.objects.filter(id__in=student_ids)
+        if selected_year:
+            students = students.filter(group__log_year__year_name=selected_year)
+
+        # Calculate statistics
+        total_students = students.count()
+        total_logs = logs.count()
+        reviewed_logs = logs.filter(is_reviewed=True).count()
+        pending_logs = total_logs - reviewed_logs
+
+        department_data.append({
+            'name': dept.name,
+            'total_students': total_students,
+            'total_logs': total_logs,
+            'reviewed_logs': reviewed_logs,
+            'pending_logs': pending_logs,
+            'review_rate': f"{(reviewed_logs/total_logs*100):.1f}%" if total_logs > 0 else "0%"
+        })
+
+    if export_format == 'excel':
+        return export_department_excel(department_data, selected_department, selected_year)
+    else:
+        return export_department_pdf(department_data, selected_department, selected_year)
+
+
+def export_department_excel(department_data, selected_department=None, selected_year=None):
+    """Export department report to Excel"""
+    import openpyxl
+    from openpyxl.styles import Font, Alignment, PatternFill, Border, Side
+    from openpyxl.chart import BarChart, Reference
+    from django.http import HttpResponse
+    import io
+
+    # Create workbook and worksheet
+    wb = openpyxl.Workbook()
+    ws = wb.active
+    ws.title = "Department Report"
+
+    # Add title
+    title = "Department Report"
+    if selected_department:
+        dept_name = Department.objects.get(id=selected_department).name
+        title += f" - {dept_name}"
+    if selected_year:
+        title += f" - {selected_year}"
+
+    ws['A1'] = title
+    ws['A1'].font = Font(size=16, bold=True)
+    ws['A1'].alignment = Alignment(horizontal='center')
+    ws.merge_cells('A1:F1')
+
+    # Add headers
+    headers = ['Department', 'Total Students', 'Total Logs', 'Reviewed Logs', 'Pending Logs', 'Review Rate']
+    for col, header in enumerate(headers, 1):
+        cell = ws.cell(row=3, column=col, value=header)
+        cell.font = Font(bold=True)
+        cell.fill = PatternFill(start_color="366092", end_color="366092", fill_type="solid")
+        cell.font = Font(color="FFFFFF", bold=True)
+        cell.alignment = Alignment(horizontal='center')
+
+    # Add data
+    for row, dept in enumerate(department_data, 4):
+        ws.cell(row=row, column=1, value=dept['name'])
+        ws.cell(row=row, column=2, value=dept['total_students'])
+        ws.cell(row=row, column=3, value=dept['total_logs'])
+        ws.cell(row=row, column=4, value=dept['reviewed_logs'])
+        ws.cell(row=row, column=5, value=dept['pending_logs'])
+        ws.cell(row=row, column=6, value=dept['review_rate'])
+
+    # Add chart
+    if len(department_data) > 0:
+        chart = BarChart()
+        chart.title = "Department Statistics"
+        chart.x_axis.title = "Departments"
+        chart.y_axis.title = "Count"
+
+        # Data for chart
+        data = Reference(ws, min_col=2, min_row=3, max_col=5, max_row=len(department_data) + 3)
+        categories = Reference(ws, min_col=1, min_row=4, max_row=len(department_data) + 3)
+
+        chart.add_data(data, titles_from_data=True)
+        chart.set_categories(categories)
+
+        # Add chart to worksheet
+        ws.add_chart(chart, "H3")
+
+    # Auto-adjust column widths
+    headers = ['Department', 'Total Students', 'Total Logs', 'Reviewed Logs', 'Pending Logs', 'Review Rate']
+    for col_num in range(1, len(headers) + 1):
+        max_length = 0
+        column_letter = openpyxl.utils.get_column_letter(col_num)
+        for row in range(1, ws.max_row + 1):
+            cell = ws.cell(row=row, column=col_num)
+            try:
+                if cell.value and len(str(cell.value)) > max_length:
+                    max_length = len(str(cell.value))
+            except:
+                pass
+        adjusted_width = min(max_length + 2, 50)
+        ws.column_dimensions[column_letter].width = adjusted_width
+
+    # Save to response
+    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = f'attachment; filename="department_report_{timezone.now().strftime("%Y%m%d_%H%M%S")}.xlsx"'
+
+    wb.save(response)
+    return response
+
+
+def export_department_pdf(department_data, selected_department=None, selected_year=None):
+    """Export department report to PDF"""
+    from reportlab.lib.pagesizes import letter, A4
+    from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer, Image
+    from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+    from reportlab.lib import colors
+    from reportlab.lib.units import inch
+    from reportlab.graphics.shapes import Drawing
+    from reportlab.graphics.charts.barcharts import VerticalBarChart
+    from django.http import HttpResponse
+    import io
+
+    # Create response
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="department_report_{timezone.now().strftime("%Y%m%d_%H%M%S")}.pdf"'
+
+    # Create PDF
+    buffer = io.BytesIO()
+    doc = SimpleDocTemplate(buffer, pagesize=A4)
+    elements = []
+
+    # Add header
+    add_agu_header(elements)
+
+    # Add title
+    title = "Department Report"
+    if selected_department:
+        dept_name = Department.objects.get(id=selected_department).name
+        title += f" - {dept_name}"
+    if selected_year:
+        title += f" - {selected_year}"
+
+    styles = getSampleStyleSheet()
+    title_style = ParagraphStyle(
+        'CustomTitle',
+        parent=styles['Heading1'],
+        fontSize=18,
+        spaceAfter=30,
+        alignment=1,  # Center alignment
+        textColor=colors.HexColor('#1f2937')
+    )
+
+    elements.append(Paragraph(title, title_style))
+    elements.append(Spacer(1, 20))
+
+    # Create table data
+    table_data = [['Department', 'Total Students', 'Total Logs', 'Reviewed Logs', 'Pending Logs', 'Review Rate']]
+    for dept in department_data:
+        table_data.append([
+            dept['name'],
+            str(dept['total_students']),
+            str(dept['total_logs']),
+            str(dept['reviewed_logs']),
+            str(dept['pending_logs']),
+            dept['review_rate']
+        ])
+
+    # Create table
+    table = Table(table_data)
+    table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#366092')),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('FONTSIZE', (0, 0), (-1, 0), 12),
+        ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+        ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
+        ('GRID', (0, 0), (-1, -1), 1, colors.black),
+        ('FONTNAME', (0, 1), (-1, -1), 'Helvetica'),
+        ('FONTSIZE', (0, 1), (-1, -1), 10),
+    ]))
+
+    elements.append(table)
+    elements.append(Spacer(1, 30))
+
+    # Add chart if data exists
+    if len(department_data) > 0:
+        # Create chart
+        drawing = Drawing(400, 200)
+        chart = VerticalBarChart()
+        chart.x = 50
+        chart.y = 50
+        chart.height = 125
+        chart.width = 300
+        chart.data = [
+            [dept['total_students'] for dept in department_data],
+            [dept['total_logs'] for dept in department_data],
+            [dept['reviewed_logs'] for dept in department_data]
+        ]
+        chart.categoryAxis.categoryNames = [dept['name'][:10] + '...' if len(dept['name']) > 10 else dept['name'] for dept in department_data]
+        chart.valueAxis.valueMin = 0
+        chart.bars[0].fillColor = colors.HexColor('#3b82f6')
+        chart.bars[1].fillColor = colors.HexColor('#10b981')
+        chart.bars[2].fillColor = colors.HexColor('#f59e0b')
+
+        drawing.add(chart)
+        elements.append(drawing)
+
+    # Add footer
+    add_footer_info(elements)
+
+    # Build PDF
+    doc.build(elements)
+
+    # Get PDF data
+    pdf_data = buffer.getvalue()
+    buffer.close()
+
+    response.write(pdf_data)
+    return response
 
 @login_required
 def student_report(request):
@@ -374,6 +625,241 @@ def student_report(request):
 
     return render(request, 'admin_section/student_report.html', context)
 
+
+@login_required
+def student_report_export(request):
+    """Export Student Report as PDF or Excel"""
+    if request.user.role != 'admin':
+        messages.error(request, "You don't have permission to access this page.")
+        return redirect('admin_section:admin_dash')
+
+    export_format = request.GET.get('format', 'pdf')
+
+    # Get filter parameters
+    selected_department = request.GET.get('department')
+    selected_year = request.GET.get('year')
+    selected_group = request.GET.get('group')
+    selected_student = request.GET.get('student')
+
+    # Get students with filters
+    students = Student.objects.select_related('user', 'group', 'group__log_year').all()
+
+    # Filter by department through logs (since Group doesn't have department)
+    if selected_department:
+        # Get students who have logs in the selected department
+        student_ids_with_dept_logs = StudentLogFormModel.objects.filter(
+            department_id=selected_department
+        ).values_list('student_id', flat=True).distinct()
+        students = students.filter(id__in=student_ids_with_dept_logs)
+
+    if selected_year:
+        students = students.filter(group__log_year__year_name=selected_year)
+    if selected_group:
+        students = students.filter(group_id=selected_group)
+    if selected_student:
+        students = students.filter(id=selected_student)
+
+    # Prepare data for export
+    student_data = []
+    for student in students:
+        # Get logs for this student
+        logs = StudentLogFormModel.objects.filter(student=student)
+        total_logs = logs.count()
+        reviewed_logs = logs.filter(is_reviewed=True).count()
+        pending_logs = total_logs - reviewed_logs
+
+        # Get unique departments
+        departments_count = logs.values('department').distinct().count()
+
+        # Get primary department from logs (most frequent department)
+        primary_department = 'N/A'
+        if logs.exists():
+            dept_counts = logs.values('department__name').annotate(count=models.Count('department')).order_by('-count')
+            if dept_counts:
+                primary_department = dept_counts[0]['department__name']
+
+        student_data.append({
+            'name': f"{student.user.first_name} {student.user.last_name}",
+            'email': student.user.email,
+            'group': student.group.group_name if student.group else 'N/A',
+            'department': primary_department,
+            'year': student.group.log_year.year_name if student.group and student.group.log_year else 'N/A',
+            'total_logs': total_logs,
+            'reviewed_logs': reviewed_logs,
+            'pending_logs': pending_logs,
+            'departments_count': departments_count,
+            'review_rate': f"{(reviewed_logs/total_logs*100):.1f}%" if total_logs > 0 else "0%"
+        })
+
+    if export_format == 'excel':
+        return export_student_excel(student_data, selected_department, selected_year, selected_group, selected_student)
+    else:
+        return export_student_pdf(student_data, selected_department, selected_year, selected_group, selected_student)
+
+
+def export_student_excel(student_data, selected_department=None, selected_year=None, selected_group=None, selected_student=None):
+    """Export student report to Excel"""
+    import openpyxl
+    from openpyxl.styles import Font, Alignment, PatternFill
+    from openpyxl.chart import BarChart, Reference
+    from django.http import HttpResponse
+
+    # Create workbook and worksheet
+    wb = openpyxl.Workbook()
+    ws = wb.active
+    ws.title = "Student Report"
+
+    # Add title
+    title = "Student Report"
+    if selected_department:
+        dept_name = Department.objects.get(id=selected_department).name
+        title += f" - {dept_name}"
+    if selected_year:
+        title += f" - {selected_year}"
+    if selected_group:
+        group_name = Group.objects.get(id=selected_group).group_name
+        title += f" - {group_name}"
+
+    ws['A1'] = title
+    ws['A1'].font = Font(size=16, bold=True)
+    ws['A1'].alignment = Alignment(horizontal='center')
+    ws.merge_cells('A1:J1')
+
+    # Add headers
+    headers = ['Name', 'Email', 'Group', 'Department', 'Year', 'Total Logs', 'Reviewed', 'Pending', 'Departments', 'Review Rate']
+    for col, header in enumerate(headers, 1):
+        cell = ws.cell(row=3, column=col, value=header)
+        cell.font = Font(bold=True)
+        cell.fill = PatternFill(start_color="366092", end_color="366092", fill_type="solid")
+        cell.font = Font(color="FFFFFF", bold=True)
+        cell.alignment = Alignment(horizontal='center')
+
+    # Add data
+    for row, student in enumerate(student_data, 4):
+        ws.cell(row=row, column=1, value=student['name'])
+        ws.cell(row=row, column=2, value=student['email'])
+        ws.cell(row=row, column=3, value=student['group'])
+        ws.cell(row=row, column=4, value=student['department'])
+        ws.cell(row=row, column=5, value=student['year'])
+        ws.cell(row=row, column=6, value=student['total_logs'])
+        ws.cell(row=row, column=7, value=student['reviewed_logs'])
+        ws.cell(row=row, column=8, value=student['pending_logs'])
+        ws.cell(row=row, column=9, value=student['departments_count'])
+        ws.cell(row=row, column=10, value=student['review_rate'])
+
+    # Auto-adjust column widths
+    headers = ['Name', 'Email', 'Student ID', 'Group', 'Department', 'Year', 'Total Logs', 'Reviewed Logs', 'Pending Logs', 'Review Rate']
+    for col_num in range(1, len(headers) + 1):
+        max_length = 0
+        column_letter = openpyxl.utils.get_column_letter(col_num)
+        for row in range(1, ws.max_row + 1):
+            cell = ws.cell(row=row, column=col_num)
+            try:
+                if cell.value and len(str(cell.value)) > max_length:
+                    max_length = len(str(cell.value))
+            except:
+                pass
+        adjusted_width = min(max_length + 2, 50)
+        ws.column_dimensions[column_letter].width = adjusted_width
+
+    # Save to response
+    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = f'attachment; filename="student_report_{timezone.now().strftime("%Y%m%d_%H%M%S")}.xlsx"'
+
+    wb.save(response)
+    return response
+
+
+def export_student_pdf(student_data, selected_department=None, selected_year=None, selected_group=None, selected_student=None):
+    """Export student report to PDF"""
+    from reportlab.lib.pagesizes import A4, landscape
+    from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
+    from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+    from reportlab.lib import colors
+    from django.http import HttpResponse
+    import io
+
+    # Create response
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="student_report_{timezone.now().strftime("%Y%m%d_%H%M%S")}.pdf"'
+
+    # Create PDF in landscape mode for better table fit
+    buffer = io.BytesIO()
+    doc = SimpleDocTemplate(buffer, pagesize=landscape(A4))
+    elements = []
+
+    # Add header
+    add_agu_header(elements)
+
+    # Add title
+    title = "Student Report"
+    if selected_department:
+        dept_name = Department.objects.get(id=selected_department).name
+        title += f" - {dept_name}"
+    if selected_year:
+        title += f" - {selected_year}"
+    if selected_group:
+        group_name = Group.objects.get(id=selected_group).group_name
+        title += f" - {group_name}"
+
+    styles = getSampleStyleSheet()
+    title_style = ParagraphStyle(
+        'CustomTitle',
+        parent=styles['Heading1'],
+        fontSize=18,
+        spaceAfter=30,
+        alignment=1,
+        textColor=colors.HexColor('#1f2937')
+    )
+
+    elements.append(Paragraph(title, title_style))
+    elements.append(Spacer(1, 20))
+
+    # Create table data
+    table_data = [['Name', 'Email', 'Group', 'Department', 'Year', 'Total Logs', 'Reviewed', 'Pending', 'Review Rate']]
+    for student in student_data:
+        table_data.append([
+            student['name'],
+            student['email'],
+            student['group'],
+            student['department'],
+            str(student['year']),
+            str(student['total_logs']),
+            str(student['reviewed_logs']),
+            str(student['pending_logs']),
+            student['review_rate']
+        ])
+
+    # Create table
+    table = Table(table_data)
+    table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#366092')),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('FONTSIZE', (0, 0), (-1, 0), 10),
+        ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+        ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
+        ('GRID', (0, 0), (-1, -1), 1, colors.black),
+        ('FONTNAME', (0, 1), (-1, -1), 'Helvetica'),
+        ('FONTSIZE', (0, 1), (-1, -1), 8),
+    ]))
+
+    elements.append(table)
+
+    # Add footer
+    add_footer_info(elements)
+
+    # Build PDF
+    doc.build(elements)
+
+    # Get PDF data
+    pdf_data = buffer.getvalue()
+    buffer.close()
+
+    response.write(pdf_data)
+    return response
+
 @login_required
 def tutor_report(request):
     """View for Tutor Report with enhanced dashboard and filtering"""
@@ -532,6 +1018,233 @@ def tutor_report(request):
     }
 
     return render(request, 'admin_section/tutor_report.html', context)
+
+
+@login_required
+def tutor_report_export(request):
+    """Export Tutor Report as PDF or Excel"""
+    if request.user.role != 'admin':
+        messages.error(request, "You don't have permission to access this page.")
+        return redirect('admin_section:admin_dash')
+
+    export_format = request.GET.get('format', 'pdf')
+
+    # Get filter parameters
+    selected_department = request.GET.get('department')
+    selected_year = request.GET.get('year')
+
+    # Get doctors (tutors) with filters
+    doctors = Doctor.objects.select_related('user').prefetch_related('departments').all()
+
+    if selected_department:
+        doctors = doctors.filter(departments__id=selected_department)
+
+    # Prepare data for export
+    tutor_data = []
+    for doctor in doctors:
+        # Get logs reviewed by this doctor
+        reviewed_logs = StudentLogFormModel.objects.filter(reviewed_by=doctor.user)
+        if selected_year:
+            reviewed_logs = reviewed_logs.filter(student__group__log_year__year_name=selected_year)
+
+        # Get unique students this doctor has reviewed
+        unique_students = reviewed_logs.values('student').distinct().count()
+
+        # Get unique departments this doctor has reviewed logs for
+        unique_departments = reviewed_logs.values('department').distinct().count()
+
+        # Calculate average review time (if available)
+        total_reviews = reviewed_logs.count()
+
+        # Get doctor's departments (many-to-many relationship)
+        doctor_departments = doctor.departments.all()
+        department_names = ', '.join([dept.name for dept in doctor_departments]) if doctor_departments.exists() else 'N/A'
+
+        tutor_data.append({
+            'name': f"{doctor.user.first_name} {doctor.user.last_name}",
+            'email': doctor.user.email,
+            'department': department_names,
+            'total_reviews': total_reviews,
+            'unique_students': unique_students,
+            'unique_departments': unique_departments,
+            'specialization': doctor.user.speciality or 'N/A',
+            'phone': doctor.user.phone_no or 'N/A'
+        })
+
+    if export_format == 'excel':
+        return export_tutor_excel(tutor_data, selected_department, selected_year)
+    else:
+        return export_tutor_pdf(tutor_data, selected_department, selected_year)
+
+
+def export_tutor_excel(tutor_data, selected_department=None, selected_year=None):
+    """Export tutor report to Excel"""
+    import openpyxl
+    from openpyxl.styles import Font, Alignment, PatternFill
+    from openpyxl.chart import BarChart, Reference
+    from django.http import HttpResponse
+
+    # Create workbook and worksheet
+    wb = openpyxl.Workbook()
+    ws = wb.active
+    ws.title = "Tutor Report"
+
+    # Add title
+    title = "Tutor Report"
+    if selected_department:
+        dept_name = Department.objects.get(id=selected_department).name
+        title += f" - {dept_name}"
+    if selected_year:
+        title += f" - {selected_year}"
+
+    ws['A1'] = title
+    ws['A1'].font = Font(size=16, bold=True)
+    ws['A1'].alignment = Alignment(horizontal='center')
+    ws.merge_cells('A1:H1')
+
+    # Add headers
+    headers = ['Name', 'Email', 'Department', 'Specialization', 'Phone', 'Total Reviews', 'Students Reviewed', 'Departments']
+    for col, header in enumerate(headers, 1):
+        cell = ws.cell(row=3, column=col, value=header)
+        cell.font = Font(bold=True)
+        cell.fill = PatternFill(start_color="366092", end_color="366092", fill_type="solid")
+        cell.font = Font(color="FFFFFF", bold=True)
+        cell.alignment = Alignment(horizontal='center')
+
+    # Add data
+    for row, tutor in enumerate(tutor_data, 4):
+        ws.cell(row=row, column=1, value=tutor['name'])
+        ws.cell(row=row, column=2, value=tutor['email'])
+        ws.cell(row=row, column=3, value=tutor['department'])
+        ws.cell(row=row, column=4, value=tutor['specialization'])
+        ws.cell(row=row, column=5, value=tutor['phone'])
+        ws.cell(row=row, column=6, value=tutor['total_reviews'])
+        ws.cell(row=row, column=7, value=tutor['unique_students'])
+        ws.cell(row=row, column=8, value=tutor['unique_departments'])
+
+    # Add chart
+    if len(tutor_data) > 0:
+        chart = BarChart()
+        chart.title = "Tutor Review Statistics"
+        chart.x_axis.title = "Tutors"
+        chart.y_axis.title = "Count"
+
+        # Data for chart
+        data = Reference(ws, min_col=6, min_row=3, max_col=8, max_row=len(tutor_data) + 3)
+        categories = Reference(ws, min_col=1, min_row=4, max_row=len(tutor_data) + 3)
+
+        chart.add_data(data, titles_from_data=True)
+        chart.set_categories(categories)
+
+        # Add chart to worksheet
+        ws.add_chart(chart, "J3")
+
+    # Auto-adjust column widths
+    for col_num in range(1, len(headers) + 1):
+        max_length = 0
+        column_letter = openpyxl.utils.get_column_letter(col_num)
+        for row in range(1, ws.max_row + 1):
+            cell = ws.cell(row=row, column=col_num)
+            try:
+                if cell.value and len(str(cell.value)) > max_length:
+                    max_length = len(str(cell.value))
+            except:
+                pass
+        adjusted_width = min(max_length + 2, 50)
+        ws.column_dimensions[column_letter].width = adjusted_width
+
+    # Save to response
+    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = f'attachment; filename="tutor_report_{timezone.now().strftime("%Y%m%d_%H%M%S")}.xlsx"'
+
+    wb.save(response)
+    return response
+
+
+def export_tutor_pdf(tutor_data, selected_department=None, selected_year=None):
+    """Export tutor report to PDF"""
+    from reportlab.lib.pagesizes import A4, landscape
+    from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
+    from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+    from reportlab.lib import colors
+    from django.http import HttpResponse
+    import io
+
+    # Create response
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="tutor_report_{timezone.now().strftime("%Y%m%d_%H%M%S")}.pdf"'
+
+    # Create PDF in landscape mode for better table fit
+    buffer = io.BytesIO()
+    doc = SimpleDocTemplate(buffer, pagesize=landscape(A4))
+    elements = []
+
+    # Add header
+    add_agu_header(elements)
+
+    # Add title
+    title = "Tutor Report"
+    if selected_department:
+        dept_name = Department.objects.get(id=selected_department).name
+        title += f" - {dept_name}"
+    if selected_year:
+        title += f" - {selected_year}"
+
+    styles = getSampleStyleSheet()
+    title_style = ParagraphStyle(
+        'CustomTitle',
+        parent=styles['Heading1'],
+        fontSize=18,
+        spaceAfter=30,
+        alignment=1,
+        textColor=colors.HexColor('#1f2937')
+    )
+
+    elements.append(Paragraph(title, title_style))
+    elements.append(Spacer(1, 20))
+
+    # Create table data
+    table_data = [['Name', 'Email', 'Department', 'Specialization', 'Total Reviews', 'Students Reviewed', 'Departments']]
+    for tutor in tutor_data:
+        table_data.append([
+            tutor['name'],
+            tutor['email'],
+            tutor['department'],
+            tutor['specialization'],
+            str(tutor['total_reviews']),
+            str(tutor['unique_students']),
+            str(tutor['unique_departments'])
+        ])
+
+    # Create table
+    table = Table(table_data)
+    table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#366092')),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('FONTSIZE', (0, 0), (-1, 0), 10),
+        ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+        ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
+        ('GRID', (0, 0), (-1, -1), 1, colors.black),
+        ('FONTNAME', (0, 1), (-1, -1), 'Helvetica'),
+        ('FONTSIZE', (0, 1), (-1, -1), 9),
+    ]))
+
+    elements.append(table)
+
+    # Add footer
+    add_footer_info(elements)
+
+    # Build PDF
+    doc.build(elements)
+
+    # Get PDF data
+    pdf_data = buffer.getvalue()
+    buffer.close()
+
+    response.write(pdf_data)
+    return response
 
 @login_required
 def bulk_add_users(request):
@@ -1131,7 +1844,11 @@ def admin_blogs(request):
 
     # Apply filters
     if category:
-        blogs = blogs.filter(category=category)
+        if category.startswith('new_'):
+            category_id = category.replace('new_', '')
+            blogs = blogs.filter(category_new_id=category_id)
+        else:
+            blogs = blogs.filter(category=category, category_new__isnull=True)
 
     if search_query:
         blogs = blogs.filter(
@@ -1148,11 +1865,17 @@ def admin_blogs(request):
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
 
+    # Get all categories (legacy + new)
+    all_categories = list(Blog.CATEGORY_CHOICES)
+    for cat in BlogCategory.objects.filter(is_active=True):
+        all_categories.append((f"new_{cat.id}", cat.name))
+
     context = {
         'blogs': page_obj,
         'selected_category': category,
         'search_query': search_query,
-        'categories': Blog.CATEGORY_CHOICES,
+        'categories': all_categories,
+        'blog_categories': BlogCategory.objects.filter(is_active=True),
     }
 
     return render(request, "admin_section/admin_blogs.html", context)
@@ -1266,6 +1989,98 @@ def blog_detail(request, blog_id):
     }
 
     return render(request, "admin_section/blog_detail.html", context)
+
+
+@login_required
+def blog_categories(request):
+    """View for managing blog categories"""
+    # Check if user is admin
+    if request.user.role != 'admin':
+        messages.error(request, "You don't have permission to access this page.")
+        return redirect('admin_section:admin_dash')
+
+    if request.method == 'POST':
+        form = BlogCategoryForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Blog category created successfully.")
+            return redirect('admin_section:blog_categories')
+    else:
+        form = BlogCategoryForm()
+
+    # Get all categories
+    categories = BlogCategory.objects.all().order_by('name')
+
+    # Pagination
+    paginator = Paginator(categories, 10)  # 10 items per page
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    context = {
+        'form': form,
+        'categories': page_obj,
+    }
+
+    return render(request, "admin_section/blog_categories.html", context)
+
+
+@login_required
+def blog_category_edit(request, category_id):
+    """View for editing a blog category"""
+    # Check if user is admin
+    if request.user.role != 'admin':
+        messages.error(request, "You don't have permission to access this page.")
+        return redirect('admin_section:admin_dash')
+
+    category = get_object_or_404(BlogCategory, id=category_id)
+
+    if request.method == 'POST':
+        form = BlogCategoryForm(request.POST, instance=category)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Blog category updated successfully.")
+            return redirect('admin_section:blog_categories')
+    else:
+        form = BlogCategoryForm(instance=category)
+
+    context = {
+        'form': form,
+        'category': category,
+        'is_edit': True,
+    }
+
+    return render(request, "admin_section/blog_category_form.html", context)
+
+
+@login_required
+def blog_category_delete(request, category_id):
+    """View for deleting a blog category"""
+    # Check if user is admin
+    if request.user.role != 'admin':
+        messages.error(request, "You don't have permission to access this page.")
+        return redirect('admin_section:admin_dash')
+
+    category = get_object_or_404(BlogCategory, id=category_id)
+
+    # Check if category is being used by any blogs
+    blogs_count = Blog.objects.filter(category_new=category).count()
+
+    if blogs_count > 0:
+        messages.error(request, f"Cannot delete category '{category.name}' because it is being used by {blogs_count} blog post(s).")
+        return redirect('admin_section:blog_categories')
+
+    if request.method == 'POST':
+        category_name = category.name
+        category.delete()
+        messages.success(request, f"Blog category '{category_name}' deleted successfully.")
+        return redirect('admin_section:blog_categories')
+
+    context = {
+        'category': category,
+        'blogs_count': blogs_count,
+    }
+
+    return render(request, "admin_section/blog_category_confirm_delete.html", context)
 
 
 @login_required
@@ -1434,20 +2249,41 @@ def update_contact_info(request):
 @login_required
 def update_profile_photo(request):
     if request.method == "POST" and request.FILES.get("profile_photo"):
-        user = request.user
-        # Delete old profile photo if it exists and it's not the default
-        if user.profile_photo and hasattr(user.profile_photo, "path") and "default.jpg" not in user.profile_photo.path:
-            try:
-                if os.path.exists(user.profile_photo.path):
-                    os.remove(user.profile_photo.path)
-            except Exception as e:
-                print(f"Error deleting old profile photo: {e}")
+        try:
+            photo = request.FILES["profile_photo"]
 
-        # Save new profile photo
-        user.profile_photo = request.FILES["profile_photo"]
-        user.save()
+            # Validate file size (120KB = 120 * 1024 bytes)
+            max_size = 120 * 1024  # 120KB in bytes
+            if photo.size > max_size:
+                return JsonResponse({
+                    "success": False,
+                    "error": f"File size too large. Maximum allowed size is 120KB. Your file is {photo.size // 1024}KB."
+                })
 
-        return JsonResponse({"success": True, "profile_photo": user.profile_photo.url})
+            # Validate file type
+            allowed_types = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif']
+            if photo.content_type not in allowed_types:
+                return JsonResponse({
+                    "success": False,
+                    "error": "Invalid file type. Only JPEG, PNG, and GIF images are allowed."
+                })
+
+            user = request.user
+            # Delete old profile photo if it exists and it's not the default
+            if user.profile_photo and hasattr(user.profile_photo, "path") and "default.jpg" not in user.profile_photo.path:
+                try:
+                    if os.path.exists(user.profile_photo.path):
+                        os.remove(user.profile_photo.path)
+                except Exception as e:
+                    print(f"Error deleting old profile photo: {e}")
+
+            # Save new profile photo
+            user.profile_photo = photo
+            user.save()
+
+            return JsonResponse({"success": True, "profile_photo": user.profile_photo.url})
+        except Exception as e:
+            return JsonResponse({"success": False, "error": str(e)})
 
     return JsonResponse({"success": False, "error": "No photo provided"})
 

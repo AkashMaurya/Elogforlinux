@@ -378,6 +378,24 @@ def update_biography(request):
 def update_profile_photo(request):
     if request.method == "POST" and request.FILES.get("profile_photo"):
         try:
+            photo = request.FILES["profile_photo"]
+
+            # Validate file size (120KB = 120 * 1024 bytes)
+            max_size = 120 * 1024  # 120KB in bytes
+            if photo.size > max_size:
+                return JsonResponse({
+                    "success": False,
+                    "error": f"File size too large. Maximum allowed size is 120KB. Your file is {photo.size // 1024}KB."
+                })
+
+            # Validate file type
+            allowed_types = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif']
+            if photo.content_type not in allowed_types:
+                return JsonResponse({
+                    "success": False,
+                    "error": "Invalid file type. Only JPEG, PNG, and GIF images are allowed."
+                })
+
             with transaction.atomic():
                 user = request.user
 
@@ -390,7 +408,7 @@ def update_profile_photo(request):
                         print(f"Error deleting old profile photo: {e}")
 
                 # Save new profile photo
-                user.profile_photo = request.FILES["profile_photo"]
+                user.profile_photo = photo
                 user.save()
 
                 return JsonResponse({"success": True, "profile_photo": user.profile_photo.url})

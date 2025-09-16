@@ -233,8 +233,25 @@ class AdminNotification(models.Model):
         self.save()
 
 
+# Blog Category Model
+class BlogCategory(models.Model):
+    name = models.CharField(max_length=50, unique=True)
+    description = models.TextField(blank=True, help_text="Optional description for the category")
+    created_at = models.DateTimeField(auto_now_add=True)
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        ordering = ['name']
+        verbose_name = "Blog Category"
+        verbose_name_plural = "Blog Categories"
+
+    def __str__(self):
+        return self.name
+
+
 # Blog Model
 class Blog(models.Model):
+    # Keep the old CATEGORY_CHOICES for backward compatibility
     CATEGORY_CHOICES = [
         ('news', 'News'),
         ('announcement', 'Announcement'),
@@ -245,7 +262,9 @@ class Blog(models.Model):
     title = models.CharField(max_length=200)
     content = models.TextField()
     summary = models.CharField(max_length=300, help_text="A brief summary of the blog post (max 300 characters)")
-    category = models.CharField(max_length=20, choices=CATEGORY_CHOICES, default='news')
+    # Use ForeignKey to BlogCategory for new posts, but keep the old field for backward compatibility
+    category_new = models.ForeignKey(BlogCategory, on_delete=models.SET_NULL, null=True, blank=True, related_name='blogs')
+    category = models.CharField(max_length=20, choices=CATEGORY_CHOICES, default='news', help_text="Legacy category field")
     attachment = models.FileField(upload_to='blog_attachments/', null=True, blank=True)
     attachment_name = models.CharField(max_length=100, blank=True, help_text="Name to display for the attachment")
     featured_image = models.ImageField(upload_to='blog_images/', null=True, blank=True)
@@ -272,6 +291,20 @@ class Blog(models.Model):
         elif self.attachment:
             return self.attachment.name.split('/')[-1]
         return None
+
+    def get_category_display(self):
+        """Returns the category name, preferring the new category over the legacy one"""
+        if self.category_new:
+            return self.category_new.name
+        else:
+            return dict(self.CATEGORY_CHOICES).get(self.category, self.category)
+
+    def get_category_value(self):
+        """Returns the category value for filtering"""
+        if self.category_new:
+            return f"new_{self.category_new.id}"
+        else:
+            return self.category
 
 
 # Mapped Attendance Model

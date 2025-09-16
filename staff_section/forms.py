@@ -126,9 +126,29 @@ class ProfileUpdateForm(forms.ModelForm):
                 attrs={
                     'class': 'hidden',
                     'id': 'profile-photo-input',
+                    'accept': 'image/*',
                 }
             ),
         }
+
+    def clean_profile_photo(self):
+        photo = self.cleaned_data.get('profile_photo')
+        if photo:
+            # Validate file size (120KB = 120 * 1024 bytes)
+            max_size = 120 * 1024  # 120KB in bytes
+            if photo.size > max_size:
+                raise forms.ValidationError(
+                    f"File size too large. Maximum allowed size is 120KB. Your file is {photo.size // 1024}KB."
+                )
+
+            # Validate file type
+            allowed_types = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif']
+            if photo.content_type not in allowed_types:
+                raise forms.ValidationError(
+                    "Invalid file type. Only JPEG, PNG, and GIF images are allowed."
+                )
+
+        return photo
 
 
 class EmergencyAttendanceForm(forms.Form):

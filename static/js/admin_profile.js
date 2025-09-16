@@ -100,10 +100,29 @@ document.addEventListener('DOMContentLoaded', () => {
   if (profilePhotoUpload) {
     profilePhotoUpload.addEventListener('change', function() {
       if (this.files && this.files[0]) {
+        const file = this.files[0];
+
+        // Check file size before upload (120KB = 120 * 1024 bytes)
+        const maxSize = 120 * 1024;
+        if (file.size > maxSize) {
+          showToast(`File size too large. Maximum allowed size is 120KB. Your file is ${Math.round(file.size / 1024)}KB.`, 'error');
+          this.value = ''; // Clear the input
+          return;
+        }
+
+        // Check file type
+        const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
+        if (!allowedTypes.includes(file.type)) {
+          showToast('Invalid file type. Only JPEG, PNG, and GIF images are allowed.', 'error');
+          this.value = ''; // Clear the input
+          return;
+        }
+
         const form = document.getElementById('profile-photo-form');
 
         // Show loading indicator
         const profileImg = document.querySelector('[alt="Profile Photo"]');
+        const originalOpacity = profileImg.style.opacity;
         profileImg.style.opacity = '0.5';
 
         const formData = new FormData(form);
@@ -120,19 +139,18 @@ document.addEventListener('DOMContentLoaded', () => {
           if (data.success) {
             // Update the profile image
             profileImg.src = data.profile_photo;
+            profileImg.style.opacity = originalOpacity;
 
             // Show success message
             showToast('Profile photo updated successfully!', 'success');
           } else {
+            profileImg.style.opacity = originalOpacity;
             showToast(data.error || 'Failed to update profile photo', 'error');
           }
         })
         .catch(error => {
+          profileImg.style.opacity = originalOpacity;
           showToast('Network error. Please try again.', 'error');
-        })
-        .finally(() => {
-          // Reset opacity
-          profileImg.style.opacity = '1';
         });
       }
     });

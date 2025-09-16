@@ -1,16 +1,246 @@
 {% extends 'base.html' %}
+{% load static %}
 
-{% block title %}Default User Section{% endblock %}
+{% block title %}Account Pending Approval{% endblock %}
 
+{% block extra_head %}
+<style>
+  @keyframes float {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+    100% { transform: translateY(0px); }
+  }
 
+  @keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+  }
 
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .float-animation {
+    animation: float 3s ease-in-out infinite;
+  }
+
+  .pulse-animation {
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  .fade-in-up {
+    animation: fadeInUp 0.8s ease-out;
+  }
+
+  .gradient-bg {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  }
+
+  .glass-effect {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+  }
+</style>
+{% endblock %}
 
 {% block content_container %}
-   <div class="card">
-      <h1>Welcome</h1>
-      <p>Thank you for trying to sign in. Our team will add you to the directory soon.</p>
-      <p>If you believe this is an error, please contact the administration.</p>
-   <p><a href="{% url 'account_logout' %}">Logout</a></p>
+<div class="min-h-screen gradient-bg flex items-center justify-center px-4 py-8">
+  <div class="max-w-2xl w-full">
+    <!-- Main Card -->
+    <div class="glass-effect rounded-3xl shadow-2xl p-8 md:p-12 text-center fade-in-up">
+      <!-- Icon -->
+      <div class="mb-8">
+        <div class="inline-flex items-center justify-center w-24 h-24 bg-yellow-100 rounded-full float-animation">
+          <i class="fas fa-clock text-4xl text-yellow-600"></i>
+        </div>
+      </div>
+
+      <!-- Title -->
+      <h1 class="text-4xl md:text-5xl font-bold text-white mb-6">
+        Account Pending
+      </h1>
+
+      <!-- Subtitle -->
+      <div class="bg-white bg-opacity-20 rounded-2xl p-6 mb-8">
+        <h2 class="text-xl md:text-2xl font-semibold text-white mb-4">
+          Welcome to AGU E-Logbook System
+        </h2>
+        <p class="text-lg text-white text-opacity-90 leading-relaxed">
+          Thank you for signing in! Your account is currently being reviewed by our administration team.
+          You will be granted access once your account has been approved and assigned to the appropriate directory.
+        </p>
+      </div>
+
+      <!-- Status Cards -->
+      <div class="grid md:grid-cols-2 gap-6 mb-8">
+        <div class="bg-white bg-opacity-10 rounded-xl p-6">
+          <div class="flex items-center justify-center mb-4">
+            <i class="fas fa-user-check text-3xl text-green-300"></i>
+          </div>
+          <h3 class="text-lg font-semibold text-white mb-2">Account Created</h3>
+          <p class="text-white text-opacity-80 text-sm">Your account has been successfully created and is in our system.</p>
+        </div>
+
+        <div class="bg-white bg-opacity-10 rounded-xl p-6">
+          <div class="flex items-center justify-center mb-4">
+            <i class="fas fa-hourglass-half text-3xl text-yellow-300 pulse-animation"></i>
+          </div>
+          <h3 class="text-lg font-semibold text-white mb-2">Pending Review</h3>
+          <p class="text-white text-opacity-80 text-sm">Our team is reviewing your account and will assign appropriate permissions.</p>
+        </div>
+      </div>
+
+      <!-- Information Box -->
+      <div class="bg-blue-500 bg-opacity-20 border border-blue-300 border-opacity-30 rounded-xl p-6 mb-8">
+        <div class="flex items-start">
+          <i class="fas fa-info-circle text-blue-300 text-xl mt-1 mr-3"></i>
+          <div class="text-left">
+            <h4 class="text-white font-semibold mb-2">What happens next?</h4>
+            <ul class="text-white text-opacity-90 text-sm space-y-1">
+              <li>• Our administration team will review your account</li>
+              <li>• You will be assigned to the appropriate user group</li>
+              <li>• You'll receive access to your designated dashboard</li>
+              <li>• An email notification will be sent once approved</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Contact Information -->
+      <div class="bg-white bg-opacity-10 rounded-xl p-6 mb-8">
+        <h4 class="text-white font-semibold mb-4 flex items-center justify-center">
+          <i class="fas fa-envelope mr-2"></i>
+          Need Help?
+        </h4>
+        <p class="text-white text-opacity-90 text-sm mb-4">
+          If you believe this is an error or need immediate assistance, please contact our administration team:
+        </p>
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+          <a href="mailto:admin@agu.edu.bh" class="inline-flex items-center justify-center px-6 py-3 bg-white bg-opacity-20 hover:bg-opacity-30 text-white rounded-lg transition-all duration-300 transform hover:scale-105">
+            <i class="fas fa-envelope mr-2"></i>
+            admin@agu.edu.bh
+          </a>
+          <a href="tel:+97317787878" class="inline-flex items-center justify-center px-6 py-3 bg-white bg-opacity-20 hover:bg-opacity-30 text-white rounded-lg transition-all duration-300 transform hover:scale-105">
+            <i class="fas fa-phone mr-2"></i>
+            +973 1778 7878
+          </a>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="flex flex-col sm:flex-row gap-4 justify-center">
+        <a href="{% url 'account_logout' %}" class="inline-flex items-center justify-center px-8 py-4 bg-red-500 hover:bg-red-600 text-white font-semibold rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg">
+          <i class="fas fa-sign-out-alt mr-2"></i>
+          Logout
+        </a>
+        <button onclick="window.location.reload()" class="inline-flex items-center justify-center px-8 py-4 bg-white bg-opacity-20 hover:bg-opacity-30 text-white font-semibold rounded-xl transition-all duration-300 transform hover:scale-105 border border-white border-opacity-30">
+          <i class="fas fa-sync-alt mr-2"></i>
+          Refresh Status
+        </button>
+      </div>
+
+      <!-- Footer -->
+      <div class="mt-8 pt-6 border-t border-white border-opacity-20">
+        <p class="text-white text-opacity-70 text-sm">
+          <i class="fas fa-university mr-2"></i>
+          Arabian Gulf University - E-Logbook System
+        </p>
+      </div>
     </div>
+
+    <!-- Additional Info Card -->
+    <div class="mt-6 glass-effect rounded-2xl p-6 text-center">
+      <div class="flex items-center justify-center space-x-6 text-white text-opacity-80">
+        <div class="flex items-center">
+          <i class="fas fa-shield-alt mr-2 text-green-300"></i>
+          <span class="text-sm">Secure</span>
+        </div>
+        <div class="flex items-center">
+          <i class="fas fa-clock mr-2 text-blue-300"></i>
+          <span class="text-sm">24/7 Support</span>
+        </div>
+        <div class="flex items-center">
+          <i class="fas fa-graduation-cap mr-2 text-purple-300"></i>
+          <span class="text-sm">AGU Official</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- JavaScript for enhanced interactions -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Add smooth hover effects
+  const cards = document.querySelectorAll('.glass-effect, [class*="bg-white bg-opacity"]');
+  cards.forEach(card => {
+    card.addEventListener('mouseenter', function() {
+      this.style.transform = 'translateY(-2px)';
+      this.style.transition = 'all 0.3s ease';
+    });
+
+    card.addEventListener('mouseleave', function() {
+      this.style.transform = 'translateY(0)';
+    });
+  });
+
+  // Add click effect to buttons
+  const buttons = document.querySelectorAll('a, button');
+  buttons.forEach(button => {
+    button.addEventListener('click', function(e) {
+      // Create ripple effect
+      const ripple = document.createElement('span');
+      const rect = this.getBoundingClientRect();
+      const size = Math.max(rect.width, rect.height);
+      const x = e.clientX - rect.left - size / 2;
+      const y = e.clientY - rect.top - size / 2;
+
+      ripple.style.width = ripple.style.height = size + 'px';
+      ripple.style.left = x + 'px';
+      ripple.style.top = y + 'px';
+      ripple.classList.add('ripple');
+
+      this.appendChild(ripple);
+
+      setTimeout(() => {
+        ripple.remove();
+      }, 600);
+    });
+  });
+
+  // Auto-refresh status every 30 seconds (optional)
+  // setInterval(() => {
+  //   console.log('Checking account status...');
+  //   // You can add AJAX call here to check if account status has changed
+  // }, 30000);
+});
+</script>
+
+<style>
+.ripple {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  transform: scale(0);
+  animation: ripple-animation 0.6s linear;
+  pointer-events: none;
+}
+
+@keyframes ripple-animation {
+  to {
+    transform: scale(4);
+    opacity: 0;
+  }
+}
+</style>
 {% endblock %}
 

@@ -49,6 +49,11 @@ urlpatterns = [
     path("blog/<int:blog_id>/edit/", views.blog_edit, name="blog_edit"),
     path("blog/<int:blog_id>/delete/", views.blog_delete, name="blog_delete"),
 
+    # Blog Category URLs
+    path("blog/categories/", views.blog_categories, name="blog_categories"),
+    path("blog/category/<int:category_id>/edit/", views.blog_category_edit, name="blog_category_edit"),
+    path("blog/category/<int:category_id>/delete/", views.blog_category_delete, name="blog_category_delete"),
+
     path("admin_support/", views.admin_support, name="admin_support"),
     path("admin_reviews/", views.admin_reviews, name="admin_reviews"),
     path("admin_profile/", views.admin_profile, name="admin_profile"),
@@ -56,8 +61,11 @@ urlpatterns = [
 
     # Report URLs
     path("department_report/", views.department_report, name="department_report"),
+    path("department_report/export/", views.department_report_export, name="department_report_export"),
     path("student_report/", views.student_report, name="student_report"),
+    path("student_report/export/", views.student_report_export, name="student_report_export"),
     path("tutor_report/", views.tutor_report, name="tutor_report"),
+    path("tutor_report/export/", views.tutor_report_export, name="tutor_report_export"),
     path("logout/", auth_views.LogoutView.as_view(), name="logout"),
     # Activity Type URLs
     path("add_activity_type/", add_activity_type, name="add_activity_type"),

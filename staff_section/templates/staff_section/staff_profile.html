@@ -171,13 +171,31 @@
 
     photoInput.addEventListener('change', function() {
       if (this.files && this.files[0]) {
+        const file = this.files[0];
+
+        // Check file size before preview (120KB = 120 * 1024 bytes)
+        const maxSize = 120 * 1024;
+        if (file.size > maxSize) {
+          alert(`File size too large. Maximum allowed size is 120KB. Your file is ${Math.round(file.size / 1024)}KB.`);
+          this.value = ''; // Clear the input
+          return;
+        }
+
+        // Check file type
+        const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
+        if (!allowedTypes.includes(file.type)) {
+          alert('Invalid file type. Only JPEG, PNG, and GIF images are allowed.');
+          this.value = ''; // Clear the input
+          return;
+        }
+
         const reader = new FileReader();
 
         reader.onload = function(e) {
           photoPreview.src = e.target.result;
         };
 
-        reader.readAsDataURL(this.files[0]);
+        reader.readAsDataURL(file);
       }
     });
   });
