@@ -106,13 +106,17 @@
         <i class="fas fa-download text-green-600 dark:text-green-400 mr-2"></i> Export Report
       </h3>
       <div class="flex flex-wrap gap-3">
-        <button onclick="exportToPDF()" class="inline-flex items-center px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-medium rounded-lg transition-colors duration-200">
+        <button onclick="exportToPDF()" class="inline-flex items-center px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-medium rounded-lg transition-colors duration-200" id="pdf-export-btn">
           <i class="fas fa-file-pdf mr-2"></i>
           Export as PDF
         </button>
-        <button onclick="exportToExcel()" class="inline-flex items-center px-4 py-2 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg transition-colors duration-200">
+        <button onclick="exportToExcel()" class="inline-flex items-center px-4 py-2 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg transition-colors duration-200" id="excel-export-btn">
           <i class="fas fa-file-excel mr-2"></i>
           Export as Excel
+        </button>
+        <button onclick="testExport()" class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors duration-200" id="test-export-btn">
+          <i class="fas fa-bug mr-2"></i>
+          Test Export
         </button>
       </div>
     </div>
@@ -809,20 +813,90 @@
 
   // Export to PDF
   function exportToPDF() {
-    const params = new URLSearchParams(window.location.search);
-    params.set('format', 'pdf');
-    const exportUrl = '/admin_section/student_report/export/?' + params.toString();
-    window.open(exportUrl, '_blank');
+    console.log('exportToPDF function called');
+    try {
+      const params = new URLSearchParams(window.location.search);
+      params.set('format', 'pdf');
+      const exportUrl = '/admin_section/student_report/export/?' + params.toString();
+      console.log('PDF Export URL:', exportUrl);
+      window.open(exportUrl, '_blank');
+    } catch (error) {
+      console.error('Error in exportToPDF:', error);
+      alert('Error exporting PDF: ' + error.message);
+    }
   }
 
   // Export to Excel
   function exportToExcel() {
+    console.log('exportToExcel function called');
+    try {
+      const params = new URLSearchParams(window.location.search);
+      params.set('format', 'excel');
+      const exportUrl = '/admin_section/student_report/export/?' + params.toString();
+      console.log('Excel Export URL:', exportUrl);
+      window.open(exportUrl, '_blank');
+    } catch (error) {
+      console.error('Error in exportToExcel:', error);
+      alert('Error exporting Excel: ' + error.message);
+    }
+  }
+
+  // Test function to debug export issues
+  function testExport() {
+    console.log('Test export function called');
+    console.log('Current URL:', window.location.href);
+    console.log('Current search params:', window.location.search);
+
+    // Test if functions exist
+    console.log('exportToPDF exists:', typeof exportToPDF === 'function');
+    console.log('exportToExcel exists:', typeof exportToExcel === 'function');
+
+    // Test URL construction
     const params = new URLSearchParams(window.location.search);
-    params.set('format', 'excel');
-    const exportUrl = '/admin_section/student_report/export/?' + params.toString();
-    window.open(exportUrl, '_blank');
+    params.set('format', 'test');
+    const testUrl = '/admin_section/student_report/export/?' + params.toString();
+    console.log('Test export URL would be:', testUrl);
+
+    alert('Check browser console for debug information. Export functions are: ' +
+          (typeof exportToPDF === 'function' ? 'WORKING' : 'NOT WORKING'));
   }
-  }
+
+  // Make functions globally accessible
+  window.exportToPDF = exportToPDF;
+  window.exportToExcel = exportToExcel;
+  window.testExport = testExport;
+
+  // Add event listeners as backup
+  document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM loaded, setting up export button listeners');
+
+    const pdfBtn = document.getElementById('pdf-export-btn');
+    const excelBtn = document.getElementById('excel-export-btn');
+    const testBtn = document.getElementById('test-export-btn');
+
+    if (pdfBtn) {
+      pdfBtn.addEventListener('click', function(e) {
+        console.log('PDF button clicked via event listener');
+        exportToPDF();
+      });
+    }
+
+    if (excelBtn) {
+      excelBtn.addEventListener('click', function(e) {
+        console.log('Excel button clicked via event listener');
+        exportToExcel();
+      });
+    }
+
+    if (testBtn) {
+      testBtn.addEventListener('click', function(e) {
+        console.log('Test button clicked via event listener');
+        testExport();
+      });
+    }
+
+    console.log('Export button listeners set up successfully');
+  });
 
   // Search functionality with debounce
   let searchTimeout;
