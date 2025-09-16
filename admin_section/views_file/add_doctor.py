@@ -14,7 +14,12 @@ from admin_section.models import Department
 from admin_section.forms import DoctorUserForm, DoctorForm, AssignDoctorToDepartmentForm, BulkDoctorUploadForm
 
 
+@login_required
 def add_doctor(request):
+    # Check if user is admin
+    if request.user.role != 'admin':
+        messages.error(request, "You don't have permission to access this page.")
+        return redirect('admin_section:admin_dash')
     # Initialize forms
     user_form = DoctorUserForm()
     doctor_form = DoctorForm()

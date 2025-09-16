@@ -58,8 +58,8 @@
       </div>
     {% endif %}
 
-    <!-- Forms Section (Hidden by default) -->
-    <div id="forms-section" class="mb-8 hidden">
+    <!-- Forms Section (Hidden by default, shown if errors or requested) -->
+    <div id="forms-section" class="mb-8 {% if user_form.errors or doctor_form.errors or bulk_form.errors or assign_form.errors %}{% else %}hidden{% endif %}">
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <!-- Add Individual Doctor Form -->
         <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-6 transform transition-all duration-300 hover:shadow-xl">
@@ -412,9 +412,23 @@
     const toggleFormsBtn = document.getElementById('toggle-forms-btn');
     const formsSection = document.getElementById('forms-section');
 
+    console.log('Add doctor page loaded');
+    console.log('Toggle button found:', !!toggleFormsBtn);
+    console.log('Forms section found:', !!formsSection);
+
     if (toggleFormsBtn && formsSection) {
+      // Check initial state and update button accordingly
+      const isInitiallyHidden = formsSection.classList.contains('hidden');
+      if (!isInitiallyHidden) {
+        toggleFormsBtn.innerHTML = '<i class="fas fa-times mr-2"></i> Hide Forms';
+        toggleFormsBtn.classList.remove('bg-blue-600', 'hover:bg-blue-700');
+        toggleFormsBtn.classList.add('bg-gray-600', 'hover:bg-gray-700');
+      }
+
       toggleFormsBtn.addEventListener('click', function() {
+        console.log('Toggle button clicked');
         const isHidden = formsSection.classList.contains('hidden');
+        console.log('Forms currently hidden:', isHidden);
 
         if (isHidden) {
           // Show forms
@@ -423,6 +437,7 @@
           toggleFormsBtn.innerHTML = '<i class="fas fa-times mr-2"></i> Hide Forms';
           toggleFormsBtn.classList.remove('bg-blue-600', 'hover:bg-blue-700');
           toggleFormsBtn.classList.add('bg-gray-600', 'hover:bg-gray-700');
+          console.log('Forms shown');
         } else {
           // Hide forms
           formsSection.classList.add('hidden');
@@ -430,6 +445,7 @@
           toggleFormsBtn.innerHTML = '<i class="fas fa-plus mr-2"></i> Add New Doctor';
           toggleFormsBtn.classList.remove('bg-gray-600', 'hover:bg-gray-700');
           toggleFormsBtn.classList.add('bg-blue-600', 'hover:bg-blue-700');
+          console.log('Forms hidden');
         }
       });
 

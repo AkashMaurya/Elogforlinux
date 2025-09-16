@@ -1690,3 +1690,173 @@ StripUnsafeNextMiddleware: request path=/admin_section/student_report/ qs=depart
 StripUnsafeNextMiddleware: request path=/admin_section/student_report/ qs=department=1&student=24&q=
 StripUnsafeNextMiddleware: request path=/admin_section/student_report/export/ qs=department=1&student=24&q=&format=pdf
 StripUnsafeNextMiddleware: request path=/admin_section/student_report/export/ qs=department=1&student=24&q=&format=excel
+StripUnsafeNextMiddleware: request path=/admin_section/student_report/export/ qs=department=1&student=24&q=&format=pdf
+StripUnsafeNextMiddleware: request path=/admin_section/student_report/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/student_report/ qs=department=&student=24&q=
+StripUnsafeNextMiddleware: request path=/admin_section/add_user/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/add_doctor/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/add_doctor/ qs=department=1
+StripUnsafeNextMiddleware: request path=/admin_section/add_doctor/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/add_staff/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/add_user/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/edit-user/86/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/edit-user/86/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/add_user/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/add_staff/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/add_staff/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/add_staff/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/student_report/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/add_training_site/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/add_doctor/ qs=
+StripUnsafeNextMiddleware: request path=/ qs=
+StripUnsafeNextMiddleware: request path=/.well-known/assetlinks.json qs=
+StripUnsafeNextMiddleware: request path=/student_login.aspx qs=
+StripUnsafeNextMiddleware: request path=/admin_section/add_doctor/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/add_doctor/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/admin_blogs/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/add_doctor/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/add_doctor/ qs=department=5
+StripUnsafeNextMiddleware: request path=/accounts/microsoft/direct/ qs=
+microsoft_direct: CALLED - method=GET path=/accounts/microsoft/direct/ user=None
+microsoft_direct: stashed state_id=RwDU6PWkhOaYuCWI
+microsoft_direct: persisted SSOState state_id=RwDU6PWkhOaYuCWI
+microsoft_direct: client_id=2b3039c5-f... tenant=9c021be8-508f-4638-b1df-52b0e3c615ac redirect_uri=https://elog.agu.edu.bh/accounts/microsoft/login/callback/
+microsoft_direct: redirecting to Microsoft OAuth URL: https://login.microsoftonline.com/9c021be8-508f-4638-b1df-52b0e3c615ac/oauth2/v2.0/authorize?client_...
+SSOStateRestoreMiddleware: callback path hit=/accounts/microsoft/login/callback/ session_keys=['socialaccount_states']
+SSO callback request host=elog.agu.edu.bh path=/accounts/microsoft/login/callback/ qs=code=1.AUcA6BsCnI9QOEax31Kw48YVrMU5MCs4_7FKklAi55HjOZkNAQBHAA.AgABBAIAAABVrSpeuWamRam2jAF1XRQEAwDs_wUA9P9IwdMKdXxWMtuzgcKrx4iPjVyt8VeY7Qjn_U6JkGEsEM_rIqt9yNhexNPrxmfLsBjLf5-kfGB4Llbc6cazjZQ3cYRna7pTQ_X96wVv4ti8FhrXq5vMBhJobaWWrkMu655dR_ph_adgAds9Lon4dQbfqv5qpa1BQx-YjSlNOAY8mAAeafpucJQDcLIaSDsEER77v6l2bmQ40zObcrC-D8chd5sdmwBI0eEzP1jioBR4j6s5X9xODzhLeNZQnfJQSN-Mkj51fG-e48eiSPqBhnYR4qHJopIWBh_Ra-zWuAaLnbQHhVDqlCnfiQl5Fl5G7BmKKjhS1MLSPGbgWgZqt_aNVRzr0LkIVwXduVBs90DdHKzk96guqJYWaelX0DsrUIORrTWpkmA4g92O5tO5byWdHMGWE4GAszlxDqgC6V9wm6jzf-gyWuliWwMVlt4cF3mYJAMd6CPzqnDCocjXUAP5JD2-3E5LqjY85EbE_tZxszGykZHLFeEiaEdxXv0Rynv6p0-ZqhrNhdwX7Kuyw8yN58q8yGydtTQHroBrlhJ_83HYOTqzi0L0nYAXufqX8D6MEAj36kc8no7RVCpu039VjEML3oqWzvfr3j907SM_DVLfGJfE5BmITXR-6536202uxTrhbptrLdwfEF5HqE41W2Z6Fd6XS10B-0vK4bnLw_E04z_Pj0H-TeYaoYT0zgE3pMGChoc17IJjpB9eOCUlu48m_iwBXv-G9dHCoqurjUB22ikKMPdgFIuiyM7Xty7e_HTtB4FcyU1uQ-_tHyfkL2sxZPpOxCur2Shnw-poHC9e&state=RwDU6PWkhOaYuCWI&session_state=008bcd29-9dd5-e560-6d30-6d39c63fad08 scheme=https session_key=5ct5zcydwrx17f46313mzqczcsecdgix cookies=['csrftoken', 'sessionid'] raw_cookie=csrftoken=2bJlkjJG2bx2iUxpoh35G6Mgq1Usnh2k; sessionid=5ct5zcydwrx17f46313mzqczcsecdgix session_keys=['socialaccount_states']
+StripUnsafeNextMiddleware: request path=/accounts/microsoft/login/callback/ qs=code=1.AUcA6BsCnI9QOEax31Kw48YVrMU5MCs4_7FKklAi55HjOZkNAQBHAA.AgABBAIAAABVrSpeuWamRam2jAF1XRQEAwDs_wUA9P9IwdMKdXxWMtuzgcKrx4iPjVyt8VeY7Qjn_U6JkGEsEM_rIqt9yNhexNPrxmfLsBjLf5-kfGB4Llbc6cazjZQ3cYRna7pTQ_X96wVv4ti8FhrXq5vMBhJobaWWrkMu655dR_ph_adgAds9Lon4dQbfqv5qpa1BQx-YjSlNOAY8mAAeafpucJQDcLIaSDsEER77v6l2bmQ40zObcrC-D8chd5sdmwBI0eEzP1jioBR4j6s5X9xODzhLeNZQnfJQSN-Mkj51fG-e48eiSPqBhnYR4qHJopIWBh_Ra-zWuAaLnbQHhVDqlCnfiQl5Fl5G7BmKKjhS1MLSPGbgWgZqt_aNVRzr0LkIVwXduVBs90DdHKzk96guqJYWaelX0DsrUIORrTWpkmA4g92O5tO5byWdHMGWE4GAszlxDqgC6V9wm6jzf-gyWuliWwMVlt4cF3mYJAMd6CPzqnDCocjXUAP5JD2-3E5LqjY85EbE_tZxszGykZHLFeEiaEdxXv0Rynv6p0-ZqhrNhdwX7Kuyw8yN58q8yGydtTQHroBrlhJ_83HYOTqzi0L0nYAXufqX8D6MEAj36kc8no7RVCpu039VjEML3oqWzvfr3j907SM_DVLfGJfE5BmITXR-6536202uxTrhbptrLdwfEF5HqE41W2Z6Fd6XS10B-0vK4bnLw_E04z_Pj0H-TeYaoYT0zgE3pMGChoc17IJjpB9eOCUlu48m_iwBXv-G9dHCoqurjUB22ikKMPdgFIuiyM7Xty7e_HTtB4FcyU1uQ-_tHyfkL2sxZPpOxCur2Shnw-poHC9e&state=RwDU6PWkhOaYuCWI&session_state=008bcd29-9dd5-e560-6d30-6d39c63fad08
+pre_social_login: existing=86 for email=akashm@agu.edu.bh
+pre_social_login: connected social to existing user pk=86
+social.get_connect_redirect_url: CALLED for user=86
+social.get_connect_redirect_url: manually logged in user 86
+social.get_connect_redirect_url: redirecting to /accounts/post-login-redirect/
+StripUnsafeNextMiddleware: request path=/accounts/post-login-redirect/ qs=
+post_login_redirect: called with user=86 auth=True session_info={'session_key': '5hbsa9k1izmh9a140y5fgcu0rxaqqeua', 'session_keys': ['socialaccount_states', '_auth_user_id', '_auth_user_backend', '_auth_user_hash'], 'has_socialaccount_states': True}
+post_login_redirect: user=86 role=staff redirecting to /staff_section/
+StripUnsafeNextMiddleware: request path=/staff_section/ qs=
+StripUnsafeNextMiddleware: request path=/staff_section/staff_profile/ qs=
+StripUnsafeNextMiddleware: request path=/staff_section/staff_profile/ qs=
+StripUnsafeNextMiddleware: request path=/staff_section/staff_profile/ qs=
+StripUnsafeNextMiddleware: request path=/staff_section/staff_profile/ qs=
+StripUnsafeNextMiddleware: request path=/staff_section/staff_profile/ qs=
+StripUnsafeNextMiddleware: request path=/staff_section/staff_profile/ qs=
+StripUnsafeNextMiddleware: request path=/staff_section/staff_profile/ qs=
+StripUnsafeNextMiddleware: request path=/staff_section/ qs=
+StripUnsafeNextMiddleware: request path=/staff_section/staff_profile/ qs=
+StripUnsafeNextMiddleware: request path=/staff_section/emergency-attendance/ qs=
+StripUnsafeNextMiddleware: request path=/staff_section/emergency-attendance/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/add_user/ qs=role=staff&q=
+StripUnsafeNextMiddleware: request path=/admin_section/edit-user/86/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/edit-user/86/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/add_user/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/add_doctor/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/edit-doctor/7/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/edit-doctor/7/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/add_doctor/ qs=
+StripUnsafeNextMiddleware: request path=/hello.world qs=%ADd+allow_url_include%3d1+%ADd+auto_prepend_file%3dphp://input
+StripUnsafeNextMiddleware: request path=/ qs=%ADd+allow_url_include%3d1+%ADd+auto_prepend_file%3dphp://input
+StripUnsafeNextMiddleware: request path=/vendor/phpunit/phpunit/src/Util/PHP/eval-stdin.php qs=
+StripUnsafeNextMiddleware: request path=/vendor/phpunit/phpunit/Util/PHP/eval-stdin.php qs=
+StripUnsafeNextMiddleware: request path=/vendor/phpunit/src/Util/PHP/eval-stdin.php qs=
+StripUnsafeNextMiddleware: request path=/vendor/phpunit/Util/PHP/eval-stdin.php qs=
+StripUnsafeNextMiddleware: request path=/vendor/phpunit/phpunit/LICENSE/eval-stdin.php qs=
+StripUnsafeNextMiddleware: request path=/vendor/vendor/phpunit/phpunit/src/Util/PHP/eval-stdin.php qs=
+StripUnsafeNextMiddleware: request path=/phpunit/phpunit/src/Util/PHP/eval-stdin.php qs=
+StripUnsafeNextMiddleware: request path=/phpunit/phpunit/Util/PHP/eval-stdin.php qs=
+StripUnsafeNextMiddleware: request path=/phpunit/src/Util/PHP/eval-stdin.php qs=
+StripUnsafeNextMiddleware: request path=/phpunit/Util/PHP/eval-stdin.php qs=
+StripUnsafeNextMiddleware: request path=/lib/phpunit/phpunit/src/Util/PHP/eval-stdin.php qs=
+StripUnsafeNextMiddleware: request path=/lib/phpunit/phpunit/Util/PHP/eval-stdin.php qs=
+StripUnsafeNextMiddleware: request path=/lib/phpunit/src/Util/PHP/eval-stdin.php qs=
+StripUnsafeNextMiddleware: request path=/lib/phpunit/Util/PHP/eval-stdin.php qs=
+StripUnsafeNextMiddleware: request path=/lib/vendor/phpunit/phpunit/src/Util/PHP/eval-stdin.php qs=
+StripUnsafeNextMiddleware: request path=/laravel/vendor/phpunit/phpunit/src/Util/PHP/eval-stdin.php qs=
+StripUnsafeNextMiddleware: request path=/www/vendor/phpunit/phpunit/src/Util/PHP/eval-stdin.php qs=
+StripUnsafeNextMiddleware: request path=/staff_section/logout/ qs=
+StripUnsafeNextMiddleware: request path=/login/ qs=
+StripUnsafeNextMiddleware: request path=/ws/vendor/phpunit/phpunit/src/Util/PHP/eval-stdin.php qs=
+StripUnsafeNextMiddleware: request path=/yii/vendor/phpunit/phpunit/src/Util/PHP/eval-stdin.php qs=
+StripUnsafeNextMiddleware: request path=/zend/vendor/phpunit/phpunit/src/Util/PHP/eval-stdin.php qs=
+StripUnsafeNextMiddleware: request path=/ws/ec/vendor/phpunit/phpunit/src/Util/PHP/eval-stdin.php qs=
+StripUnsafeNextMiddleware: request path=/V2/vendor/phpunit/phpunit/src/Util/PHP/eval-stdin.php qs=
+StripUnsafeNextMiddleware: request path=/tests/vendor/phpunit/phpunit/src/Util/PHP/eval-stdin.php qs=
+StripUnsafeNextMiddleware: request path=/accounts/microsoft/direct/ qs=
+microsoft_direct: CALLED - method=GET path=/accounts/microsoft/direct/ user=None
+microsoft_direct: stashed state_id=MeWmT1e7jJoGGbZa
+microsoft_direct: persisted SSOState state_id=MeWmT1e7jJoGGbZa
+microsoft_direct: client_id=2b3039c5-f... tenant=9c021be8-508f-4638-b1df-52b0e3c615ac redirect_uri=https://elog.agu.edu.bh/accounts/microsoft/login/callback/
+microsoft_direct: redirecting to Microsoft OAuth URL: https://login.microsoftonline.com/9c021be8-508f-4638-b1df-52b0e3c615ac/oauth2/v2.0/authorize?client_...
+StripUnsafeNextMiddleware: request path=/test/vendor/phpunit/phpunit/src/Util/PHP/eval-stdin.php qs=
+StripUnsafeNextMiddleware: request path=/testing/vendor/phpunit/phpunit/src/Util/PHP/eval-stdin.php qs=
+StripUnsafeNextMiddleware: request path=/api/vendor/phpunit/phpunit/src/Util/PHP/eval-stdin.php qs=
+SSOStateRestoreMiddleware: callback path hit=/accounts/microsoft/login/callback/ session_keys=['socialaccount_states']
+SSO callback request host=elog.agu.edu.bh path=/accounts/microsoft/login/callback/ qs=code=1.AUcA6BsCnI9QOEax31Kw48YVrMU5MCs4_7FKklAi55HjOZkNAQBHAA.AgABBAIAAABVrSpeuWamRam2jAF1XRQEAwDs_wUA9P-8UWII_b8CLhzYfRZGmGK4tb2skkHiYHJFFPNqEerUTqyT40F4_Q6LMA7dxelSFGa11flidQtVvW_PGQ2Sdwe1hrHLopE0TlJ9KKrjpHX3hzftRHGYsQrZiEwdx7PKVDKw8e0Nt-EByWY-AB4POQRPqbXG5WrZf5mxEpLuMF77-IKtId31c0saxDDo4BtgGCPvznVxetusEmE-SoHLuS0WVLXuNYlV0wyTmp-aTEf4cRaI_mESiedJ8C1_4VWh1AuS_y9ThJ3c8FYyagvMcFH-QbXrT-2VX6L8HtQUDiC1qxX8oi38f5HQGB8HKMmkDC4z-gXf1VM7Rp63xLskWEmXYubfBk6qwM5pPPPN077MNESUyrNxIDWfvXKKwI2Cpf-9Z_8Wh5jkLAyBEmgUSDOZu11LkUTEPfahEaDEYaMsvG3NathWnmxQMAQftldoh0uokK3CwVfB1quna4qvOPXmkbbEbpVnUdlzXwkW4G3sf-L0Gm_AQRNi_NpoRLMM28uzOOFBVVzlz0G4mn3ySYKA24Bl5yf4ujrpxpQkG9ZUWQmwttrreuEJl3Acg0RyAPtBb9cfWOx3CagbG2l8DWZ_fHarFHh4befLIZfcRB1wq6g0FBDjIRIrx6r2VfXUb_iaEhHMWY6TEUweYZIH9c-0-uq3eqqWPe9qoABtU0_nreRC_3JsardsqDclwkFghHXs9303pZCmOhtvJkuG5-8oAqhSsCYsKh1JiuEBC_P3QcMaJRt4vHZFJGeAfM6HKqiHuGXYG4Ax8yBIQozsOYPxHKVlvZWXH6m2tpCj4ndz6h9l&state=MeWmT1e7jJoGGbZa&session_state=008bcd29-9dd5-e560-6d30-6d39c63fad08 scheme=https session_key=oi0ii6ph95qrkojxz3pkdz011sk9td6i cookies=['csrftoken', 'sessionid'] raw_cookie=csrftoken=Bq9evLx6SVHItntG5sV0bWNlYdyko03d; sessionid=oi0ii6ph95qrkojxz3pkdz011sk9td6i session_keys=['socialaccount_states']
+StripUnsafeNextMiddleware: request path=/accounts/microsoft/login/callback/ qs=code=1.AUcA6BsCnI9QOEax31Kw48YVrMU5MCs4_7FKklAi55HjOZkNAQBHAA.AgABBAIAAABVrSpeuWamRam2jAF1XRQEAwDs_wUA9P-8UWII_b8CLhzYfRZGmGK4tb2skkHiYHJFFPNqEerUTqyT40F4_Q6LMA7dxelSFGa11flidQtVvW_PGQ2Sdwe1hrHLopE0TlJ9KKrjpHX3hzftRHGYsQrZiEwdx7PKVDKw8e0Nt-EByWY-AB4POQRPqbXG5WrZf5mxEpLuMF77-IKtId31c0saxDDo4BtgGCPvznVxetusEmE-SoHLuS0WVLXuNYlV0wyTmp-aTEf4cRaI_mESiedJ8C1_4VWh1AuS_y9ThJ3c8FYyagvMcFH-QbXrT-2VX6L8HtQUDiC1qxX8oi38f5HQGB8HKMmkDC4z-gXf1VM7Rp63xLskWEmXYubfBk6qwM5pPPPN077MNESUyrNxIDWfvXKKwI2Cpf-9Z_8Wh5jkLAyBEmgUSDOZu11LkUTEPfahEaDEYaMsvG3NathWnmxQMAQftldoh0uokK3CwVfB1quna4qvOPXmkbbEbpVnUdlzXwkW4G3sf-L0Gm_AQRNi_NpoRLMM28uzOOFBVVzlz0G4mn3ySYKA24Bl5yf4ujrpxpQkG9ZUWQmwttrreuEJl3Acg0RyAPtBb9cfWOx3CagbG2l8DWZ_fHarFHh4befLIZfcRB1wq6g0FBDjIRIrx6r2VfXUb_iaEhHMWY6TEUweYZIH9c-0-uq3eqqWPe9qoABtU0_nreRC_3JsardsqDclwkFghHXs9303pZCmOhtvJkuG5-8oAqhSsCYsKh1JiuEBC_P3QcMaJRt4vHZFJGeAfM6HKqiHuGXYG4Ax8yBIQozsOYPxHKVlvZWXH6m2tpCj4ndz6h9l&state=MeWmT1e7jJoGGbZa&session_state=008bcd29-9dd5-e560-6d30-6d39c63fad08
+StripUnsafeNextMiddleware: request path=/demo/vendor/phpunit/phpunit/src/Util/PHP/eval-stdin.php qs=
+pre_social_login: existing=86 for email=akashm@agu.edu.bh
+pre_social_login: connected social to existing user pk=86
+social.get_connect_redirect_url: CALLED for user=86
+social.get_connect_redirect_url: manually logged in user 86
+social.get_connect_redirect_url: redirecting to /accounts/post-login-redirect/
+StripUnsafeNextMiddleware: request path=/cms/vendor/phpunit/phpunit/src/Util/PHP/eval-stdin.php qs=
+StripUnsafeNextMiddleware: request path=/accounts/post-login-redirect/ qs=
+post_login_redirect: called with user=86 auth=True session_info={'session_key': 'ckxas1ij71xdz9qgn1kkxqjanfnv411f', 'session_keys': ['socialaccount_states', '_auth_user_id', '_auth_user_backend', '_auth_user_hash'], 'has_socialaccount_states': True}
+post_login_redirect: user=86 role=doctor redirecting to /doctors/
+StripUnsafeNextMiddleware: request path=/doctors/ qs=
+StripUnsafeNextMiddleware: request path=/crm/vendor/phpunit/phpunit/src/Util/PHP/eval-stdin.php qs=
+StripUnsafeNextMiddleware: request path=/admin/vendor/phpunit/phpunit/src/Util/PHP/eval-stdin.php qs=
+StripUnsafeNextMiddleware: request path=/backup/vendor/phpunit/phpunit/src/Util/PHP/eval-stdin.php qs=
+StripUnsafeNextMiddleware: request path=/blog/vendor/phpunit/phpunit/src/Util/PHP/eval-stdin.php qs=
+StripUnsafeNextMiddleware: request path=/workspace/drupal/vendor/phpunit/phpunit/src/Util/PHP/eval-stdin.php qs=
+StripUnsafeNextMiddleware: request path=/panel/vendor/phpunit/phpunit/src/Util/PHP/eval-stdin.php qs=
+StripUnsafeNextMiddleware: request path=/public/vendor/phpunit/phpunit/src/Util/PHP/eval-stdin.php qs=
+StripUnsafeNextMiddleware: request path=/apps/vendor/phpunit/phpunit/src/Util/PHP/eval-stdin.php qs=
+StripUnsafeNextMiddleware: request path=/app/vendor/phpunit/phpunit/src/Util/PHP/eval-stdin.php qs=
+StripUnsafeNextMiddleware: request path=/index.php qs=s=/index/\think\app/invokefunction&function=call_user_func_array&vars[0]=md5&vars[1][]=Hello
+StripUnsafeNextMiddleware: request path=/public/index.php qs=s=/index/\think\app/invokefunction&function=call_user_func_array&vars[0]=md5&vars[1][]=Hello
+StripUnsafeNextMiddleware: request path=/index.php qs=lang=../../../../../../../../usr/local/lib/php/pearcmd&+config-create+/&/<?echo(md5("hi"));?>+/tmp/index1.php
+StripUnsafeNextMiddleware: request path=/index.php qs=lang=../../../../../../../../tmp/index1
+StripUnsafeNextMiddleware: request path=/containers/json qs=
+StripUnsafeNextMiddleware: request path=/doctors/doctor_profile/ qs=
+StripUnsafeNextMiddleware: request path=/doctors/doctor_profile/ qs=
+StripUnsafeNextMiddleware: request path=/doctors/take-attendance/ qs=
+StripUnsafeNextMiddleware: request path=/doctors/ qs=
+StripUnsafeNextMiddleware: request path=/doctors/take-attendance/ qs=
+StripUnsafeNextMiddleware: request path=/doctors/ qs=
+StripUnsafeNextMiddleware: request path=/doctors/doctor_reviews/ qs=
+StripUnsafeNextMiddleware: request path=/doctors/take-attendance/ qs=
+StripUnsafeNextMiddleware: request path=/doctors/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/student_report/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/student_report/export/ qs=format=pdf
+StripUnsafeNextMiddleware: request path=/admin_section/student_report/ qs=department=&student=22&q=
+StripUnsafeNextMiddleware: request path=/admin_section/student_report/export/ qs=department=&student=22&q=&format=excel
+StripUnsafeNextMiddleware: request path=/admin_section/tutor_report/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/tutor_report/export/ qs=format=pdf
+StripUnsafeNextMiddleware: request path=/admin_section/tutor_report/export/ qs=format=pdf
+StripUnsafeNextMiddleware: request path=/admin_section/tutor_report/export/ qs=format=excel
+StripUnsafeNextMiddleware: request path=/admin_section/tutor_report/ qs=department=1&doctor=&q=
+StripUnsafeNextMiddleware: request path=/admin_section/tutor_report/export/ qs=department=1&doctor=&q=&format=pdf
+StripUnsafeNextMiddleware: request path=/admin_section/tutor_report/export/ qs=department=1&doctor=&q=&format=excel
+StripUnsafeNextMiddleware: request path=/admin_section/tutor_report/ qs=department=1&doctor=7&q=
+StripUnsafeNextMiddleware: request path=/admin_section/tutor_report/export/ qs=department=1&doctor=7&q=&format=pdf
+StripUnsafeNextMiddleware: request path=/admin_section/tutor_report/ qs=department=1&doctor=7&q=
+StripUnsafeNextMiddleware: request path=/admin_section/add_staff/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/add_doctor/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/add_doctor/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/tutor_report/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/tutor_report/export/ qs=format=pdf
+StripUnsafeNextMiddleware: request path=/admin_section/tutor_report/export/ qs=format=excel
+StripUnsafeNextMiddleware: request path=/admin_section/tutor_report/ qs=department=1&doctor=&q=
+StripUnsafeNextMiddleware: request path=/admin_section/tutor_report/export/ qs=department=1&doctor=&q=&format=pdf
+StripUnsafeNextMiddleware: request path=/admin_section/tutor_report/export/ qs=department=1&doctor=&q=&format=excel
+StripUnsafeNextMiddleware: request path=/admin_section/tutor_report/ qs=department=1&doctor=7&q=
+StripUnsafeNextMiddleware: request path=/admin_section/tutor_report/export/ qs=department=1&doctor=7&q=&format=pdf
+StripUnsafeNextMiddleware: request path=/admin_section/tutor_report/export/ qs=department=1&doctor=7&q=&format=excel
+StripUnsafeNextMiddleware: request path=/admin_section/admin_profile/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/update-profile-photo/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/admin_blogs/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/admin_profile/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/admin_blogs/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/admin_profile/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/ qs=

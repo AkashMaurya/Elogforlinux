@@ -644,20 +644,24 @@ def student_report_export(request):
     # Get students with filters
     students = Student.objects.select_related('user', 'group', 'group__log_year').all()
 
-    # Filter by department through logs (since Group doesn't have department)
-    if selected_department:
+    # Apply filters in order of specificity
+    if selected_student:
+        # If specific student is selected, filter by student first
+        students = students.filter(id=selected_student)
+
+    if selected_group:
+        students = students.filter(group_id=selected_group)
+
+    if selected_year:
+        students = students.filter(group__log_year__year_name=selected_year)
+
+    # Filter by department through logs only if department is selected AND no specific student
+    if selected_department and not selected_student:
         # Get students who have logs in the selected department
         student_ids_with_dept_logs = StudentLogFormModel.objects.filter(
             department_id=selected_department
         ).values_list('student_id', flat=True).distinct()
         students = students.filter(id__in=student_ids_with_dept_logs)
-
-    if selected_year:
-        students = students.filter(group__log_year__year_name=selected_year)
-    if selected_group:
-        students = students.filter(group_id=selected_group)
-    if selected_student:
-        students = students.filter(id=selected_student)
 
     # Prepare data for export
     student_data = []
@@ -1042,18 +1046,22 @@ def tutor_report_export(request):
     # Prepare data for export
     tutor_data = []
     for doctor in doctors:
-        # Get logs reviewed by this doctor
-        reviewed_logs = StudentLogFormModel.objects.filter(reviewed_by=doctor.user)
+        # Get logs supervised by this doctor (tutor field)
+        supervised_logs = StudentLogFormModel.objects.filter(tutor=doctor)
         if selected_year:
-            reviewed_logs = reviewed_logs.filter(student__group__log_year__year_name=selected_year)
+            supervised_logs = supervised_logs.filter(student__group__log_year__year_name=selected_year)
 
-        # Get unique students this doctor has reviewed
-        unique_students = reviewed_logs.values('student').distinct().count()
+        # Get unique students this doctor has supervised
+        unique_students = supervised_logs.values('student').distinct().count()
 
-        # Get unique departments this doctor has reviewed logs for
-        unique_departments = reviewed_logs.values('department').distinct().count()
+        # Get unique departments this doctor has supervised logs for
+        unique_departments = supervised_logs.values('department').distinct().count()
 
-        # Calculate average review time (if available)
+        # Calculate total supervised logs
+        total_supervised = supervised_logs.count()
+
+        # Get reviewed logs (logs that have been reviewed)
+        reviewed_logs = supervised_logs.filter(is_reviewed=True)
         total_reviews = reviewed_logs.count()
 
         # Get doctor's departments (many-to-many relationship)
@@ -1064,6 +1072,7 @@ def tutor_report_export(request):
             'name': f"{doctor.user.first_name} {doctor.user.last_name}",
             'email': doctor.user.email,
             'department': department_names,
+            'total_supervised': total_supervised,
             'total_reviews': total_reviews,
             'unique_students': unique_students,
             'unique_departments': unique_departments,
@@ -1100,10 +1109,10 @@ def export_tutor_excel(tutor_data, selected_department=None, selected_year=None)
     ws['A1'] = title
     ws['A1'].font = Font(size=16, bold=True)
     ws['A1'].alignment = Alignment(horizontal='center')
-    ws.merge_cells('A1:H1')
+    ws.merge_cells('A1:I1')
 
     # Add headers
-    headers = ['Name', 'Email', 'Department', 'Specialization', 'Phone', 'Total Reviews', 'Students Reviewed', 'Departments']
+    headers = ['Name', 'Email', 'Department', 'Specialization', 'Phone', 'Total Supervised', 'Total Reviews', 'Students Supervised', 'Departments']
     for col, header in enumerate(headers, 1):
         cell = ws.cell(row=3, column=col, value=header)
         cell.font = Font(bold=True)
@@ -1118,9 +1127,10 @@ def export_tutor_excel(tutor_data, selected_department=None, selected_year=None)
         ws.cell(row=row, column=3, value=tutor['department'])
         ws.cell(row=row, column=4, value=tutor['specialization'])
         ws.cell(row=row, column=5, value=tutor['phone'])
-        ws.cell(row=row, column=6, value=tutor['total_reviews'])
-        ws.cell(row=row, column=7, value=tutor['unique_students'])
-        ws.cell(row=row, column=8, value=tutor['unique_departments'])
+        ws.cell(row=row, column=6, value=tutor['total_supervised'])
+        ws.cell(row=row, column=7, value=tutor['total_reviews'])
+        ws.cell(row=row, column=8, value=tutor['unique_students'])
+        ws.cell(row=row, column=9, value=tutor['unique_departments'])
 
     # Add chart
     if len(tutor_data) > 0:
@@ -1204,13 +1214,14 @@ def export_tutor_pdf(tutor_data, selected_department=None, selected_year=None):
     elements.append(Spacer(1, 20))
 
     # Create table data
-    table_data = [['Name', 'Email', 'Department', 'Specialization', 'Total Reviews', 'Students Reviewed', 'Departments']]
+    table_data = [['Name', 'Email', 'Department', 'Specialization', 'Total Supervised', 'Total Reviews', 'Students Supervised', 'Departments']]
     for tutor in tutor_data:
         table_data.append([
             tutor['name'],
             tutor['email'],
             tutor['department'],
             tutor['specialization'],
+            str(tutor['total_supervised']),
             str(tutor['total_reviews']),
             str(tutor['unique_students']),
             str(tutor['unique_departments'])

@@ -114,10 +114,6 @@
           <i class="fas fa-file-excel mr-2"></i>
           Export as Excel
         </button>
-        <button onclick="testExport()" class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors duration-200" id="test-export-btn">
-          <i class="fas fa-bug mr-2"></i>
-          Test Export
-        </button>
       </div>
     </div>
   </div>
@@ -841,30 +837,9 @@
     }
   }
 
-  // Test function to debug export issues
-  function testExport() {
-    console.log('Test export function called');
-    console.log('Current URL:', window.location.href);
-    console.log('Current search params:', window.location.search);
-
-    // Test if functions exist
-    console.log('exportToPDF exists:', typeof exportToPDF === 'function');
-    console.log('exportToExcel exists:', typeof exportToExcel === 'function');
-
-    // Test URL construction
-    const params = new URLSearchParams(window.location.search);
-    params.set('format', 'test');
-    const testUrl = '/admin_section/student_report/export/?' + params.toString();
-    console.log('Test export URL would be:', testUrl);
-
-    alert('Check browser console for debug information. Export functions are: ' +
-          (typeof exportToPDF === 'function' ? 'WORKING' : 'NOT WORKING'));
-  }
-
   // Make functions globally accessible
   window.exportToPDF = exportToPDF;
   window.exportToExcel = exportToExcel;
-  window.testExport = testExport;
 
   // Add event listeners as backup
   document.addEventListener('DOMContentLoaded', function() {
@@ -872,7 +847,6 @@
 
     const pdfBtn = document.getElementById('pdf-export-btn');
     const excelBtn = document.getElementById('excel-export-btn');
-    const testBtn = document.getElementById('test-export-btn');
 
     if (pdfBtn) {
       pdfBtn.addEventListener('click', function(e) {
@@ -885,13 +859,6 @@
       excelBtn.addEventListener('click', function(e) {
         console.log('Excel button clicked via event listener');
         exportToExcel();
-      });
-    }
-
-    if (testBtn) {
-      testBtn.addEventListener('click', function(e) {
-        console.log('Test button clicked via event listener');
-        testExport();
       });
     }
 
