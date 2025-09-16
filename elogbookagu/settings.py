@@ -30,7 +30,7 @@ SECRET_KEY = config("SECRET_KEY")
 
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 # DEBUG = os.getenelog("DEBUG", "False") == "True"
 #ALLOWED_HOSTS = ['63.178.58.137', 'elog.agu.edu.bh']

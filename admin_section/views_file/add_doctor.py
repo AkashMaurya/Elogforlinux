@@ -10,7 +10,7 @@ from django import forms
 import csv
 import io
 from accounts.models import CustomUser, Doctor
-from admin_section.models import Department
+from admin_section.models import Department, AdminNotification
 from admin_section.forms import DoctorUserForm, DoctorForm, AssignDoctorToDepartmentForm, BulkDoctorUploadForm
 
 
@@ -260,7 +260,9 @@ def add_doctor(request):
         'selected_department': department_filter,
         'search_query': search_query,
         'bulk_results': bulk_results,
-        'sample_csv_data': sample_csv_data
+        'sample_csv_data': sample_csv_data,
+        'unread_notifications_count': AdminNotification.objects.filter(recipient=request.user, is_read=False).count() if request.user.is_authenticated else 0,
+        'admin_unread_notifications_count': AdminNotification.objects.filter(recipient=request.user, is_read=False).count() if request.user.is_authenticated else 0
     }
 
     return render(request, "admin_section/add_doctor.html", context)

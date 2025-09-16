@@ -2139,3 +2139,8 @@ StripUnsafeNextMiddleware: request path=/admin_section/add_doctor/ qs=
 StripUnsafeNextMiddleware: request path=/admin_section/add_doctor/ qs=
 StripUnsafeNextMiddleware: request path=/admin_section/add_doctor/ qs=
 StripUnsafeNextMiddleware: request path=/admin_section/add_doctor/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/add_doctor/ qs=
+StripUnsafeNextMiddleware: request path=/admin_section/add_doctor/ qs=
+StripUnsafeNextMiddleware: request path=/apple-touch-icon-precomposed.png qs=
+StripUnsafeNextMiddleware: request path=/ qs=
+StripUnsafeNextMiddleware: request path=/apple-touch-icon.png qs=
