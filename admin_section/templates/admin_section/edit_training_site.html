@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+
+{% block title %}
+  Edit Training Site
+{% endblock %}
+
+{% block navbar %}
+{% include 'components/admin_auth_navbar.html' %}
+{% endblock %}
+
+{% block content %}
+  <div class="container mx-auto px-4 py-8">
+    <div class="flex items-center justify-between mb-8">
+      <div>
+        <h2 class="text-3xl font-bold text-gray-800 dark:text-white">Edit Training Site</h2>
+        <p class="text-gray-600 dark:text-gray-300 mt-1">Update training site information</p>
+      </div>
+      <a href="{% url 'admin_section:add_training_site' %}" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600 transition-colors duration-200 flex items-center">
+        <i class="fas fa-arrow-left mr-2"></i> Back to Training Sites
+      </a>
+    </div>
+
+    <!-- Messages section -->
+    {% if messages %}
+      <div class="mb-6">
+        {% for message in messages %}
+          <div class="p-4 mb-4 rounded-lg {% if message.tags == 'success' %}bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100{% elif message.tags == 'error' %}bg-red-100 text-red-800 dark:bg-red-800 dark:text-red-100{% else %}bg-blue-100 text-blue-800 dark:bg-blue-800 dark:text-blue-100{% endif %}">
+            {{ message }}
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    <div class="max-w-2xl mx-auto">
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+        <form method="post" action="{% url 'admin_section:edit_training_site' training_site.id %}">
+          {% csrf_token %}
+          
+          <div class="mb-4">
+            <label for="{{ form.name.id_for_label }}" class="block text-gray-700 dark:text-gray-300 mb-2">Training Site Name</label>
+            {{ form.name }}
+            {% if form.name.errors %}
+              <p class="text-red-500 text-sm mt-1">{{ form.name.errors.0 }}</p>
+            {% endif %}
+          </div>
+          
+          <div class="mb-6">
+            <label for="{{ form.log_year.id_for_label }}" class="block text-gray-700 dark:text-gray-300 mb-2">Academic Year</label>
+            {{ form.log_year }}
+            {% if form.log_year.errors %}
+              <p class="text-red-500 text-sm mt-1">{{ form.log_year.errors.0 }}</p>
+            {% endif %}
+          </div>
+          
+          <div class="flex justify-end space-x-4">
+            <a href="{% url 'admin_section:add_training_site' %}" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600 transition-colors duration-200">
+              Cancel
+            </a>
+            <button type="submit" class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-lg transition duration-200">
+              Update Training Site
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+{% endblock %}

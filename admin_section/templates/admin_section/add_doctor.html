@@ -1,0 +1,561 @@
+{% extends 'base.html' %}
+
+{% block title %}
+  Manage Doctors
+{% endblock %}
+
+{% block navbar %}
+{% include 'components/admin_auth_navbar.html' %}
+{% endblock %}
+
+<!-- Main Content -->
+
+{% block content %}
+  <div class="container mx-auto px-4 py-8">
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
+      <div>
+        <h2 class="text-3xl font-bold text-gray-800 dark:text-white">Manage Doctors</h2>
+        <p class="text-gray-600 dark:text-gray-300 mt-1">edit, and manage doctors and their department assignments</p>
+      </div>
+      <div class="mt-4 md:mt-0">
+       <!-- <button id="toggle-forms-btn" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 flex items-center">
+          <i class="fas fa-plus mr-2"></i> Add New Doctor
+        </button>-->
+      </div>
+    </div>
+
+    <!-- Success/Error Messages -->
+    {% if messages %}
+      <div class="mb-6">
+        {% for message in messages %}
+          <div class="p-4 mb-4 rounded-lg {% if message.tags == 'success' %}bg-green-100 text-green-800 dark:bg-green-200 dark:text-green-900{% elif message.tags == 'error' %}bg-red-100 text-red-800 dark:bg-red-200 dark:text-red-900{% elif message.tags == 'warning' %}bg-yellow-100 text-yellow-800 dark:bg-yellow-200 dark:text-yellow-900{% else %}bg-blue-100 text-blue-800 dark:bg-blue-200 dark:text-blue-900{% endif %} animate-fadeIn">
+            {{ message }}
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    <!-- Bulk Upload Results -->
+    {% if bulk_results %}
+      <div class="mb-6 p-4 rounded-lg bg-gray-100 dark:bg-gray-700">
+        <h3 class="text-lg font-semibold mb-2 text-gray-800 dark:text-white">Bulk Upload Results</h3>
+        <p class="mb-2">Successfully added: <span class="font-semibold text-green-600 dark:text-green-400">{{ bulk_results.success_count }}</span></p>
+        <p class="mb-2">Failed: <span class="font-semibold text-red-600 dark:text-red-400">{{ bulk_results.error_count }}</span></p>
+
+        {% if bulk_results.errors %}
+          <div class="mt-4">
+            <h4 class="text-md font-semibold mb-2 text-gray-800 dark:text-white">Errors:</h4>
+            <ul class="list-disc pl-5 text-red-600 dark:text-red-400">
+              {% for error in bulk_results.errors %}
+                <li>{{ error }}</li>
+              {% endfor %}
+            </ul>
+            {% if bulk_results.errors|length < bulk_results.error_count %}
+              <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">Showing {{ bulk_results.errors|length }} of {{ bulk_results.error_count }} errors.</p>
+            {% endif %}
+          </div>
+        {% endif %}
+      </div>
+    {% endif %}
+
+    <!-- Forms Section (Hidden by default, shown if errors or requested) -->
+    <div id="forms-section" class="mb-8 {% if user_form.errors or doctor_form.errors or bulk_form.errors or assign_form.errors %}{% else %}hidden{% endif %}">
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Add Individual Doctor Form -->
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-6 transform transition-all duration-300 hover:shadow-xl">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-xl font-semibold text-gray-800 dark:text-white">Add New Doctor</h3>
+            <span class="text-xs px-2 py-1 bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 rounded-full">Individual</span>
+          </div>
+          <form method="POST" action="{% url 'admin_section:add_doctor' %}" onsubmit="console.log('Form submitting...'); return validateForm(this);">
+            {% csrf_token %}
+            <input type="hidden" name="add_doctor" value="1">
+
+            <!-- Display any form errors at the top -->
+            {% if user_form.non_field_errors or doctor_form.non_field_errors %}
+              <div class="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
+                <h4 class="font-bold">Please correct the following errors:</h4>
+                {% for error in user_form.non_field_errors %}
+                  <p>{{ error }}</p>
+                {% endfor %}
+                {% for error in doctor_form.non_field_errors %}
+                  <p>{{ error }}</p>
+                {% endfor %}
+              </div>
+            {% endif %}
+
+            <!-- User Form Fields -->
+            <div class="mb-4">
+              <label for="{{ user_form.username.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Username</label>
+              {{ user_form.username }}
+              {% if user_form.username.errors %}
+                <p class="text-red-500 text-sm mt-1">{{ user_form.username.errors.0 }}</p>
+              {% endif %}
+            </div>
+
+            <div class="mb-4">
+              <label for="{{ user_form.email.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email</label>
+              {{ user_form.email }}
+              {% if user_form.email.errors %}
+                <p class="text-red-500 text-sm mt-1">{{ user_form.email.errors.0 }}</p>
+              {% endif %}
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+              <div>
+                <label for="{{ user_form.password1.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Password</label>
+                {{ user_form.password1 }}
+                {% if user_form.password1.errors %}
+                  <p class="text-red-500 text-sm mt-1">{{ user_form.password1.errors.0 }}</p>
+                {% endif %}
+              </div>
+              <div>
+                <label for="{{ user_form.password2.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Confirm Password</label>
+                {{ user_form.password2 }}
+                {% if user_form.password2.errors %}
+                  <p class="text-red-500 text-sm mt-1">{{ user_form.password2.errors.0 }}</p>
+                {% endif %}
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+              <div>
+                <label for="{{ user_form.first_name.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">First Name</label>
+                {{ user_form.first_name }}
+                {% if user_form.first_name.errors %}
+                  <p class="text-red-500 text-sm mt-1">{{ user_form.first_name.errors.0 }}</p>
+                {% endif %}
+              </div>
+              <div>
+                <label for="{{ user_form.last_name.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Last Name</label>
+                {{ user_form.last_name }}
+                {% if user_form.last_name.errors %}
+                  <p class="text-red-500 text-sm mt-1">{{ user_form.last_name.errors.0 }}</p>
+                {% endif %}
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+              <div>
+                <label for="{{ user_form.phone_no.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Phone Number</label>
+                {{ user_form.phone_no }}
+                {% if user_form.phone_no.errors %}
+                  <p class="text-red-500 text-sm mt-1">{{ user_form.phone_no.errors.0 }}</p>
+                {% endif %}
+              </div>
+              <div>
+                <label for="{{ user_form.city.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">City</label>
+                {{ user_form.city }}
+                {% if user_form.city.errors %}
+                  <p class="text-red-500 text-sm mt-1">{{ user_form.city.errors.0 }}</p>
+                {% endif %}
+              </div>
+            </div>
+
+            <div class="mb-4">
+              <label for="{{ user_form.country.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Country</label>
+              {{ user_form.country }}
+              {% if user_form.country.errors %}
+                <p class="text-red-500 text-sm mt-1">{{ user_form.country.errors.0 }}</p>
+              {% endif %}
+            </div>
+
+            <div class="mb-4">
+              <label for="{{ user_form.speciality.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Speciality</label>
+              {{ user_form.speciality }}
+              {% if user_form.speciality.errors %}
+                <p class="text-red-500 text-sm mt-1">{{ user_form.speciality.errors.0 }}</p>
+              {% endif %}
+            </div>
+
+            <div class="mb-4">
+              <label for="{{ user_form.bio.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Bio</label>
+              {{ user_form.bio }}
+              {% if user_form.bio.errors %}
+                <p class="text-red-500 text-sm mt-1">{{ user_form.bio.errors.0 }}</p>
+              {% endif %}
+            </div>
+
+            <!-- Doctor Form Fields -->
+            <div class="mb-4">
+              <label for="{{ doctor_form.departments.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Departments</label>
+              {{ doctor_form.departments }}
+              {% if doctor_form.departments.errors %}
+                <p class="text-red-500 text-sm mt-1">{{ doctor_form.departments.errors.0 }}</p>
+              {% endif %}
+              <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Hold Ctrl/Cmd to select multiple departments</p>
+            </div>
+
+            <button type="submit" class="w-full mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all duration-300 transform hover:scale-105" onclick="console.log('Add Doctor form submitted')">
+              <i class="fas fa-user-md mr-2"></i> Add Doctor
+            </button>
+          </form>
+        </div>
+
+        <!-- Assign Doctor to Department Form -->
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-6 transform transition-all duration-300 hover:shadow-xl">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-xl font-semibold text-gray-800 dark:text-white">Assign to Department</h3>
+            <span class="text-xs px-2 py-1 bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 rounded-full">Existing Doctor</span>
+          </div>
+          <form method="POST" action="{% url 'admin_section:add_doctor' %}">
+            {% csrf_token %}
+            <input type="hidden" name="assign_doctor" value="1">
+
+            <div class="mb-4">
+              <label for="{{ assign_form.doctor.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Doctor</label>
+              {{ assign_form.doctor }}
+              {% if assign_form.doctor.errors %}
+                <p class="text-red-500 text-sm mt-1">{{ assign_form.doctor.errors.0 }}</p>
+              {% endif %}
+            </div>
+
+            <div class="mb-4">
+              <label for="{{ assign_form.department.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Department</label>
+              {{ assign_form.department }}
+              {% if assign_form.department.errors %}
+                <p class="text-red-500 text-sm mt-1">{{ assign_form.department.errors.0 }}</p>
+              {% endif %}
+            </div>
+
+            <button type="submit" class="w-full mt-4 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-all duration-300 transform hover:scale-105">
+              <i class="fas fa-link mr-2"></i> Assign to Department
+            </button>
+          </form>
+        </div>
+
+        <!-- Bulk Upload Form -->
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 transform transition-all duration-300 hover:shadow-xl">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-xl font-semibold text-gray-800 dark:text-white">Bulk Upload</h3>
+            <span class="text-xs px-2 py-1 bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200 rounded-full">Multiple Doctors</span>
+          </div>
+          <form method="POST" action="{% url 'admin_section:add_doctor' %}" enctype="multipart/form-data">
+            {% csrf_token %}
+            <input type="hidden" name="bulk_upload" value="1">
+
+            <div class="mb-4">
+              <label for="{{ bulk_form.csv_file.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">CSV File</label>
+              {{ bulk_form.csv_file }}
+              {% if bulk_form.csv_file.errors %}
+                <p class="text-red-500 text-sm mt-1">{{ bulk_form.csv_file.errors.0 }}</p>
+              {% endif %}
+              <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Upload a CSV file with doctor information</p>
+            </div>
+
+            <div class="mb-4">
+              <label for="{{ bulk_form.department.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Department</label>
+              {{ bulk_form.department }}
+              {% if bulk_form.department.errors %}
+                <p class="text-red-500 text-sm mt-1">{{ bulk_form.department.errors.0 }}</p>
+              {% endif %}
+              <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">All doctors will be assigned to this department</p>
+            </div>
+
+            <button type="submit" class="w-full mt-4 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-all duration-300 transform hover:scale-105">
+              <i class="fas fa-upload mr-2"></i> Upload CSV
+            </button>
+
+            <div class="mt-4">
+              <a href="{% url 'admin_section:doctor_download_sample_csv' %}" class="text-blue-600 hover:underline dark:text-blue-400 flex items-center">
+                <i class="fas fa-download mr-1"></i> Download Sample CSV
+              </a>
+            </div>
+
+            <!-- Sample CSV Format -->
+            <div class="mt-4 p-3 bg-gray-100 dark:bg-gray-700 rounded-lg">
+              <h4 class="text-sm font-semibold mb-2 text-gray-800 dark:text-white">Required CSV Format:</h4>
+              <div class="overflow-x-auto text-xs">
+                <code class="text-gray-800 dark:text-gray-300">
+                  username,email,password,first_name,last_name,phone_no,city,country,speciality,bio<br>
+                  {{ sample_csv_data.username }},{{ sample_csv_data.email }},{{ sample_csv_data.password }},{{ sample_csv_data.first_name }},{{ sample_csv_data.last_name }},{{ sample_csv_data.phone_no }},{{ sample_csv_data.city }},{{ sample_csv_data.country }},{{ sample_csv_data.speciality }},{{ sample_csv_data.bio }}
+                </code>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Doctors Table Section -->
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden">
+      <!-- Filter and Search -->
+      <div class="p-4 border-b border-gray-200 dark:border-gray-700">
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between space-y-3 md:space-y-0">
+          <div class="flex flex-col md:flex-row md:items-center space-y-3 md:space-y-0 md:space-x-4">
+            <!-- Department Filter -->
+            <div>
+              <form method="get" action="{% url 'admin_section:add_doctor' %}" class="flex items-center space-x-2">
+                {% if search_query %}
+                  <input type="hidden" name="q" value="{{ search_query }}">
+                {% endif %}
+                <select name="department" class="px-3 py-2 border border-gray-300 rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                  <option value="">All Departments</option>
+                  {% for dept in departments %}
+                    <option value="{{ dept.id }}" {% if selected_department == dept.id|stringformat:"s" %}selected{% endif %}>{{ dept.name }}</option>
+                  {% endfor %}
+                </select>
+                <button type="submit" class="px-3 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors duration-200">
+                  <i class="fas fa-filter"></i>
+                </button>
+              </form>
+            </div>
+          </div>
+
+          <!-- Search -->
+          <div>
+            <form method="get" action="{% url 'admin_section:add_doctor' %}" class="flex items-center space-x-2">
+              {% if selected_department %}
+                <input type="hidden" name="department" value="{{ selected_department }}">
+              {% endif %}
+              <input type="text" name="q" value="{{ search_query }}" placeholder="Search doctors..." class="px-3 py-2 border border-gray-300 rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+              <button type="submit" class="px-3 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors duration-200">
+                <i class="fas fa-search"></i>
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <!-- Table -->
+      <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+          <thead class="bg-gray-50 dark:bg-gray-700">
+            <tr>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Name</th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Email</th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Departments</th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Speciality</th>
+              <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Actions</th>
+            </tr>
+          </thead>
+          <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+            {% for doctor in doctors %}
+              <tr class="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-150">
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">{{ doctor.user.first_name }} {{ doctor.user.last_name }}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">{{ doctor.user.email }}</td>
+                <td class="px-6 py-4 text-sm text-gray-500 dark:text-gray-300">
+                  {% for department in doctor.departments.all %}
+                    <div class="flex items-center mb-1 last:mb-0">
+                      <span class="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 text-xs px-2 py-1 rounded-full mr-2">{{ department.name }}</span>
+                      <a href="{% url 'admin_section:remove_from_department' doctor.id department.id %}" class="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 transition-colors duration-200" title="Remove from department">
+                        <i class="fas fa-times-circle"></i>
+                      </a>
+                    </div>
+                  {% empty %}
+                    <span class="text-gray-400 dark:text-gray-500 italic">No departments</span>
+                  {% endfor %}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">{{ doctor.user.speciality|default:"Not specified" }}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                  <div class="flex justify-end space-x-2">
+                    <a href="{% url 'admin_section:edit_doctor' doctor.id %}" class="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300 transition-colors duration-200">
+                      <i class="fas fa-edit"></i> Edit
+                    </a>
+                    <a href="{% url 'admin_section:delete_doctor' doctor.id %}" class="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 transition-colors duration-200">
+                      <i class="fas fa-trash"></i> Delete
+                    </a>
+                  </div>
+                </td>
+              </tr>
+            {% empty %}
+              <tr>
+                <td colspan="5" class="px-6 py-8 text-center text-sm text-gray-500 dark:text-gray-400">
+                  <div class="flex flex-col items-center justify-center">
+                    <i class="fas fa-user-md text-4xl mb-3 text-gray-300 dark:text-gray-600"></i>
+                    <p class="mb-2">No doctors found.</p>
+                    {% if search_query or selected_department %}
+                      <a href="{% url 'admin_section:add_doctor' %}" class="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300 transition-colors duration-200">
+                        <i class="fas fa-times mr-1"></i> Clear filters
+                      </a>
+                    {% endif %}
+                  </div>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination -->
+      {% if doctors.has_other_pages %}
+        <div class="px-6 py-4 bg-gray-50 dark:bg-gray-700 border-t border-gray-200 dark:border-gray-600">
+          <div class="flex justify-between items-center">
+            <div class="text-sm text-gray-700 dark:text-gray-300">
+              Showing <span class="font-medium">{{ doctors.start_index }}</span> to <span class="font-medium">{{ doctors.end_index }}</span> of <span class="font-medium">{{ doctors.paginator.count }}</span> doctors
+            </div>
+            <nav class="inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+              {% if doctors.has_previous %}
+                <a href="?page={{ doctors.previous_page_number }}{% if selected_department %}&department={{ selected_department }}{% endif %}{% if search_query %}&q={{ search_query }}{% endif %}" class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm font-medium text-gray-500 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200">
+                  <span class="sr-only">Previous</span>
+                  <i class="fas fa-chevron-left"></i>
+                </a>
+              {% endif %}
+
+              {% for i in doctors.paginator.page_range %}
+                {% if doctors.number == i %}
+                  <span class="relative inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 bg-blue-50 dark:bg-blue-900 text-sm font-medium text-blue-600 dark:text-blue-200">
+                    {{ i }}
+                  </span>
+                {% elif i > doctors.number|add:'-3' and i < doctors.number|add:'3' %}
+                  <a href="?page={{ i }}{% if selected_department %}&department={{ selected_department }}{% endif %}{% if search_query %}&q={{ search_query }}{% endif %}" class="relative inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200">
+                    {{ i }}
+                  </a>
+                {% endif %}
+              {% endfor %}
+
+              {% if doctors.has_next %}
+                <a href="?page={{ doctors.next_page_number }}{% if selected_department %}&department={{ selected_department }}{% endif %}{% if search_query %}&q={{ search_query }}{% endif %}" class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm font-medium text-gray-500 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200">
+                  <span class="sr-only">Next</span>
+                  <i class="fas fa-chevron-right"></i>
+                </a>
+              {% endif %}
+            </nav>
+          </div>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  // Form validation function
+  function validateForm(form) {
+    console.log('Validating form...');
+
+    // Check required fields
+    const requiredFields = [
+      'username', 'email', 'password1', 'password2',
+      'first_name', 'last_name', 'phone_no', 'city',
+      'country', 'speciality'
+    ];
+
+    let isValid = true;
+    const missingFields = [];
+
+    requiredFields.forEach(fieldName => {
+      const field = form.querySelector(`[name="${fieldName}"]`);
+      if (field && !field.value.trim()) {
+        missingFields.push(fieldName);
+        isValid = false;
+      }
+    });
+
+    // Check departments
+    const departmentSelect = form.querySelector('[name="departments"]');
+    if (departmentSelect && departmentSelect.selectedOptions.length === 0) {
+      missingFields.push('departments');
+      isValid = false;
+    }
+
+    if (!isValid) {
+      console.error('Missing required fields:', missingFields);
+      alert('Please fill in all required fields: ' + missingFields.join(', '));
+      return false;
+    }
+
+    // Check password match
+    const password1 = form.querySelector('[name="password1"]');
+    const password2 = form.querySelector('[name="password2"]');
+    if (password1 && password2 && password1.value !== password2.value) {
+      alert('Passwords do not match!');
+      return false;
+    }
+
+    console.log('Form validation passed');
+
+    // Disable submit button to prevent double submission
+    const submitBtn = form.querySelector('button[type="submit"]');
+    if (submitBtn) {
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Adding Doctor...';
+
+      // Re-enable after 5 seconds as a safety measure
+      setTimeout(() => {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<i class="fas fa-user-md mr-2"></i> Add Doctor';
+      }, 5000);
+    }
+
+    return true;
+  }
+
+  // Simple and reliable function to show/hide forms
+  function toggleForms() {
+    console.log('🔄 toggleForms called');
+
+    const formsSection = document.getElementById('forms-section');
+    const toggleBtn = document.getElementById('toggle-forms-btn');
+
+    if (!formsSection || !toggleBtn) {
+      console.error('❌ Error: Page elements not found');
+      alert('Error: Page elements not found. Please refresh the page.');
+      return false;
+    }
+
+    const isHidden = formsSection.classList.contains('hidden');
+    console.log('📋 Forms currently hidden:', isHidden);
+
+    if (isHidden) {
+      // Show forms
+      formsSection.classList.remove('hidden');
+      toggleBtn.innerHTML = '<i class="fas fa-times mr-2"></i> Hide Forms';
+      toggleBtn.className = 'px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors duration-200 flex items-center';
+      console.log('✅ Forms shown successfully');
+    } else {
+      // Hide forms
+      formsSection.classList.add('hidden');
+      toggleBtn.innerHTML = '<i class="fas fa-plus mr-2"></i> Add New Doctor';
+      toggleBtn.className = 'px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 flex items-center';
+      console.log('✅ Forms hidden successfully');
+    }
+
+    return false;
+  }
+
+  document.addEventListener('DOMContentLoaded', function() {
+    console.log('✅ Add doctor page loaded');
+
+    const formsSection = document.getElementById('forms-section');
+    const toggleBtn = document.getElementById('toggle-forms-btn');
+
+    if (!formsSection || !toggleBtn) {
+      console.error('❌ Required elements not found');
+      return;
+    }
+
+    // Add single event listener to the button
+    toggleBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      console.log('🔘 Button clicked');
+      toggleForms();
+    });
+
+    // Check initial state and update button accordingly
+    const isInitiallyHidden = formsSection.classList.contains('hidden');
+    console.log('📋 Forms initially hidden:', isInitiallyHidden);
+
+    if (!isInitiallyHidden) {
+      // Forms are visible, update button text
+      toggleBtn.innerHTML = '<i class="fas fa-times mr-2"></i> Hide Forms';
+      toggleBtn.className = 'px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors duration-200 flex items-center';
+    }
+
+    // Auto-show forms if there are errors or results
+    const hasFormErrors = document.querySelectorAll('.text-red-500').length > 0;
+    const hasBulkResults = document.querySelector('.bulk_results') !== null || {% if bulk_results %}true{% else %}false{% endif %};
+    const urlParams = new URLSearchParams(window.location.search);
+    const showFormParam = urlParams.get('show_form') === 'true';
+
+    if (hasFormErrors || hasBulkResults || showFormParam) {
+      console.log('📝 Auto-showing forms due to errors/results');
+      formsSection.classList.remove('hidden');
+      toggleBtn.innerHTML = '<i class="fas fa-times mr-2"></i> Hide Forms';
+      toggleBtn.className = 'px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors duration-200 flex items-center';
+    }
+
+    console.log('✅ Add doctor page initialization complete');
+  });
+</script>
+{% endblock %}

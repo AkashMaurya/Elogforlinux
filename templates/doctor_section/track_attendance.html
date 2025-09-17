@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container">
+    <h2>Student Attendance Tracking</h2>
+    <a href="{% url 'doctor_dashboard' %}" class="btn btn-secondary mb-3">Back to Dashboard</a>
+    <form method="post">
+        {% csrf_token %}
+        <!-- Add attendance form elements here -->
+        <button type="submit" class="btn btn-primary">Submit Attendance</button>
+    </form>
+</div>
+{% endblock %}

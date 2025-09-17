@@ -1,0 +1,188 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ blog.title }} - ElogBook{% endblock %}
+{% block navbar %}
+  {% include './components/public_navbar.html' %}
+{% endblock %}
+
+{% block extra_head %}
+  <style>
+    .blog-content {
+      line-height: 1.8;
+    }
+    
+    .blog-content p {
+      margin-bottom: 1.5rem;
+    }
+    
+    .blog-content h2 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-top: 2rem;
+      margin-bottom: 1rem;
+    }
+    
+    .blog-content h3 {
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin-top: 1.5rem;
+      margin-bottom: 0.75rem;
+    }
+    
+    .blog-content ul, .blog-content ol {
+      margin-left: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+    
+    .blog-content li {
+      margin-bottom: 0.5rem;
+    }
+    
+    .blog-content a {
+      color: #3b82f6;
+      text-decoration: underline;
+    }
+    
+    .blog-content a:hover {
+      color: #2563eb;
+    }
+    
+    .related-card {
+      transition: all 0.3s ease;
+    }
+    
+    .related-card:hover {
+      transform: translateY(-8px);
+    }
+  </style>
+{% endblock %}
+
+{% block content_container %}
+<!-- Hero Section with Blog Title -->
+<section class="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-700 dark:from-gray-800 dark:via-gray-700 dark:to-gray-900 py-16 md:py-24 w-full relative overflow-hidden">
+  <div class="absolute inset-0 bg-pattern opacity-10"></div>
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+    <div class="flex items-center justify-center mb-4">
+      <span class="px-3 py-1 text-sm font-semibold rounded-full 
+        {% if blog.category == 'news' %}bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-300
+        {% elif blog.category == 'announcement' %}bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300
+        {% elif blog.category == 'feature' %}bg-purple-100 text-purple-800 dark:bg-purple-900/50 dark:text-purple-300
+        {% else %}bg-gray-100 text-gray-800 dark:bg-gray-900/50 dark:text-gray-300{% endif %}">
+        {% for cat_value, cat_name in categories %}
+          {% if cat_value == blog.category %}{{ cat_name }}{% endif %}
+        {% endfor %}
+      </span>
+    </div>
+    <h1 class="text-4xl md:text-5xl font-bold text-center text-white animate-fade-in bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-100">{{ blog.title }}</h1>
+    <div class="mt-4 flex flex-wrap justify-center items-center text-gray-200">
+      <span>{{ blog.created_at|date:"F d, Y" }}</span>
+      <span class="mx-2">•</span>
+      <span>By {{ blog.author.get_full_name|default:blog.author.username }}</span>
+    </div>
+  </div>
+</section>
+
+{% block content %}
+<!-- Main Content Section -->
+<section class="py-12 md:py-16 bg-gray-50 dark:bg-gray-900">
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+    <!-- Featured Image -->
+    {% if blog.featured_image %}
+      <div class="mb-10 rounded-xl overflow-hidden shadow-lg">
+        <img src="{{ blog.featured_image.url }}" alt="{{ blog.title }}" class="w-full h-auto object-cover">
+      </div>
+    {% endif %}
+    
+    <!-- Blog Summary -->
+    <div class="mb-8">
+      <p class="text-xl text-gray-700 dark:text-gray-300 italic">{{ blog.summary }}</p>
+    </div>
+    
+    <!-- Blog Content -->
+    <div class="blog-content prose prose-lg max-w-none dark:prose-invert text-gray-700 dark:text-gray-300">
+      {{ blog.content|linebreaks }}
+    </div>
+    
+    <!-- Attachment -->
+    {% if blog.attachment %}
+      <div class="mt-12 p-6 bg-white dark:bg-gray-800 rounded-xl shadow-md">
+        <h3 class="text-xl font-bold text-gray-800 dark:text-white mb-4">Attachment</h3>
+        <div class="flex items-center">
+          <svg class="h-10 w-10 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"></path>
+          </svg>
+          <div class="ml-4">
+            <a href="{{ blog.attachment.url }}" target="_blank" class="text-lg font-medium text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300">
+              {{ blog.get_attachment_name }}
+            </a>
+            <p class="text-sm text-gray-500 dark:text-gray-400">Click to download</p>
+          </div>
+        </div>
+      </div>
+    {% endif %}
+    
+    <!-- Metadata -->
+    <div class="mt-12 pt-6 border-t border-gray-200 dark:border-gray-700">
+      <div class="flex justify-between text-sm text-gray-500 dark:text-gray-400">
+        <div>
+          <span>Published: {{ blog.created_at|date:"F d, Y" }}</span>
+        </div>
+        <div>
+          <a href="{% url 'update_page' %}" class="inline-flex items-center text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300">
+            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+            </svg>
+            Back to Updates
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Related Posts Section -->
+{% if related_blogs %}
+<section class="py-12 bg-white dark:bg-gray-800">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-8 text-center">Related Updates</h2>
+    
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+      {% for related in related_blogs %}
+        <div class="related-card bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden">
+          <div class="relative">
+            {% if related.featured_image %}
+              <img src="{{ related.featured_image.url }}" alt="{{ related.title }}" class="w-full h-48 object-cover transition duration-300 hover:scale-105">
+            {% else %}
+              <div class="w-full h-48 bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
+                <svg class="h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                </svg>
+              </div>
+            {% endif %}
+            <div class="absolute top-4 left-4 px-3 py-1 bg-blue-500 text-white text-sm font-medium rounded-full">
+              {% for cat_value, cat_name in categories %}
+                {% if cat_value == related.category %}{{ cat_name }}{% endif %}
+              {% endfor %}
+            </div>
+          </div>
+          <div class="p-6">
+            <div class="flex items-center mb-4">
+              <span class="text-sm text-gray-500 dark:text-gray-400">{{ related.created_at|date:"M d, Y" }}</span>
+            </div>
+            <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-3 hover:text-blue-600 dark:hover:text-blue-400 transition duration-300">{{ related.title }}</h3>
+            <p class="text-gray-600 dark:text-gray-300 mb-4">{{ related.summary|truncatechars:100 }}</p>
+            <a href="{% url 'blog_detail' related.id %}" class="inline-flex items-center text-blue-500 dark:text-blue-400 hover:text-blue-600 dark:hover:text-blue-300 transition duration-300 group">
+              <span>Read More</span>
+              <svg class="w-4 h-4 ml-2 transform group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+              </svg>
+            </a>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+{% endblock %}
+{% endblock %}

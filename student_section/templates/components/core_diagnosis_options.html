@@ -1,0 +1,4 @@
+<option value="">Select Core Diagnosis</option>
+{% for diagnosis in core_diagnosis %}
+    <option value="{{ diagnosis.id }}">{{ diagnosis.name }}</option>
+{% endfor %}

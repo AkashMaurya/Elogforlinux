@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+
+{% block title %}
+  Delete Doctor Confirmation
+{% endblock %}
+
+{% block navbar %}
+{% include 'components/admin_auth_navbar.html' %}
+{% endblock %}
+
+<!-- Main Content -->
+
+{% block content %}
+  <div class="container mx-auto px-4 py-8">
+    <div class="max-w-md mx-auto bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden">
+      <div class="p-6">
+        <div class="flex items-center justify-center mb-6">
+          <div class="w-16 h-16 bg-red-100 dark:bg-red-900 rounded-full flex items-center justify-center">
+            <i class="fas fa-exclamation-triangle text-red-600 dark:text-red-400 text-2xl"></i>
+          </div>
+        </div>
+        
+        <h2 class="text-2xl font-bold text-center text-gray-800 dark:text-white mb-4">Delete Doctor</h2>
+        
+        <div class="text-center mb-6">
+          <p class="text-gray-600 dark:text-gray-300 mb-4">
+            Are you sure you want to delete the doctor <span class="font-semibold">{{ doctor.user.first_name }} {{ doctor.user.last_name }}</span>?
+          </p>
+          <p class="text-red-600 dark:text-red-400 text-sm">
+            This action cannot be undone. All data associated with this doctor will be permanently deleted.
+          </p>
+        </div>
+        
+        <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg mb-6">
+          <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Doctor Information:</h3>
+          <ul class="text-sm text-gray-600 dark:text-gray-400 space-y-1">
+            <li><span class="font-medium">Name:</span> {{ doctor.user.first_name }} {{ doctor.user.last_name }}</li>
+            <li><span class="font-medium">Email:</span> {{ doctor.user.email }}</li>
+            <li><span class="font-medium">Speciality:</span> {{ doctor.user.speciality|default:"Not specified" }}</li>
+            <li>
+              <span class="font-medium">Departments:</span> 
+              {% if doctor.departments.all %}
+                {{ doctor.departments.all|join:", " }}
+              {% else %}
+                None
+              {% endif %}
+            </li>
+          </ul>
+        </div>
+        
+        <div class="flex justify-center space-x-4">
+          <a href="{% url 'admin_section:add_doctor' %}" class="px-6 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600 transition-colors duration-200">
+            Cancel
+          </a>
+          <form method="POST" action="{% url 'admin_section:delete_doctor' doctor.id %}">
+            {% csrf_token %}
+            <button type="submit" class="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-colors duration-200">
+              Delete Doctor
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}

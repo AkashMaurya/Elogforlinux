@@ -1,0 +1,1237 @@
+{% extends 'base.html' %}
+{% load custom_filters %}
+{% load static %}
+
+{% block title %}
+  Doctor Dashboard
+{% endblock %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'css/doctor_dash.css' %}">
+{% endblock %}
+
+{% block navbar %}
+  {% include './components/doc_auth_navbar.html' %}
+{% endblock %}
+
+{% block content %}
+  <div class="text-center p-10 mt-2">
+    <!-- Dashboard Header -->
+    <div class="text-center my-6 animate-slide-in">
+      <h2 class="text-4xl font-bold dark:text-white bg-gradient-to-r from-purple-500 to-indigo-500 dark:from-purple-400 dark:to-indigo-400 text-transparent bg-clip-text">Welcome, Dr. {{ request.session.first_name }}</h2>
+      <p class="text-gray-600 dark:text-gray-300 mt-2">Review student records and manage your tasks efficiently.</p>
+    </div>
+
+    <!-- Dashboard Filters -->
+    <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg mb-6 animate-fade-in">
+      <h3 class="text-xl font-semibold dark:text-white mb-4">Filter Dashboard</h3>
+      <form method="get" action="{% url 'doctor_section:doctor_dash' %}" class="space-y-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- Department Filter -->
+          <div>
+            <label for="department" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Department</label>
+            <select id="department" name="department" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+              <option value="">All Departments</option>
+              {% for dept in departments %}
+                <option value="{{ dept.id }}" {% if selected_department == dept.id|stringformat:'s' %}selected{% endif %}>{{ dept.name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <!-- Student Search -->
+          <div>
+            <label for="student_search" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Search Student</label>
+            <input type="text" id="student_search" name="q" value="{{ search_query }}" placeholder="Search by name, ID or email" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+          </div>
+        </div>
+
+        <div class="flex justify-end">
+          <button type="submit" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition duration-300 flex items-center">
+            <i class="fas fa-filter mr-2"></i> Apply Filters
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Dashboard Stats -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+      <!-- Total Records to Review -->
+      <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg flex items-center space-x-4 transform transition-all duration-300 hover:scale-105 animate-pulse-card">
+        <img src="https://cdn-icons-png.flaticon.com/512/1160/1160758.png" class="w-14 h-14" alt="Records Icon" />
+        <div>
+          <h3 class="text-xl font-semibold dark:text-white">Total Records</h3>
+          <p class="text-3xl font-bold text-purple-600 dark:text-purple-400">{{ total_records|default:100 }}</p>
+        </div>
+      </div>
+
+      <!-- Records Left to Review -->
+      <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg flex items-center space-x-4 transform transition-all duration-300 hover:scale-105 animate-pulse-card">
+        <img src="https://cdn-icons-png.flaticon.com/512/1008/1008928.png" alt="Pending Icon" class="w-14 h-14" />
+        <div>
+          <h3 class="text-xl font-semibold dark:text-white">Left to Review</h3>
+          <p class="text-3xl font-bold text-red-600 dark:text-red-400">{{ left_to_review }}</p>
+        </div>
+      </div>
+
+      <!-- Reviewed Records -->
+      <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg flex items-center space-x-4 transform transition-all duration-300 hover:scale-105 animate-pulse-card">
+        <img src="https://cdn-icons-png.flaticon.com/512/190/190411.png" alt="Reviewed Icon" class="w-14 h-14" />
+        <div>
+          <h3 class="text-xl font-semibold dark:text-white">Reviewed</h3>
+          <p class="text-3xl font-bold text-green-600 dark:text-green-400">{{ reviewed }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Doctor Info and Quick Links -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
+      <!-- Doctor Info with Progress Circle -->
+      <div class="bg-white dark:bg-gray-800 p-8 rounded-xl shadow-lg flex flex-col items-center justify-center min-h-[250px] transform transition-all duration-300 hover:shadow-xl">
+        <h3 class="text-2xl font-semibold dark:text-white mb-4 text-center">Your Progress</h3>
+        <div class="relative w-32 h-32 flex items-center justify-center">
+          <svg class="w-full h-full" viewBox="0 0 100 100">
+            <circle class="text-gray-200 dark:text-gray-600 stroke-current" stroke-width="10" cx="50" cy="50" r="40" fill="transparent"></circle>
+            <circle class="text-indigo-500 progress-ring stroke-current" stroke-width="10" stroke-linecap="round" cx="50" cy="50" r="40" fill="transparent" stroke-dasharray="251.2" stroke-dashoffset="calc(251.2 - (251.2 * {{ review_percentage|default:70 }}) / 100)"></circle>
+          </svg>
+          <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-2xl font-bold dark:text-white">{{ review_percentage|default:70 }}%</div>
+        </div>
+        <p class="text-gray-800 dark:text-gray-200 mt-4 text-center">Reviewed out of {{ total_records|default:100 }} records</p>
+      </div>
+
+      <!-- Quick Links -->
+      <div class="bg-white dark:bg-gray-800 p-8 rounded-xl shadow-lg transform transition-all duration-300 hover:shadow-xl">
+        <h3 class="text-2xl font-semibold dark:text-white mb-4">Quick Actions</h3>
+        <div class="space-y-3">
+          <a href="{% url 'doctor_section:doctor_reviews' %}" class="block py-3 px-6 bg-gradient-to-r from-purple-500 to-indigo-700 dark:from-purple-600 dark:to-indigo-800 text-white rounded-lg hover:from-purple-600 hover:to-indigo-800 dark:hover:from-purple-700 dark:hover:to-indigo-900 transition duration-300 transform hover:-translate-y-1"><i class="fas fa-clipboard-check mr-2"></i> Review Records</a>
+          <a href="{% url 'doctor_section:take_attendance' %}" class="block py-3 px-6 bg-gradient-to-r from-green-500 to-emerald-700 dark:from-green-600 dark:to-emerald-800 text-white rounded-lg hover:from-green-600 hover:to-emerald-800 dark:hover:from-green-700 dark:hover:to-emerald-900 transition duration-300 transform hover:-translate-y-1"><i class="fas fa-user-check mr-2"></i> Take Attendance</a>
+          <a href="{% url 'doctor_section:doctor_help' %}" class="block py-3 px-6 bg-gradient-to-r from-blue-500 to-blue-700 dark:from-blue-600 dark:to-blue-800 text-white rounded-lg hover:from-blue-600 hover:to-blue-800 dark:hover:from-blue-700 dark:hover:to-blue-900 transition duration-300 transform hover:-translate-y-1"><i class="fas fa-chart-bar mr-2"></i> Reports</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Priority Review Section (Unique Feature) -->
+    <div class="bg-white dark:bg-gray-800 p-8 rounded-xl shadow-lg mb-10 animate-fade-in">
+      <h3 class="text-2xl font-semibold dark:text-white mb-6">Priority Reviews</h3>
+      <div class="space-y-4">
+        {% if priority_records %}
+          {% for record in priority_records %}
+            <div class="flex items-center justify-between p-4 bg-gray-100 dark:bg-gray-700 rounded-lg transform transition-all duration-300 hover:scale-102">
+              <div>
+                <p class="text-lg font-semibold dark:text-white">{{ record.student_name }}</p>
+                <p class="text-gray-600 dark:text-gray-300">Due: {{ record.due_date }}</p>
+              </div>
+              <a href="{% url 'doctor_section:review_log' record.id %}" class="py-2 px-4 bg-red-500 text-white rounded-lg hover:bg-red-600 transition duration-300">Review Now</a>
+            </div>
+          {% endfor %}
+        {% else %}
+          <p class="text-gray-600 dark:text-gray-300">No priority reviews at the moment.</p>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Chart.js Visualization -->
+    <div class="bg-white dark:bg-gray-800 p-8 rounded-xl shadow-lg animate-fade-in mb-10">
+      <h3 class="text-2xl font-semibold dark:text-white mb-6">Record Review Overview</h3>
+      <canvas id="reviewChart" height="120"></canvas>
+
+      <!-- Fallback for chart if JavaScript fails -->
+      <div class="chart-fallback hidden mt-4">
+        <div class="flex items-center justify-between mb-4">
+          <div class="flex-1">
+            <div class="text-sm font-medium text-gray-700 dark:text-gray-300">Total Records</div>
+            <div class="h-4 bg-purple-500 rounded-full" style="width: 100%"></div>
+            <div class="text-sm font-bold mt-1">{{ total_records }}</div>
+          </div>
+        </div>
+        <div class="flex items-center justify-between mb-4">
+          <div class="flex-1">
+            <div class="text-sm font-medium text-gray-700 dark:text-gray-300">Left to Review</div>
+            <div class="h-4 bg-red-500 rounded-full" style="width: {% if total_records %}{{ left_to_review|multiply:100|divisibleby:total_records }}{% else %}0{% endif %}%"></div>
+            <div class="text-sm font-bold mt-1">{{ left_to_review }}</div>
+          </div>
+        </div>
+        <div class="flex items-center justify-between">
+          <div class="flex-1">
+            <div class="text-sm font-medium text-gray-700 dark:text-gray-300">Reviewed</div>
+            <div class="h-4 bg-green-500 rounded-full" style="width: {% if total_records %}{{ reviewed|multiply:100|divisibleby:total_records }}{% else %}0{% endif %}%"></div>
+            <div class="text-sm font-bold mt-1">{{ reviewed }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Student Performance Section -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
+      <!-- Student Activity Distribution -->
+      <div class="bg-white dark:bg-gray-800 p-8 rounded-xl shadow-lg animate-fade-in">
+        <h3 class="text-2xl font-semibold dark:text-white mb-6">Student Activity Types</h3>
+        <canvas id="activityChart" height="200"></canvas>
+
+        <!-- Fallback for chart if JavaScript fails -->
+        <div class="chart-fallback hidden mt-4">
+          <p class="text-gray-600 dark:text-gray-400 text-center py-4">Activity type distribution data</p>
+          <div class="space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Observed</span>
+              <span class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ reviewed }}</span>
+            </div>
+            <div class="flex items-center justify-between">
+              <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Assisted</span>
+              <span class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ left_to_review }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Student Participation Distribution -->
+      <div class="bg-white dark:bg-gray-800 p-8 rounded-xl shadow-lg animate-fade-in">
+        <h3 class="text-2xl font-semibold dark:text-white mb-6">Participation Distribution</h3>
+        <canvas id="participationChart" height="200"></canvas>
+
+        <!-- Fallback for chart if JavaScript fails -->
+        <div class="chart-fallback hidden mt-4">
+          <p class="text-gray-600 dark:text-gray-400 text-center py-4">Participation distribution data</p>
+          <div class="space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Observed</span>
+              <span class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ reviewed }}</span>
+            </div>
+            <div class="flex items-center justify-between">
+              <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Assisted</span>
+              <span class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ left_to_review }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Student Performance Details -->
+    <div class="bg-white dark:bg-gray-800 p-8 rounded-xl shadow-lg animate-fade-in mb-10">
+      <div class="flex flex-wrap justify-between items-center mb-6">
+        <h3 class="text-2xl font-semibold dark:text-white">Student Performance</h3>
+        <div class="flex flex-wrap items-center gap-2">
+          <span class="text-sm text-gray-600 dark:text-gray-400">{{ student_performance|length }} Students</span>
+          {% if search_query %}
+            <span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+              Search: "{{ search_query }}"
+            </span>
+          {% endif %}
+          {% if selected_department %}
+            <span class="px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+              Filtered by Department
+            </span>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Student Performance Visualization -->
+      <div class="mb-8">
+        <h4 class="text-lg font-semibold dark:text-white mb-4">Student Performance Comparison</h4>
+        <canvas id="studentComparisonChart" height="200"></canvas>
+
+        <!-- Fallback for chart if JavaScript fails -->
+        <div class="chart-fallback hidden mt-4">
+          <p class="text-gray-600 dark:text-gray-400 text-center py-4">Student performance comparison</p>
+          <div class="space-y-4 mt-4">
+            {% for student in student_performance|slice:":10" %}
+              <div class="flex flex-col">
+                <div class="flex justify-between mb-1">
+                  <span class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ student.name }}</span>
+                  <span class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ student.total_logs }} logs</span>
+                </div>
+                <div class="flex w-full h-4 bg-gray-200 rounded-full overflow-hidden dark:bg-gray-700">
+                  <div class="h-4 bg-green-500" style="width: {% if student.total_logs %}{{ student.reviewed_logs|multiply:100|divisibleby:student.total_logs }}{% else %}0{% endif %}%"></div>
+                  <div class="h-4 bg-red-500" style="width: {% if student.total_logs %}{{ student.pending_logs|multiply:100|divisibleby:student.total_logs }}{% else %}0{% endif %}%"></div>
+                </div>
+                <div class="flex justify-between mt-1 text-xs">
+                  <span class="text-gray-500 dark:text-gray-400">Reviewed: {{ student.reviewed_logs }}</span>
+                  <span class="text-gray-500 dark:text-gray-400">Pending: {{ student.pending_logs }}</span>
+                </div>
+              </div>
+            {% empty %}
+              <p class="text-gray-600 dark:text-gray-400 text-center py-4">No student data available</p>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+
+      <!-- Student Performance Charts -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        <!-- Student Status Distribution Chart -->
+        <div class="bg-white dark:bg-gray-800 p-4 rounded-xl shadow-md">
+          <h4 class="text-lg font-semibold dark:text-white mb-4">Student Log Status</h4>
+          <canvas id="studentStatusChart" height="200"></canvas>
+
+          <!-- Fallback for chart if JavaScript fails -->
+          <div class="chart-fallback hidden mt-4">
+            <div class="flex items-center justify-between mb-4">
+              <div class="flex-1">
+                <div class="text-sm font-medium text-gray-700 dark:text-gray-300">Reviewed</div>
+                <div class="h-4 bg-green-500 rounded-full" style="width: {% if total_records %}{{ reviewed|multiply:100|divisibleby:total_records }}{% else %}0{% endif %}%"></div>
+                <div class="text-sm font-bold mt-1">{{ reviewed }}</div>
+              </div>
+            </div>
+            <div class="flex items-center justify-between mb-4">
+              <div class="flex-1">
+                <div class="text-sm font-medium text-gray-700 dark:text-gray-300">Pending</div>
+                <div class="h-4 bg-red-500 rounded-full" style="width: {% if total_records %}{{ left_to_review|multiply:100|divisibleby:total_records }}{% else %}0{% endif %}%"></div>
+                <div class="text-sm font-bold mt-1">{{ left_to_review }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Student Performance Bar Chart -->
+        <div class="bg-white dark:bg-gray-800 p-4 rounded-xl shadow-md">
+          <h4 class="text-lg font-semibold dark:text-white mb-4">Top Students by Logs</h4>
+          <canvas id="studentPerformanceChart" height="200"></canvas>
+
+          <!-- Fallback for chart if JavaScript fails -->
+          <div class="chart-fallback hidden mt-4">
+            {% if student_performance %}
+              {% for student in student_performance|slice:":5" %}
+                <div class="flex items-center justify-between mb-4">
+                  <div class="flex-1">
+                    <div class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ student.name }}</div>
+                    <div class="h-4 bg-blue-500 rounded-full" style="width: {% if student_performance.0.total_logs %}{{ student.total_logs|multiply:100|divisibleby:student_performance.0.total_logs }}{% else %}0{% endif %}%"></div>
+                    <div class="text-sm font-bold mt-1">{{ student.total_logs }} logs</div>
+                  </div>
+                </div>
+              {% endfor %}
+            {% else %}
+              <p class="text-gray-600 dark:text-gray-400 text-center py-4">No student data available</p>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+
+      {% if student_performance %}
+        <div class="flex justify-between items-center mb-4">
+          <h4 class="text-lg font-semibold dark:text-white">Detailed Student Data</h4>
+          <button id="toggleTableBtn" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200">
+            Show Table
+          </button>
+        </div>
+
+        <div id="studentTableContainer" class="hidden overflow-x-auto">
+          <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+            <thead class="bg-gray-50 dark:bg-gray-800">
+              <tr>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Student</th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">ID</th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Total Logs</th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Reviewed</th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Pending</th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Completion</th>
+              </tr>
+            </thead>
+            <tbody class="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-800">
+              {% for student in student_performance %}
+                <tr class="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-200">
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="flex items-center">
+                      <div>
+                        <div class="text-sm font-medium text-gray-900 dark:text-white">{{ student.name }}</div>
+                        <div class="text-sm text-gray-500 dark:text-gray-400">{{ student.email }}</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                    {{ student.student_id }}
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                    {{ student.total_logs }}
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                    {{ student.reviewed_logs }}
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                    {{ student.pending_logs }}
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5">
+                      <div class="bg-blue-600 h-2.5 rounded-full" style="width: {{ student.completion_percentage }}%"></div>
+                    </div>
+                    <span class="text-xs text-gray-600 dark:text-gray-400 mt-1 block">{{ student.completion_percentage }}%</span>
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+
+        <script>
+          // Toggle table visibility
+          document.addEventListener('DOMContentLoaded', function() {
+            const toggleBtn = document.getElementById('toggleTableBtn');
+            const tableContainer = document.getElementById('studentTableContainer');
+
+            if (toggleBtn && tableContainer) {
+              toggleBtn.addEventListener('click', function() {
+                const isHidden = tableContainer.classList.contains('hidden');
+
+                if (isHidden) {
+                  tableContainer.classList.remove('hidden');
+                  toggleBtn.textContent = 'Hide Table';
+                } else {
+                  tableContainer.classList.add('hidden');
+                  toggleBtn.textContent = 'Show Table';
+                }
+              });
+            }
+          });
+        </script>
+      {% else %}
+        <div class="text-center py-8">
+          <p class="text-gray-600 dark:text-gray-400">No student data available for the selected criteria.</p>
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- Student Performance Chart -->
+    <div class="bg-white dark:bg-gray-800 p-8 rounded-xl shadow-lg animate-fade-in">
+      <h3 class="text-2xl font-semibold dark:text-white mb-6">Student Log Submission Trend</h3>
+      <canvas id="studentTrendChart" height="120"></canvas>
+
+      <!-- Fallback for chart if JavaScript fails -->
+      <div class="chart-fallback hidden mt-4">
+        <p class="text-gray-600 dark:text-gray-400 text-center py-4">Monthly log submission trend</p>
+        <div class="grid grid-cols-6 gap-2 mt-4">
+          {% with trend_data=chart_data.monthly_trend %}
+            {% if trend_data.labels %}
+              {% for month in trend_data.labels|slice:":6" %}
+                <div class="flex flex-col items-center">
+                  <div class="h-20 w-full bg-teal-500 rounded-t-lg" style="height: 20px"></div>
+                  <div class="text-xs font-medium text-gray-700 dark:text-gray-300 mt-1">{{ month }}</div>
+                </div>
+              {% endfor %}
+            {% else %}
+              <p class="text-gray-600 dark:text-gray-400 text-center py-4 col-span-6">No trend data available</p>
+            {% endif %}
+          {% endwith %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Student Performance by Department Chart -->
+    <div class="bg-white dark:bg-gray-800 p-8 rounded-xl shadow-lg animate-fade-in mt-6">
+      <h3 class="text-2xl font-semibold dark:text-white mb-6">Student Performance by Department</h3>
+      <canvas id="departmentPerformanceChart" height="120"></canvas>
+
+      <!-- Fallback for chart if JavaScript fails -->
+      <div class="chart-fallback hidden mt-4">
+        <p class="text-gray-600 dark:text-gray-400 text-center py-4">Department performance data</p>
+        <div class="space-y-4 mt-4">
+          {% for dept in departments %}
+            <div class="flex flex-col">
+              <div class="flex justify-between mb-1">
+                <span class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ dept.name }}</span>
+                <span class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ dept.total|default:0 }} logs</span>
+              </div>
+              <div class="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
+                <div class="bg-blue-600 h-2.5 rounded-full" style="width: {% if dept.total %}{{ dept.reviewed|multiply:100|divisibleby:dept.total }}{% else %}0{% endif %}%"></div>
+              </div>
+              <div class="flex justify-between mt-1 text-xs">
+                <span class="text-gray-500 dark:text-gray-400">Reviewed: {{ dept.reviewed|default:0 }}</span>
+                <span class="text-gray-500 dark:text-gray-400">Pending: {{ dept.pending|default:0 }}</span>
+              </div>
+            </div>
+          {% empty %}
+            <p class="text-gray-600 dark:text-gray-400 text-center py-4">No department data available</p>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add loading indicators to all chart containers -->
+  <style>
+    .chart-loading {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(255, 255, 255, 0.7);
+      z-index: 10;
+    }
+
+    .dark .chart-loading {
+      background-color: rgba(17, 24, 39, 0.7);
+    }
+
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 4px solid rgba(0, 0, 0, 0.1);
+      border-radius: 50%;
+      border-top-color: #3b82f6;
+      animation: spin 1s ease-in-out infinite;
+    }
+
+    .dark .spinner {
+      border-color: rgba(255, 255, 255, 0.1);
+      border-top-color: #3b82f6;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+  </style>
+
+  <script>
+    // Add loading indicators to all chart containers
+    document.addEventListener('DOMContentLoaded', function() {
+      const chartCanvases = document.querySelectorAll('canvas[id$="Chart"]');
+
+      chartCanvases.forEach(canvas => {
+        const container = canvas.parentElement;
+        if (container) {
+          // Set position relative on container
+          container.style.position = 'relative';
+
+          // Create loading indicator
+          const loadingDiv = document.createElement('div');
+          loadingDiv.className = 'chart-loading';
+          loadingDiv.innerHTML = '<div class="spinner"></div>';
+
+          // Add loading indicator to container
+          container.appendChild(loadingDiv);
+
+          // Store reference to loading indicator on canvas
+          canvas.loadingIndicator = loadingDiv;
+        }
+      });
+    });
+  </script>
+
+  <!-- Chart.js Script -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js" integrity="sha512-ElRFoEQdI5Ht6kZvyzXhYG9NqjtkmlkfYk0wr6wHxU9JEHakS7UJZNeml5ALk+8IKlU6jDgMabC3vkumRokgJA==" crossorigin="anonymous" referrerpolicy="no-referrer" defer></script>
+  <script>
+    // Function to show fallbacks for all charts
+    function showChartFallbacks() {
+      console.error('Showing chart fallbacks');
+      // Add error message to all chart containers
+      const chartCanvases = document.querySelectorAll('canvas[id$="Chart"]');
+      chartCanvases.forEach(canvas => {
+        if (canvas.parentElement) {
+          // Hide the canvas
+          canvas.style.display = 'none';
+
+          // Remove loading indicator if it exists
+          if (canvas.loadingIndicator) {
+            canvas.loadingIndicator.style.display = 'none';
+          }
+
+          // Show fallback if it exists
+          const fallback = canvas.parentElement.querySelector('.chart-fallback');
+          if (fallback) {
+            fallback.classList.remove('hidden');
+          } else {
+            // Add error message if no fallback exists
+            canvas.parentElement.innerHTML += '<div class="p-4 bg-red-100 text-red-700 rounded-lg">Failed to load chart. Please try refreshing the page.</div>';
+          }
+        }
+      });
+    }
+
+    // Check if Chart.js loaded successfully
+    window.addEventListener('load', function() {
+      if (typeof Chart === 'undefined') {
+        console.error('Chart.js failed to load!');
+        showChartFallbacks();
+      }
+
+      // Set a timeout to show fallbacks if charts don't load within 5 seconds
+      setTimeout(function() {
+        const chartCanvases = document.querySelectorAll('canvas[id$="Chart"]');
+        let allChartsEmpty = true;
+
+        chartCanvases.forEach(canvas => {
+          // Check if canvas has content
+          const context = canvas.getContext('2d');
+          const imageData = context.getImageData(0, 0, canvas.width, canvas.height).data;
+          const hasContent = Array.from(imageData).some(pixel => pixel !== 0);
+
+          if (hasContent) {
+            allChartsEmpty = false;
+          }
+        });
+
+        if (allChartsEmpty) {
+          console.warn('Charts did not render within timeout period');
+          showChartFallbacks();
+        }
+      }, 5000); // 5 second timeout
+    });
+  </script>
+  <script>
+    // Debug chart data and environment
+    console.log('Chart.js loaded:', typeof Chart !== 'undefined');
+    console.log('Canvas elements:', {
+      'reviewChart': document.getElementById('reviewChart'),
+      'activityChart': document.getElementById('activityChart'),
+      'participationChart': document.getElementById('participationChart'),
+      'studentTrendChart': document.getElementById('studentTrendChart'),
+      'studentStatusChart': document.getElementById('studentStatusChart'),
+      'studentPerformanceChart': document.getElementById('studentPerformanceChart')
+    });
+    console.log('Chart Data:', {
+      'activity_distribution': {{ chart_data.activity_distribution|default:"{labels: [], data: []}" |safe }},
+      'participation_distribution': {{ chart_data.participation_distribution|default:"{labels: [], data: []}" |safe }},
+      'monthly_trend': {{ chart_data.monthly_trend|default:"{labels: [], data: []}" |safe }},
+      'student_status_distribution': {{ chart_data.student_status_distribution|default:"{labels: ['Reviewed', 'Pending'], data: [0, 0]}" |safe }},
+      'top_students': {{ chart_data.top_students|default:"{labels: [], data: []}" |safe }}
+    });
+
+    // Wait for DOM to be fully loaded
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log('DOM fully loaded');
+
+      // Prevent multiple initializations
+      if (window.chartsInitialized) {
+        console.warn('Charts already initialized, skipping initialization');
+        return;
+      }
+
+      window.chartsInitialized = true;
+
+      // Initialize charts
+      (function() {
+        console.log('Initializing charts...');
+
+        // Common functions
+        const isDarkMode = () => document.documentElement.classList.contains('dark')
+        const textColor = () => (isDarkMode() ? '#ffffff' : '#000000')
+        const gridColor = () => isDarkMode() ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)'
+
+        // Common chart options
+        const commonOptions = {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              labels: {
+                color: textColor(),
+                font: { weight: 'bold' }
+              }
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: {
+                color: textColor(),
+                font: { weight: 'bold' }
+              },
+              grid: {
+                color: gridColor()
+              }
+            },
+            x: {
+              ticks: {
+                color: textColor(),
+                font: { weight: 'bold' }
+              },
+              grid: {
+                color: gridColor()
+              }
+            }
+          }
+        }
+
+        // Function to safely initialize a chart
+        function initChart(canvasId, chartType, chartData, chartOptions) {
+          console.log(`Initializing chart: ${canvasId}`);
+
+          // Check if Chart.js is loaded
+          if (typeof Chart === 'undefined') {
+            console.error('Chart.js is not loaded!');
+            return null;
+          }
+
+          // Get canvas element
+          const canvas = document.getElementById(canvasId);
+          if (!canvas) {
+            console.error(`Canvas not found: ${canvasId}`);
+            return null;
+          }
+
+          // Check if canvas is in the DOM
+          if (!document.body.contains(canvas)) {
+            console.error(`Canvas ${canvasId} is not in the DOM`);
+            return null;
+          }
+
+          // Get 2D context
+          const ctx = canvas.getContext('2d');
+          if (!ctx) {
+            console.error(`Could not get 2D context for ${canvasId}`);
+            return null;
+          }
+
+          // Validate chart data
+          if (!chartData || !chartData.datasets || !chartData.labels) {
+            console.error(`Invalid chart data for ${canvasId}:`, chartData);
+            return null;
+          }
+
+          try {
+            // Create chart configuration
+            const config = {
+              type: chartType,
+              data: chartData,
+              options: chartOptions || commonOptions
+            };
+
+            console.log(`Chart config for ${canvasId}:`, config);
+
+            // Create chart
+            const chart = new Chart(ctx, config);
+
+            // Remove loading indicator
+            if (canvas.loadingIndicator) {
+              canvas.loadingIndicator.style.display = 'none';
+            }
+
+            return chart;
+          } catch (error) {
+            console.error(`Error creating chart ${canvasId}:`, error);
+            if (canvas && canvas.parentElement) {
+              canvas.parentElement.innerHTML = '<p class="text-center text-red-500 dark:text-red-400 py-8">Error loading chart. Please try refreshing the page.</p>';
+            }
+            return null;
+          }
+        }
+
+        // 1. Review Status Chart
+        const totalRecords = {{ total_records }}
+        const leftToReview = {{ left_to_review }}
+        const reviewed = {{ reviewed }}
+
+        const reviewChart = initChart('reviewChart', 'bar', {
+          labels: ['Total Records', 'Left to Review', 'Reviewed'],
+          datasets: [
+            {
+              label: 'Review Status',
+              data: [totalRecords, leftToReview, reviewed],
+              backgroundColor: ['rgba(139, 92, 246, 0.7)', 'rgba(239, 68, 68, 0.7)', 'rgba(16, 185, 129, 0.7)'],
+              borderColor: ['rgba(139, 92, 246, 1)', 'rgba(239, 68, 68, 1)', 'rgba(16, 185, 129, 1)'],
+              borderWidth: 1
+            }
+          ]
+        });
+
+      // 2. Activity Distribution Chart
+      // Get activity data
+      let activityDistribution = {{ chart_data.activity_distribution|default:"{labels: ['No Data'], data: [1]}" |safe }};
+
+      // Ensure we have valid data
+      if (!activityDistribution.labels || !activityDistribution.labels.length) {
+        activityDistribution.labels = ['No Data'];
+        activityDistribution.data = [1];
+      }
+
+      // Create pie chart options
+      const pieChartOptions = {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: 'right',
+            labels: {
+              color: textColor(),
+              font: { weight: 'bold' }
+            }
+          },
+          tooltip: {
+            callbacks: {
+              label: function(context) {
+                const label = context.label || '';
+                const value = context.raw || 0;
+                const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                const percentage = Math.round((value / total) * 100);
+                return `${label}: ${value} (${percentage}%)`;
+              }
+            }
+          }
+        }
+      };
+
+      // Initialize activity chart
+      const activityChart = initChart('activityChart', 'pie', {
+        labels: activityDistribution.labels,
+        datasets: [{
+          label: 'Activity Types',
+          data: activityDistribution.data,
+          backgroundColor: [
+            'rgba(255, 99, 132, 0.7)',
+            'rgba(54, 162, 235, 0.7)',
+            'rgba(255, 206, 86, 0.7)',
+            'rgba(75, 192, 192, 0.7)',
+            'rgba(153, 102, 255, 0.7)',
+            'rgba(255, 159, 64, 0.7)',
+            'rgba(199, 199, 199, 0.7)'
+          ],
+          borderColor: [
+            'rgba(255, 99, 132, 1)',
+            'rgba(54, 162, 235, 1)',
+            'rgba(255, 206, 86, 1)',
+            'rgba(75, 192, 192, 1)',
+            'rgba(153, 102, 255, 1)',
+            'rgba(255, 159, 64, 1)',
+            'rgba(199, 199, 199, 1)'
+          ],
+          borderWidth: 1
+        }]
+      }, pieChartOptions);
+
+      // 3. Participation Distribution Chart
+      // Get participation data
+      let participationDistribution = {{ chart_data.participation_distribution|default:"{labels: ['No Data'], data: [1]}" |safe }};
+
+      // Ensure we have valid data
+      if (!participationDistribution.labels || !participationDistribution.labels.length) {
+        participationDistribution.labels = ['No Data'];
+        participationDistribution.data = [1];
+      }
+
+      // Create doughnut chart options
+      const doughnutChartOptions = {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: 'right',
+            labels: {
+              color: textColor(),
+              font: { weight: 'bold' }
+            }
+          },
+          tooltip: {
+            callbacks: {
+              label: function(context) {
+                const label = context.label || '';
+                const value = context.raw || 0;
+                const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                const percentage = Math.round((value / total) * 100);
+                return `${label}: ${value} (${percentage}%)`;
+              }
+            }
+          }
+        }
+      };
+
+      // Initialize participation chart
+      const participationChart = initChart('participationChart', 'doughnut', {
+        labels: participationDistribution.labels,
+        datasets: [{
+          label: 'Participation Types',
+          data: participationDistribution.data,
+          backgroundColor: [
+            'rgba(54, 162, 235, 0.7)',
+            'rgba(255, 99, 132, 0.7)'
+          ],
+          borderColor: [
+            'rgba(54, 162, 235, 1)',
+            'rgba(255, 99, 132, 1)'
+          ],
+          borderWidth: 1
+        }]
+      }, doughnutChartOptions);
+
+      // 4. Student Trend Chart
+      // Get trend data
+      let trendDistribution = {{ chart_data.monthly_trend|default:"{labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'], data: [0, 0, 0, 0, 0, 0]}" |safe }};
+
+      // Ensure we have valid data
+      if (!trendDistribution.labels || !trendDistribution.labels.length) {
+        trendDistribution.labels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
+        trendDistribution.data = [0, 0, 0, 0, 0, 0];
+      }
+
+      // Initialize trend chart
+      const trendChart = initChart('studentTrendChart', 'line', {
+        labels: trendDistribution.labels,
+        datasets: [{
+          label: 'Log Submissions',
+          data: trendDistribution.data,
+          fill: false,
+          borderColor: 'rgb(75, 192, 192)',
+          tension: 0.1
+        }]
+      });
+
+      // 7. Department Performance Chart
+      // Get department data from the chart_data
+      let departmentPerformance = {{ chart_data.department_performance|default:"{labels: ['No Data'], reviewed: [0], pending: [0]}" |safe }};
+
+      // Ensure we have valid data
+      if (!departmentPerformance.labels || !departmentPerformance.labels.length) {
+        departmentPerformance = {
+          labels: ['No Department Data'],
+          reviewed: [0],
+          pending: [0]
+        };
+      }
+
+      // Create stacked bar chart options
+      const stackedBarOptions = {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          x: {
+            stacked: true,
+            grid: {
+              color: gridColor()
+            },
+            ticks: {
+              color: textColor()
+            }
+          },
+          y: {
+            stacked: true,
+            grid: {
+              color: gridColor()
+            },
+            ticks: {
+              color: textColor()
+            }
+          }
+        },
+        plugins: {
+          legend: {
+            position: 'top',
+            labels: {
+              color: textColor(),
+              font: { weight: 'bold' }
+            }
+          },
+          tooltip: {
+            callbacks: {
+              footer: function(tooltipItems) {
+                let total = 0;
+                tooltipItems.forEach(function(tooltipItem) {
+                  total += tooltipItem.parsed.y;
+                });
+                return 'Total: ' + total;
+              }
+            }
+          }
+        }
+      };
+
+      // Initialize department performance chart
+      const departmentChart = initChart('departmentPerformanceChart', 'bar', {
+        labels: departmentPerformance.labels,
+        datasets: [
+          {
+            label: 'Reviewed',
+            data: departmentPerformance.reviewed,
+            backgroundColor: 'rgba(16, 185, 129, 0.7)',  // Green for reviewed
+            borderColor: 'rgba(16, 185, 129, 1)',
+            borderWidth: 1
+          },
+          {
+            label: 'Pending',
+            data: departmentPerformance.pending,
+            backgroundColor: 'rgba(239, 68, 68, 0.7)',   // Red for pending
+            borderColor: 'rgba(239, 68, 68, 1)',
+            borderWidth: 1
+          }
+        ]
+      }, stackedBarOptions);
+
+      // 5. Student Comparison Chart (Stacked Bar Chart)
+      // Get student performance data
+      const studentNames = [];
+      const reviewedData = [];
+      const pendingData = [];
+
+      {% for student in student_performance|slice:":10" %}
+        studentNames.push('{{ student.name }}');
+        reviewedData.push({{ student.reviewed_logs|default:0 }});
+        pendingData.push({{ student.pending_logs|default:0 }});
+      {% endfor %}
+
+      // If no data, add placeholder
+      if (studentNames.length === 0) {
+        studentNames.push('No Data');
+        reviewedData.push(0);
+        pendingData.push(0);
+      }
+
+      // Create student comparison chart options
+      const comparisonChartOptions = {
+        indexAxis: 'y',  // Horizontal bar chart
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          x: {
+            stacked: true,
+            grid: {
+              color: gridColor()
+            },
+            ticks: {
+              color: textColor()
+            }
+          },
+          y: {
+            stacked: true,
+            grid: {
+              display: false
+            },
+            ticks: {
+              color: textColor()
+            }
+          }
+        },
+        plugins: {
+          legend: {
+            position: 'top',
+            labels: {
+              color: textColor(),
+              font: { weight: 'bold' }
+            }
+          },
+          tooltip: {
+            callbacks: {
+              footer: function(tooltipItems) {
+                let total = 0;
+                tooltipItems.forEach(function(tooltipItem) {
+                  total += tooltipItem.parsed.x;
+                });
+                return 'Total: ' + total;
+              }
+            }
+          }
+        }
+      };
+
+      // Initialize student comparison chart
+      const comparisonChart = initChart('studentComparisonChart', 'bar', {
+        labels: studentNames,
+        datasets: [
+          {
+            label: 'Reviewed',
+            data: reviewedData,
+            backgroundColor: 'rgba(16, 185, 129, 0.7)',  // Green for reviewed
+            borderColor: 'rgba(16, 185, 129, 1)',
+            borderWidth: 1
+          },
+          {
+            label: 'Pending',
+            data: pendingData,
+            backgroundColor: 'rgba(239, 68, 68, 0.7)',   // Red for pending
+            borderColor: 'rgba(239, 68, 68, 1)',
+            borderWidth: 1
+          }
+        ]
+      }, comparisonChartOptions);
+
+      // 6. Student Status Distribution Chart (Pie Chart)
+      // Get student status data
+      let statusData = {{ chart_data.student_status_distribution|default:"{labels: ['Reviewed', 'Pending'], data: [1, 1]}" |safe }};
+
+      // Ensure we have valid data
+      if (!statusData.labels || !statusData.labels.length) {
+        statusData.labels = ['Reviewed', 'Pending'];
+        statusData.data = [1, 1];
+      }
+
+      // Initialize student status chart
+      const studentStatusChart = initChart('studentStatusChart', 'pie', {
+        labels: statusData.labels,
+        datasets: [{
+          label: 'Log Status',
+          data: statusData.data,
+          backgroundColor: [
+            'rgba(16, 185, 129, 0.7)',  // Green for reviewed
+            'rgba(239, 68, 68, 0.7)'    // Red for pending
+          ],
+          borderColor: [
+            'rgba(16, 185, 129, 1)',
+            'rgba(239, 68, 68, 1)'
+          ],
+          borderWidth: 1
+        }]
+      }, pieChartOptions);
+
+      // 6. Student Performance Bar Chart
+      // Get top students data
+      let topStudentsData = {{ chart_data.top_students|default:"{labels: ['No Student Data'], data: [0]}" |safe }};
+
+      // Ensure we have valid data
+      if (!topStudentsData.labels || !topStudentsData.labels.length) {
+        topStudentsData.labels = ['No Student Data'];
+        topStudentsData.data = [0];
+      }
+
+      // Create bar chart options
+      const barChartOptions = {
+        indexAxis: 'y',  // Horizontal bar chart
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: false
+          },
+          tooltip: {
+            callbacks: {
+              title: function(tooltipItems) {
+                return tooltipItems[0].label;
+              },
+              label: function(context) {
+                return `Logs: ${context.raw}`;
+              }
+            }
+          }
+        },
+        scales: {
+          y: {
+            ticks: {
+              color: textColor(),
+              font: { weight: 'bold' }
+            },
+            grid: {
+              display: false
+            }
+          },
+          x: {
+            beginAtZero: true,
+            ticks: {
+              color: textColor(),
+              font: { weight: 'bold' }
+            },
+            grid: {
+              color: gridColor()
+            }
+          }
+        }
+      };
+
+      // Initialize student performance chart
+      const studentPerformanceChart = initChart('studentPerformanceChart', 'bar', {
+        labels: topStudentsData.labels,
+        datasets: [{
+          label: 'Total Logs',
+          data: topStudentsData.data,
+          backgroundColor: 'rgba(59, 130, 246, 0.7)',
+          borderColor: 'rgba(59, 130, 246, 1)',
+          borderWidth: 1
+        }]
+      }, barChartOptions);
+
+      // Handle theme changes
+      window.addEventListener('themeChanged', () => {
+        const newColor = textColor()
+        const newGridColor = gridColor()
+
+        // Update all charts
+        const updateChartColors = (chart) => {
+          if (!chart) return; // Skip if chart is not initialized
+
+          if (chart.options.scales) {
+            chart.options.scales.y.ticks.color = newColor
+            chart.options.scales.x.ticks.color = newColor
+            chart.options.scales.y.grid.color = newGridColor
+            chart.options.scales.x.grid.color = newGridColor
+          }
+
+          if (chart.options.plugins && chart.options.plugins.legend) {
+            chart.options.plugins.legend.labels.color = newColor
+          }
+
+          try {
+            chart.update()
+          } catch (e) {
+            console.error('Error updating chart:', e);
+          }
+        }
+
+        // Update all charts
+        const charts = [reviewChart, activityChart, participationChart, trendChart, comparisonChart, studentStatusChart, studentPerformanceChart, departmentChart];
+        charts.forEach(chart => {
+          try {
+            if (chart) updateChartColors(chart);
+          } catch (e) {
+            console.error('Error updating chart:', e);
+          }
+        });
+
+        // Also update chart options for future charts
+        if (pieChartOptions && pieChartOptions.plugins && pieChartOptions.plugins.legend) {
+          pieChartOptions.plugins.legend.labels.color = newColor;
+        }
+
+        if (doughnutChartOptions && doughnutChartOptions.plugins && doughnutChartOptions.plugins.legend) {
+          doughnutChartOptions.plugins.legend.labels.color = newColor;
+        }
+
+        if (barChartOptions && barChartOptions.scales) {
+          barChartOptions.scales.y.ticks.color = newColor;
+          barChartOptions.scales.x.ticks.color = newColor;
+          barChartOptions.scales.x.grid.color = newGridColor;
+        }
+      })();
+
+      console.log('Charts initialization complete');
+    });
+  })
+  </script>
+
+  <!-- Custom Animations -->
+  <style>
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateX(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+    .animate-slide-in {
+      animation: slideIn 1s ease-out forwards;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    .animate-fade-in {
+      animation: fadeIn 1s ease-out forwards;
+    }
+
+    @keyframes pulseCard {
+      0%,
+      100% {
+        transform: scale(1);
+      }
+      50% {
+        transform: scale(1.02);
+      }
+    }
+    .animate-pulse-card {
+      animation: pulseCard 2s infinite ease-in-out;
+    }
+
+    .progress-ring {
+      transform: rotate(-90deg);
+      transform-origin: 50% 50%;
+    }
+    .hover\:scale-102:hover {
+      transform: scale(1.02);
+    }
+  </style>
+{% endblock %}

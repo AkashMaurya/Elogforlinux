@@ -1,0 +1,55 @@
+{% extends 'components/auth_navbar_base.html' %}
+
+{% block home_url %}{% url 'student_section:student_dash' %}{% endblock %}
+{% block header_icon %}fas fa-user-graduate{% endblock %}
+{% block portal_name %}Student Portal{% endblock %}
+{% block user_role %}Student{% endblock %}
+{% block user_role_header %}Student{% endblock %}
+{% block profile_url %}{% url 'student_section:student_profile' %}{% endblock %}
+{% block notifications_url %}{% url 'student_section:notifications' %}{% endblock %}
+{% block logout_url %}{% url 'student_section:logout' %}{% endblock %}
+{% block logout_url_bottom %}{% url 'student_section:logout' %}{% endblock %}
+
+{% block sidebar_menu %}
+  <!-- Dashboard -->
+  <a href="{% url 'student_section:student_dash' %}" class="nav-item flex items-center px-4 py-3 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 group transition-colors duration-200">
+    <i class="fas fa-chart-line w-5 h-5 text-blue-600 dark:text-blue-400"></i>
+    <span class="ml-3 font-medium">Dashboard</span>
+  </a>
+
+  <!-- Profile -->
+  <a href="{% url 'student_section:student_profile' %}" class="nav-item flex items-center px-4 py-3 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 group transition-colors duration-200">
+    <i class="fas fa-user-graduate w-5 h-5 text-blue-600 dark:text-blue-400"></i>
+    <span class="ml-3 font-medium">Profile</span>
+  </a>
+
+
+  <!-- Support -->
+  <a href="{% url 'student_section:student_support' %}" class="nav-item flex items-center px-4 py-3 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 group transition-colors duration-200">
+    <i class="fab fa-hire-a-helper w-5 h-5 text-blue-600 dark:text-blue-400"></i>
+    <span class="ml-3 font-medium">Support</span>
+  </a>
+
+  <!-- Fill Elog -->
+  <a href="{% url 'student_section:student_elog' %}" class="nav-item flex items-center px-4 py-3 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 group transition-colors duration-200">
+    <i class="fas fa-pen-fancy w-5 h-5 text-blue-600 dark:text-blue-400"></i>
+    <span class="ml-3 font-medium">Fill Elog</span>
+  </a>
+
+  <!-- Your Records -->
+  <a href="{% url 'student_section:student_final_records' %}" class="nav-item flex items-center px-4 py-3 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 group transition-colors duration-200">
+    <i class="fas fa-book-reader w-5 h-5 text-blue-600 dark:text-blue-400"></i>
+    <span class="ml-3 font-medium">Your Records</span>
+  </a>
+
+  <!-- Notifications -->
+  <a href="{% url 'student_section:notifications' %}" class="nav-item flex items-center px-4 py-3 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 group transition-colors duration-200">
+    <i class="fas fa-bell w-5 h-5 text-blue-600 dark:text-blue-400"></i>
+    <span class="ml-3 font-medium">Notifications</span>
+    {% if student_unread_notifications_count > 0 %}
+      <span class="ml-auto bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+        {{ student_unread_notifications_count }}
+      </span>
+    {% endif %}
+  </a>
+{% endblock %}

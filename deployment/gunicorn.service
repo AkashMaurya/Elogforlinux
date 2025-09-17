@@ -1,0 +1,28 @@
+[Unit]
+Description=gunicorn daemon for Elogforlinux (elogbookagu)
+After=network.target
+
+[Service]
+Type=notify
+User=ubuntu
+Group=www-data
+WorkingDirectory=/home/ubuntu/projects/Elogforlinux/elogbookagu
+# Use the gunicorn executable from the project's virtualenv
+ExecStart=/home/ubuntu/projects/myenv/bin/gunicorn \
+  --access-logfile - \
+  --error-logfile - \
+  --workers 1 \
+  --bind 127.0.0.1:8000 \
+  elogbookagu.wsgi:application \
+  --log-level debug
+
+Environment=PATH=/home/ubuntu/projects/myenv/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin
+Environment=PYTHONUNBUFFERED=1
+Environment=DJANGO_SETTINGS_MODULE=elogbookagu.settings
+
+Restart=always
+RestartSec=5
+LimitNOFILE=4096
+
+[Install]
+WantedBy=multi-user.target

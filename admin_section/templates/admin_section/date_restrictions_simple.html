@@ -1,0 +1,492 @@
+{% extends 'base.html' %}
+
+{% block title %}
+  Manage Date Restrictions
+{% endblock %}
+
+{% block navbar %}
+  {% include 'components/admin_auth_navbar.html' %}
+{% endblock %}
+
+{% block content %}
+  <div class="p-4 sm:p-6 md:p-8 lg:p-10 max-w-7xl mx-auto">
+    <!-- Page Header -->
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+      <div>
+        <h2 class="text-2xl sm:text-3xl font-bold text-gray-800 dark:text-white flex items-center">
+          <i class="fas fa-calendar-alt text-blue-500 mr-2"></i> Date Restrictions Management
+        </h2>
+        <p class="text-gray-600 dark:text-gray-400 mt-1">Configure when students can submit logs and doctors can review them</p>
+      </div>
+    </div>
+
+    <!-- Help Section -->
+    <div class=" bg-dark-900 mb-8 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-xl border border-blue-200 dark:border-blue-800 p-6">
+      <div class="flex items-start">
+        <div class="flex-shrink-0">
+          <i class="fas fa-info-circle text-blue-600 dark:text-blue-400 text-xl mt-1"></i>
+        </div>
+        <div class="ml-4">
+          <h3 class="text-lg font-semibold text-black dark:text-blue-900 mb-2">How Date Restrictions Work</h3>
+          <div class="text-black dark:text-blue-900 space-y-2">
+            <p><strong>Student Restrictions:</strong> Control when students can submit their log entries (past/future date limits and allowed days).</p>
+            <p><strong>Doctor Restrictions:</strong> Control when doctors can review student logs (review deadlines and allowed days).</p>
+            <p><strong>Review Period:</strong> Set automatic deadlines for doctors to review logs after submission.</p>
+            <p><strong>Allowed Days:</strong> Restrict submissions/reviews to specific days of the week (e.g., weekdays only).</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Messages -->
+    {% if messages %}
+      <div class="mb-6">
+        {% for message in messages %}
+          <div class="p-4 rounded-lg {% if message.tags == 'success' %}bg-green-100 text-green-700{% elif message.tags == 'error' %}bg-red-100 text-red-700{% else %}bg-blue-100 text-blue-700{% endif %}">
+            {{ message }}
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    <!-- Main Form -->
+    <div class="bg-white dark:bg-gray-800 shadow-md rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden transition-all duration-300 hover:shadow-lg">
+      <div class="bg-gray-50 dark:bg-gray-700 px-6 py-4 border-b border-gray-200 dark:border-gray-600">
+        <h3 class="text-lg font-semibold text-gray-800 dark:text-white">Date Restriction Settings</h3>
+      </div>
+
+      <form method="post" class="p-6">
+        {% csrf_token %}
+
+        <!-- Status Toggle -->
+        <div class="mb-8 p-4 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg border border-yellow-200 dark:border-yellow-800">
+          <div class="flex items-start">
+            <div class="flex-shrink-0">
+              <i class="fas fa-toggle-on text-yellow-600 dark:text-yellow-400 text-xl mt-1"></i>
+            </div>
+            <div class="ml-3 flex-1">
+              <label class="inline-flex relative items-center cursor-pointer">
+                <input type="checkbox" name="is_active" class="sr-only peer" {% if settings.is_active %}checked{% endif %}>
+                <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+                <span class="ml-3 text-sm font-medium text-gray-900 dark:text-gray-300">Enable Date Restrictions</span>
+              </label>
+              <p class="text-sm text-yellow-700 dark:text-yellow-300 mt-2">
+                <strong>Important:</strong> When disabled, students and doctors can submit/review logs on any date without restrictions.
+                Enable this to enforce the date limits and allowed days configured below.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Student Restrictions -->
+        <div class="mb-8 p-6 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+          <div class="flex items-center mb-4">
+            <i class="fas fa-user-graduate text-blue-600 dark:text-blue-400 text-xl mr-3"></i>
+            <h4 class="text-lg font-medium text-blue-900 dark:text-blue-100">Student Log Submission Restrictions</h4>
+          </div>
+          <p class="text-sm text-blue-800 dark:text-blue-200 mb-6">
+            These settings control when students can submit their log entries. Use these to prevent backdating or future dating of logs.
+          </p>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Past Days Limit -->
+            <div>
+              <label for="student_past_days_limit" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Past Days Limit
+              </label>
+              <div class="relative">
+                <input type="number" name="student_past_days_limit" id="student_past_days_limit" min="0" max="365" value="{{ settings.past_days_limit }}" class="block w-full pl-10 pr-4 py-2 text-base border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white transition-colors duration-200">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <i class="fas fa-history text-gray-400"></i>
+                </div>
+              </div>
+              <p class="text-sm text-blue-600 dark:text-blue-300 mt-1">
+                <i class="fas fa-lightbulb mr-1"></i>
+                <strong>Example:</strong> If set to 7, students can only submit logs for dates within the last 7 days.
+                Set to 0 to allow only today's date.
+              </p>
+            </div>
+
+            <!-- Future Dates Toggle -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Allow Future Dates
+              </label>
+              <div class="flex items-center">
+                <label class="inline-flex relative items-center cursor-pointer">
+                  <input type="checkbox" name="student_allow_future_dates" id="student_allow_future_dates" class="sr-only peer" {% if settings.allow_future_dates %}checked{% endif %}>
+                  <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+                  <span class="ml-3 text-sm font-medium text-gray-900 dark:text-gray-300">Allow students to select future dates</span>
+                </label>
+              </div>
+              <p class="text-sm text-blue-600 dark:text-blue-300 mt-2">
+                <i class="fas fa-calendar-plus mr-1"></i>
+                <strong>Recommended:</strong> Keep disabled unless students need to pre-schedule logs for planned activities.
+              </p>
+            </div>
+
+            <!-- Future Days Limit -->
+            <div id="student_future_days_container" class="opacity-50">
+              <label for="student_future_days_limit" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Future Days Limit
+              </label>
+              <div class="relative">
+                <input type="number" name="student_future_days_limit" id="student_future_days_limit" min="0" max="365" value="0" class="block w-full pl-10 pr-4 py-2 text-base border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white transition-colors duration-200" disabled>
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <i class="fas fa-calendar-plus text-gray-400"></i>
+                </div>
+              </div>
+              <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Maximum number of days in the future a student can select</p>
+            </div>
+
+            <!-- Allowed Days of Week -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Allowed Days of Week
+              </label>
+              <div class="bg-gray-50 dark:bg-gray-700 p-3 rounded-lg border border-gray-200 dark:border-gray-600">
+                <div class="flex items-center mb-2">
+                  <input type="checkbox" name="student_days_0" id="student_days_0" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 dark:bg-gray-700 dark:border-gray-600" checked>
+                  <label for="student_days_0" class="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">Monday</label>
+                </div>
+                <div class="flex items-center mb-2">
+                  <input type="checkbox" name="student_days_1" id="student_days_1" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 dark:bg-gray-700 dark:border-gray-600" checked>
+                  <label for="student_days_1" class="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">Tuesday</label>
+                </div>
+                <div class="flex items-center mb-2">
+                  <input type="checkbox" name="student_days_2" id="student_days_2" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 dark:bg-gray-700 dark:border-gray-600" checked>
+                  <label for="student_days_2" class="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">Wednesday</label>
+                </div>
+                <div class="flex items-center mb-2">
+                  <input type="checkbox" name="student_days_3" id="student_days_3" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 dark:bg-gray-700 dark:border-gray-600" checked>
+                  <label for="student_days_3" class="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">Thursday</label>
+                </div>
+                <div class="flex items-center mb-2">
+                  <input type="checkbox" name="student_days_4" id="student_days_4" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 dark:bg-gray-700 dark:border-gray-600" checked>
+                  <label for="student_days_4" class="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">Friday</label>
+                </div>
+                <div class="flex items-center mb-2">
+                  <input type="checkbox" name="student_days_5" id="student_days_5" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 dark:bg-gray-700 dark:border-gray-600" checked>
+                  <label for="student_days_5" class="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">Saturday</label>
+                </div>
+                <div class="flex items-center">
+                  <input type="checkbox" name="student_days_6" id="student_days_6" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 dark:bg-gray-700 dark:border-gray-600" checked>
+                  <label for="student_days_6" class="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">Sunday</label>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Doctor Restrictions -->
+        <div class="mb-6">
+          <h4 class="text-lg font-medium text-gray-800 dark:text-white mb-4">Doctor Restrictions</h4>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Past Days Limit -->
+            <div>
+              <label for="doctor_past_days_limit" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Past Days Limit
+              </label>
+              <div class="relative">
+                <input type="number" name="doctor_past_days_limit" id="doctor_past_days_limit" min="0" max="365" value="{{ settings.doctor_past_days_limit }}" class="block w-full pl-10 pr-4 py-2 text-base border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white transition-colors duration-200">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <i class="fas fa-history text-gray-400"></i>
+                </div>
+              </div>
+              <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Maximum number of days in the past a doctor can review logs</p>
+            </div>
+
+            <!-- Future Dates Toggle -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Allow Future Dates
+              </label>
+              <div class="flex items-center">
+                <label class="inline-flex relative items-center cursor-pointer">
+                  <input type="checkbox" name="doctor_allow_future_dates" id="doctor_allow_future_dates" class="sr-only peer" {% if settings.doctor_allow_future_dates %}checked{% endif %}>
+                  <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+                  <span class="ml-3 text-sm font-medium text-gray-900 dark:text-gray-300">Allow doctors to review future-dated logs</span>
+                </label>
+              </div>
+            </div>
+
+            <!-- Future Days Limit -->
+            <div id="doctor_future_days_container" class="{% if not doctor_allow_future_dates %}opacity-50{% endif %}">
+              <label for="doctor_future_days_limit" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Future Days Limit
+              </label>
+              <div class="relative">
+                <input type="number" name="doctor_future_days_limit" id="doctor_future_days_limit" min="0" max="365" value="{{ settings.doctor_future_days_limit }}" class="block w-full pl-10 pr-4 py-2 text-base border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white transition-colors duration-200" {% if not settings.doctor_allow_future_dates %}disabled{% endif %}>
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <i class="fas fa-calendar-plus text-gray-400"></i>
+                </div>
+              </div>
+              <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Maximum number of days in the future a doctor can review logs</p>
+            </div>
+
+            <!-- Allowed Days of Week -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Allowed Days of Week
+              </label>
+              <div class="bg-gray-50 dark:bg-gray-700 p-3 rounded-lg border border-gray-200 dark:border-gray-600">
+                {% for day_value, day_name in settings.DAYS_OF_WEEK %}
+                <div class="flex items-center mb-2">
+                  <input type="checkbox" name="doctor_days_{{ day_value }}" id="doctor_days_{{ day_value }}" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 dark:bg-gray-700 dark:border-gray-600" {% if day_value|stringformat:"i" in settings.allowed_days_for_doctors %}checked{% endif %}>
+                  <label for="doctor_days_{{ day_value }}" class="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">{{ day_name }}</label>
+                </div>
+                {% endfor %}
+              </div>
+            </div>
+          </div>
+
+          <!-- Review Period Settings -->
+          <div class="mt-6 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+            <h5 class="text-md font-medium text-blue-800 dark:text-blue-300 mb-3">
+              <i class="fas fa-clock mr-2"></i> Doctor Review Period Settings
+            </h5>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <!-- Enable Review Period -->
+              <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Enable Review Period
+                </label>
+                <div class="flex items-center">
+                  <label class="inline-flex relative items-center cursor-pointer">
+                    <input type="checkbox" name="doctor_review_enabled" id="doctor_review_enabled" class="sr-only peer" {% if settings.doctor_review_enabled %}checked{% endif %}>
+                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+                    <span class="ml-3 text-sm font-medium text-gray-900 dark:text-gray-300">Enforce review period deadline</span>
+                  </label>
+                </div>
+                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">When enabled, doctors cannot review logs after the deadline</p>
+              </div>
+
+              <!-- Review Period Days -->
+              <div id="review_period_container" class="{% if not settings.doctor_review_enabled %}opacity-50{% endif %}">
+                <label for="doctor_review_period" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Review Period (Days)
+                </label>
+                <div class="relative">
+                  <input type="number" name="doctor_review_period" id="doctor_review_period" min="1" max="365" value="{{ settings.doctor_review_period }}" class="block w-full pl-10 pr-4 py-2 text-base border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white transition-colors duration-200" {% if not settings.doctor_review_enabled %}disabled{% endif %}>
+                  <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <i class="fas fa-calendar-day text-gray-400"></i>
+                  </div>
+                </div>
+                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Number of days doctors have to review student logs</p>
+              </div>
+
+              <!-- Notification Days -->
+              <div id="notification_days_container" class="{% if not settings.doctor_review_enabled %}opacity-50{% endif %}">
+                <label for="doctor_notification_days" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Notification Days Before Deadline
+                </label>
+                <div class="relative">
+                  <input type="number" name="doctor_notification_days" id="doctor_notification_days" min="1" max="30" value="{{ settings.doctor_notification_days }}" class="block w-full pl-10 pr-4 py-2 text-base border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white transition-colors duration-200" {% if not settings.doctor_review_enabled %}disabled{% endif %}>
+                  <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <i class="fas fa-bell text-gray-400"></i>
+                  </div>
+                </div>
+                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Days before deadline to send notification to doctors</p>
+              </div>
+
+              <!-- Info Box -->
+              <div class="md:col-span-2 bg-white dark:bg-gray-700 p-3 rounded-lg border border-gray-200 dark:border-gray-600">
+                <div class="flex items-start">
+                  <div class="flex-shrink-0 mt-0.5">
+                    <i class="fas fa-info-circle text-blue-500"></i>
+                  </div>
+                  <div class="ml-3">
+                    <p class="text-sm text-gray-600 dark:text-gray-300">
+                      When the review period is enabled, doctors will have a limited time to review student logs. After the deadline passes, they will no longer be able to review those logs. Notifications will be sent to doctors before the deadline to remind them to complete their reviews.
+                    </p>
+                    <p class="text-sm text-gray-600 dark:text-gray-300 mt-2">
+                      To send notifications, you need to set up a scheduled task to run the following command:
+                      <code class="bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded text-sm font-mono">python manage.py send_deadline_notifications</code>
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Attendance Tracking Settings -->
+        <div class="mb-6">
+          <h4 class="text-lg font-medium text-gray-800 dark:text-white mb-4">Attendance Tracking Settings</h4>
+
+          <div class="p-4 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
+            <div class="flex items-center justify-between">
+              <div>
+                <h5 class="text-md font-medium text-green-800 dark:text-green-300 mb-2">
+                  <i class="fas fa-user-check mr-2"></i> Student Attendance Tracking
+                </h5>
+                <p class="text-sm text-green-600 dark:text-green-400">
+                  Allow doctors to track student attendance during training sessions at various training sites.
+                </p>
+              </div>
+              <div class="ml-4">
+                <label class="inline-flex relative items-center cursor-pointer">
+                  <input type="checkbox" name="attendance_tracking_enabled" id="attendance_tracking_enabled" class="sr-only peer" {% if settings.attendance_tracking_enabled %}checked{% endif %}>
+                  <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-green-300 dark:peer-focus:ring-green-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-green-600"></div>
+                  <span class="ml-3 text-sm font-medium text-gray-900 dark:text-gray-300">Enable Attendance Tracking</span>
+                </label>
+              </div>
+            </div>
+
+            <div class="mt-3 bg-white dark:bg-gray-700 p-3 rounded-lg border border-gray-200 dark:border-gray-600">
+              <div class="flex items-start">
+                <div class="flex-shrink-0 mt-0.5">
+                  <i class="fas fa-info-circle text-green-500"></i>
+                </div>
+                <div class="ml-3">
+                  <p class="text-sm text-gray-600 dark:text-gray-300">
+                    When enabled, doctors can access attendance tracking features to mark student presence/absence during training sessions.
+                    This includes taking attendance, viewing attendance history, and generating attendance reports.
+                  </p>
+                  <p class="text-sm text-gray-600 dark:text-gray-300 mt-2">
+                    When disabled, all attendance tracking features will be hidden from doctors and they will receive an error message if they try to access attendance pages.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Submit Button -->
+        <div class="flex justify-end">
+          <button type="submit" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors duration-200">
+            <i class="fas fa-save mr-2"></i> Save Settings
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- JavaScript for Toggle Logic -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Student future dates toggle
+      const studentAllowFutureDates = document.getElementById('student_allow_future_dates');
+      const studentFutureDaysLimit = document.getElementById('student_future_days_limit');
+      const studentFutureDaysContainer = document.getElementById('student_future_days_container');
+
+      studentAllowFutureDates.addEventListener('change', function() {
+        studentFutureDaysLimit.disabled = !this.checked;
+        if (this.checked) {
+          studentFutureDaysContainer.classList.remove('opacity-50');
+        } else {
+          studentFutureDaysContainer.classList.add('opacity-50');
+        }
+      });
+
+      // Doctor future dates toggle
+      const doctorAllowFutureDates = document.getElementById('doctor_allow_future_dates');
+      const doctorFutureDaysLimit = document.getElementById('doctor_future_days_limit');
+      const doctorFutureDaysContainer = document.getElementById('doctor_future_days_container');
+
+      doctorAllowFutureDates.addEventListener('change', function() {
+        doctorFutureDaysLimit.disabled = !this.checked;
+        if (this.checked) {
+          doctorFutureDaysContainer.classList.remove('opacity-50');
+        } else {
+          doctorFutureDaysContainer.classList.add('opacity-50');
+        }
+      });
+
+      // Doctor review period toggle
+      const doctorReviewEnabled = document.getElementById('doctor_review_enabled');
+      const doctorReviewPeriod = document.getElementById('doctor_review_period');
+      const doctorNotificationDays = document.getElementById('doctor_notification_days');
+      const reviewPeriodContainer = document.getElementById('review_period_container');
+      const notificationDaysContainer = document.getElementById('notification_days_container');
+
+      doctorReviewEnabled.addEventListener('change', function() {
+        doctorReviewPeriod.disabled = !this.checked;
+        doctorNotificationDays.disabled = !this.checked;
+        if (this.checked) {
+          reviewPeriodContainer.classList.remove('opacity-50');
+          notificationDaysContainer.classList.remove('opacity-50');
+        } else {
+          reviewPeriodContainer.classList.add('opacity-50');
+          notificationDaysContainer.classList.add('opacity-50');
+        }
+      });
+    });
+
+    // Add helpful tooltips and real-time validation
+    function addTooltips() {
+      const tooltips = {
+        'student_past_days_limit': 'Common values: 7 (one week), 14 (two weeks), 30 (one month)',
+        'student_future_days_limit': 'Usually 1-7 days for planned activities',
+        'doctor_past_days_limit': 'Typically 30-90 days to allow review of older logs',
+        'doctor_review_period': 'Recommended: 7-14 days for timely reviews',
+        'doctor_notification_days': 'Send reminders 1-3 days before deadline'
+      };
+
+      Object.keys(tooltips).forEach(id => {
+        const element = document.getElementById(id);
+        if (element) {
+          element.title = tooltips[id];
+          element.addEventListener('focus', function() {
+            showTooltip(this, tooltips[id]);
+          });
+        }
+      });
+    }
+
+    function showTooltip(element, text) {
+      // Simple tooltip implementation
+      const tooltip = document.createElement('div');
+      tooltip.className = 'absolute z-10 px-3 py-2 text-sm text-white bg-gray-900 rounded-lg shadow-lg';
+      tooltip.textContent = text;
+      tooltip.style.top = (element.offsetTop - 40) + 'px';
+      tooltip.style.left = element.offsetLeft + 'px';
+      element.parentNode.appendChild(tooltip);
+
+      setTimeout(() => {
+        if (tooltip.parentNode) {
+          tooltip.parentNode.removeChild(tooltip);
+        }
+      }, 3000);
+    }
+
+    // Add real-time validation feedback
+    function addValidation() {
+      const numberInputs = document.querySelectorAll('input[type="number"]');
+      numberInputs.forEach(input => {
+        input.addEventListener('input', function() {
+          const value = parseInt(this.value);
+          const min = parseInt(this.min);
+          const max = parseInt(this.max);
+
+          // Remove existing validation classes
+          this.classList.remove('border-red-500', 'border-green-500');
+
+          if (value < min || value > max || isNaN(value)) {
+            this.classList.add('border-red-500');
+          } else {
+            this.classList.add('border-green-500');
+          }
+        });
+      });
+    }
+
+    // Initialize enhancements
+    addTooltips();
+    addValidation();
+
+    // Add form submission confirmation
+    document.querySelector('form').addEventListener('submit', function(e) {
+      const isActive = document.querySelector('input[name="is_active"]').checked;
+      if (!isActive) {
+        const confirm = window.confirm('Date restrictions will be disabled. Students and doctors will be able to submit/review logs on any date. Continue?');
+        if (!confirm) {
+          e.preventDefault();
+        }
+      }
+    });
+  });
+  </script>
+{% endblock %}
