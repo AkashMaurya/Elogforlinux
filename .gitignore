@@ -118,3 +118,6 @@ dmypy.json
 
 # Gunicorn socket
 gunicorn.sock
+
+# Kilocode and other editor files
+.kilocode/
