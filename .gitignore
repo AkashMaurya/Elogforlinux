@@ -57,6 +57,8 @@ Thumbs.db
 # Logs
 *.log
 gunicorn*.log
+sso-debug.log
+stderr.log
 
 # SSL certificates
 *.crt
@@ -113,6 +115,9 @@ celerybeat.pid
 .mypy_cache/
 .dmypy.json
 dmypy.json
+
+# Gunicorn socket
+gunicorn.sock
 
 # Kilocode and other editor files
 .kilocode/
