@@ -3,18 +3,17 @@ Description=gunicorn daemon for Elogforlinux (elogbookagu)
 After=network.target
 
 [Service]
-Type=notify
 User=ubuntu
 Group=www-data
 WorkingDirectory=/home/ubuntu/projects/Elogforlinux/elogbookagu
-# Use the gunicorn executable from the project's virtualenv
 ExecStart=/home/ubuntu/projects/myenv/bin/gunicorn \
-  --access-logfile - \
-  --error-logfile - \
-  --workers 1 \
-  --bind 127.0.0.1:8000 \
-  elogbookagu.wsgi:application \
-  --log-level debug
+  --workers 3 \
+  --bind 127.0.0.1:8001 \
+  --timeout 30 \
+  --log-level info \
+  --access-logfile /home/ubuntu/projects/Elogforlinux/elogbookagu/gunicorn-access.log \
+  --error-logfile /home/ubuntu/projects/Elogforlinux/elogbookagu/gunicorn-error.log \
+  elogbookagu.wsgi:application
 
 Environment=PATH=/home/ubuntu/projects/myenv/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin
 Environment=PYTHONUNBUFFERED=1
