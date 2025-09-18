@@ -26,7 +26,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = config("SECRET_KEY")
+SECRET_KEY = config("SECRET_KEY", default="django-insecure-4q2u_l7xp6hq5!y2fi^%cu#bn6o$d)p%n2jnja8lnvvuxu&)1v")
 
 
 # SECURITY WARNING: don't run with debug turned on in production!
@@ -141,8 +141,8 @@ DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
         "NAME": "ELogBookAgu",
-        "USER": config("DB_USER"),
-        "PASSWORD": config("DB_PASSWORD"),
+        "USER": config("DB_USER", default="postgres"),
+        "PASSWORD": config("DB_PASSWORD", default="root@123"),
         "HOST": config("DB_HOST", default="localhost"),
         "PORT": config("DB_PORT", default=5432, cast=int),
     }
@@ -303,7 +303,7 @@ SOCIALACCOUNT_PROVIDERS = {
     # If you prefer to allow any tenant, set the Azure App's Supported account
     # types to "Accounts in any organizational directory" (multi-tenant),
     # then you can use 'common' instead.
-    'TENANT': config('TENANT_ID'),
+    'TENANT': config('TENANT_ID', default='9c021be8-508f-4638-b1df-52b0e3c615ac'),
         'AUTH_PARAMS': {
             'response_type': 'code'
         },
@@ -319,7 +319,7 @@ SOCIALACCOUNT_PROVIDERS = {
 # Read redirect URI and tenant-specific endpoints from environment.
 MICROSOFT_CLIENT_ID = config('MICROSOFT_CLIENT_ID', default='')
 MICROSOFT_CLIENT_SECRET = config('MICROSOFT_CLIENT_SECRET', default='')
-TENANT_ID = config('TENANT_ID')
+TENANT_ID = config('TENANT_ID', default='9c021be8-508f-4638-b1df-52b0e3c615ac')
 # The REDIRECT_URI you register in Azure must match this value exactly.
 # For production put: https://elog.agu.edu.bh/accounts/microsoft/login/callback/
 REDIRECT_URI = config('MICROSOFT_REDIRECT_URI', default='https://elog.agu.edu.bh/accounts/microsoft/login/callback/')
